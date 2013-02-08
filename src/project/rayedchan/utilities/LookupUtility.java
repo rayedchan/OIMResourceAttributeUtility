@@ -1,13 +1,11 @@
-package LookupUtility;
+package project.rayedchan.utilities;
 
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.Exceptions.tcDuplicateLookupCodeException;
 import Thor.API.Exceptions.tcInvalidAttributeException;
-import Thor.API.Exceptions.tcInvalidColumnException;
 import Thor.API.Exceptions.tcInvalidLookupException;
 import Thor.API.Exceptions.tcInvalidValueException;
-import Thor.API.Exceptions.tcNoLookupException;
 import Thor.API.Operations.tcLookupOperationsIntf;
 import Thor.API.tcResultSet;
 import java.io.BufferedReader;
@@ -17,77 +15,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.login.LoginException;
-import oracle.iam.platform.OIMClient;
 
 /**
  * @author rayedchan
  * This utility supports create, delete, and update operations related to lookups.
  * Mainly used for adding and deleting lookup entries specified from a flat file.
- * Lookup Definition operations are usually done through Design Console. This utility
- * does it through API calls.
- * TODO: Close tc objects
  * 
- * Differences:
+ * Differences between API and Design Console:
  * Design Console allows duplicate code key; API restricts duplicate code key.
  * Lookup definition name cannot be changed in Design Console, but through API the name can be changed.
  * 
  */
 public class LookupUtility 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcColumnNotFoundException, tcDuplicateLookupCodeException, tcInvalidValueException, tcInvalidColumnException, tcNoLookupException, tcInvalidAttributeException 
-    {
-        String ctxFactory = "weblogic.jndi.WLInitialContextFactory"; //WebLogic Context 
-        String oimServerURL = "t3://localhost:14000"; //OIM URL
-        String authwlConfigPath = "/home/oracle/oimClient_lib/conf/authwl.conf"; //Path to login configuration
-        String username = "xelsysadm"; //OIM Administrator 
-        String password = "Password1"; //Administrator Password
-       
-        System.setProperty("java.security.auth.login.config", authwlConfigPath); //set the login configuration
-        Hashtable<String,String> env = new Hashtable<String,String>(); //use to store OIM environment properties
-        env.put(OIMClient.JAVA_NAMING_FACTORY_INITIAL, ctxFactory);
-        env.put(OIMClient.JAVA_NAMING_PROVIDER_URL, oimServerURL);
-        OIMClient oimClient = new OIMClient(env);
-        oimClient.login(username, password.toCharArray()); //login to OIM
-       
-        tcLookupOperationsIntf lookupOps = oimClient.getService(tcLookupOperationsIntf.class);
-        String lookupName =  "Lookup.Test";
-        String entryValue = "codeKeyTest6";
-        String decode = "decodeTest7";
-        String language = "en";
-        String country = "US";
-        String columnNameFilter = "Lookup Definition.Lookup Code Information.Key";
-        String columnValueFilter = "3128";
-        String fileNameAdd = "/home/oracle/Desktop/testAdd";
-        String fileNameDelete = "/home/oracle/Desktop/testDelete";
-        
-        //addLookup(lookupOps, lookupName);
-        //printLookupEntryColumns(lookupOps, lookupName);
-        //printLookupEntries(lookupOps, lookupName);
-        //addEntryToLookup(lookupOps, lookupName, entryValue, decode, language, country);
-        //System.out.println(doesEntryExist(lookupOps,lookupName,columnNameFilter,columnValueFilter));
-        //updateLookup(lookupOps, lookupName , "LKU_GROUP", "test");
-        //removeEntryFromLookup(lookupOps,lookupName, "code");
-        //updateEntryFromLookup(lookupOps,lookupName, "newCode2", "code", "code");
-        //printLookupFileFormat(lookupOps,lookupName);
-        //addEntriesToLookupDSFF(lookupOps,fileNameAdd);
-        //deleteEntriesFromLookupDSFF(lookupOps, fileNameDelete);
-          
-        /*HashMap<String,String> map = new HashMap<String,String>();
-        map.put("key", "value");
-        map.put("key", "test");
-        map.put("key2", "test");
-        map.put("key2", "value");
-        System.out.println(map.containsKey("key"));
-        System.out.println(map.toString());*/
-    }
-    
     /*
      * Add entries from a flat file to a lookup. 
      * Sanity Check: Name of lookup definition must exist. File format must be correct.
@@ -111,7 +56,7 @@ public class LookupUtility
      *   
      * @return - boolean value to indicate success or failure
      */
-    private static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException, tcColumnNotFoundException
+    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException, tcColumnNotFoundException
     {
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -269,7 +214,7 @@ public class LookupUtility
      *   
      * @return - boolean value to indicate success or failure
      */
-    private static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException, tcColumnNotFoundException
+    public static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException, tcColumnNotFoundException
     {
         FileInputStream fstream = null;
         DataInputStream in = null;

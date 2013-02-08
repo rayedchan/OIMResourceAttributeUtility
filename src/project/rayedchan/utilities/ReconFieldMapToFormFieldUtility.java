@@ -1,4 +1,4 @@
-package ReconFieldMapToFormFieldUtility;
+package project.rayedchan.utilities;
 
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
@@ -8,9 +8,6 @@ import Thor.API.tcResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
-import javax.security.auth.login.LoginException;
-import oracle.iam.platform.OIMClient;
 
 /**
  *
@@ -20,29 +17,7 @@ import oracle.iam.platform.OIMClient;
  * multivalued fields at the moment.
  */
 public class ReconFieldMapToFormFieldUtility 
-{
-    public static void main(String[] args) throws LoginException, tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException
-    {
-        String ctxFactory = "weblogic.jndi.WLInitialContextFactory"; //WebLogic Context 
-        String oimServerURL = "t3://localhost:14000"; //OIM URL
-        String authwlConfigPath = "/home/oracle/oimClient_lib/conf/authwl.conf"; //Path to login configuration
-        String username = "xelsysadm"; //OIM Administrator 
-        String password = "Password1"; //Administrator Password
-       
-        System.setProperty("java.security.auth.login.config", authwlConfigPath); //set the login configuration
-        Hashtable<String,String> env = new Hashtable<String,String>(); //use to store OIM environment properties
-        env.put(OIMClient.JAVA_NAMING_FACTORY_INITIAL, ctxFactory);
-        env.put(OIMClient.JAVA_NAMING_PROVIDER_URL, oimServerURL);
-        OIMClient oimClient = new OIMClient(env);
-        oimClient.login(username, password.toCharArray()); //login to OIM
-        
-        tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
-        tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
-        //printTcResultSetRecords(result);
-        //printReconFieldAndFormFieldMappings(formDefOps, 45L);
-        //printReconFieldAndFormFieldMappingsBySort(formDefOps, 45L, 1, 1);
-    }
-    
+{    
     /*
      * Print the current mappings of the reconciliation fields and process form
      * fields with sorting options.

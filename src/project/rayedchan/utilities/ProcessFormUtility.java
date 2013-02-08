@@ -1,4 +1,4 @@
-package ProcessFormUtility;
+package project.rayedchan.utilities;
 
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcAddFieldFailedException;
@@ -7,9 +7,6 @@ import Thor.API.Exceptions.tcDeleteNotAllowedException;
 import Thor.API.Exceptions.tcFormFieldNotFoundException;
 import Thor.API.Exceptions.tcFormNotFoundException;
 import Thor.API.Exceptions.tcInvalidAttributeException;
-import Thor.API.Exceptions.tcObjectNotFoundException;
-import Thor.API.Exceptions.tcProcessNotFoundException;
-import Thor.API.Exceptions.tcUpdateNotAllowedException;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.tcResultSet;
 import java.io.BufferedReader;
@@ -20,14 +17,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.security.auth.login.LoginException;
-import oracle.iam.platform.OIMClient;
+import project.rayedchan.custom.objects.ProcessFormField;
 
 /**
  * @author rayedchan
@@ -64,61 +59,7 @@ public class ProcessFormUtility
     public static String FT_TEXTAREA = "TextArea";
     public static String FT_ITRESOURCELOOKUPFIELD = "ITResourceLookupField";
     public static String FT_LOOKUPFIELD = "LookupField";
-    
-              
-    public static void main(String[] args) throws LoginException, tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, tcFormFieldNotFoundException, tcInvalidAttributeException, tcUpdateNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, tcObjectNotFoundException, tcDeleteNotAllowedException
-    {
-        String ctxFactory = "weblogic.jndi.WLInitialContextFactory"; //WebLogic Context 
-        String oimServerURL = "t3://localhost:14000"; //OIM URL
-        String authwlConfigPath = "/home/oracle/oimClient_lib/conf/authwl.conf"; //Path to login configuration
-        String username = "xelsysadm"; //OIM Administrator 
-        String password = "Password1"; //Administrator Password
-       
-        System.setProperty("java.security.auth.login.config", authwlConfigPath); //set the login configuration
-        Hashtable<String,String> env = new Hashtable<String,String>(); //use to store OIM environment properties
-        env.put(OIMClient.JAVA_NAMING_FACTORY_INITIAL, ctxFactory);
-        env.put(OIMClient.JAVA_NAMING_PROVIDER_URL, oimServerURL);
-        OIMClient oimClient = new OIMClient(env);
-        oimClient.login(username, password.toCharArray()); //login to OIM
-        
-        tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
-        //printProcessFormColumnNames(formDefOps);
-        //printAllProcessFormInfo(formDefOps);
-        //printProcessFormFieldColumnNames(formDefOps);
-        //printProcessFormFields(formDefOps, 47L, 1);
-        //printProcessFormFieldsFileFormatAdd(formDefOps, "UD_LDAP_USR");
-        //System.out.println(doesProcessFormExist(formDefOps, "UD_LDAP_USR"));
-        addFieldsToProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldAdd");
-        //System.out.println(isFormVersionLocked(formDefOps,47L , 3 ));
-        //removeFieldsFromProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldRemove");
-        
-        //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
-        //printTcResultSetRecords(getAllProcessFormFields(formDefOps, 47L, 3));
-        
-        
-        /*long processFormKey = 47L;
-        int processFormVersion = 2;
-        String fieldName = "test1";
-        String fieldType = "TextField";
-        String variantType = "String";
-        int length = 100;
-        int order = 19;
-        String defaultValue = null;
-        String profileEnabled = null;
-        boolean secure = false;
-        
-        ProcessFormField processFormFieldObj = new ProcessFormField (processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure);
-        addFieldToProcessForm(formDefOps, processFormFieldObj);*/
-        
-        
- 
-        //System.out.println(getProcessFormNameByFormKey(formDefOps, 47L));
-        
-        //HashMap<String,String> map = new HashMap();
-        //map.put("Structure Utility.Additional Columns.Field Label", "test5");
-        //formDefOps.updateFormField(277L, map);
 
-    }
     
     /*
      *Add fields to the lastest process form version. Data source is a flat file. File must follow 
@@ -1061,166 +1002,5 @@ public class ProcessFormUtility
     public static void removeFormField(tcFormDefinitionOperationsIntf formDefOps, Long formFieldKey) throws tcAPIException, tcFormFieldNotFoundException, tcDeleteNotAllowedException
     {      
         formDefOps.removeFormField(formFieldKey);
-    }
-}
-
-/*
- * An class-object representation of a process form field.
- */
-class ProcessFormField
-{
-    private long processFormKey;
-    private int processFormVersion;
-    private String fieldName;
-    private String fieldType = "TextField";
-    private String variantType = "String";
-    private int length = 100;
-    private int order;
-    private String defaultValue = null;
-    private String profileEnabled = null;
-    private boolean secure = false;
-    
-    /*
-     * Constructors
-     */
-    public ProcessFormField(long processFormKey, int processFormVersion, String fieldName, String fieldType, String variantType, int length, int order, String defaultValue, String profileEnabled, boolean secure)
-    {  
-        this.processFormKey = processFormKey;
-        this.processFormVersion = processFormVersion;
-        this.fieldName = fieldName;
-        this.fieldType = fieldType;
-        this.variantType = variantType;
-        this.length = length;
-        this.order = order;
-        this.defaultValue = defaultValue;
-        this.profileEnabled = profileEnabled;
-        this.secure = secure;
-    }
-    
-    public ProcessFormField(long processFormKey, int processFormVersion)
-    {
-        this.processFormKey = processFormKey;
-        this.processFormVersion = processFormVersion;
-    }
-    
-    /*
-     * Getter methods
-     */
-    public long getProcessFormKey()
-    {
-        return this.processFormKey;
-    }
-    
-    public int getProcessFormVersion()
-    {
-        return this.processFormVersion;
-    }
-    
-    public String getFieldName()
-    {
-        return this.fieldName;
-    }
-    
-    public String getFieldType()
-    {
-        return this.fieldType;
-    }
-    
-    public String getVariantType()
-    {
-        return this.variantType;
-    }
-    
-    public int getLength()
-    {
-        return this.length;
-    }
-    
-    public int getOrder()
-    {
-        return this.order;
-    }
-    
-    public String getDefaultValue()
-    {
-        return this.defaultValue;
-    }
-    
-    public String getProfileEnabled()
-    {
-        return this.profileEnabled;
-    }
-    
-    public boolean getSecure()
-    {
-        return this.secure;
-    }
-    
-    /*
-     * Setter Methods
-     */
-    public void setProcessFormKey(long processFormKey)
-    {
-        this.processFormKey = processFormKey;
-    }
-    
-    public void setProcessFormVersion(int processFormVersion)
-    {
-        this.processFormVersion = processFormVersion;
-    }
-    
-    public void setFieldName(String fieldName)
-    {
-        this.fieldName = fieldName;
-    }
-    
-    public void setFieldType(String fieldType)
-    {
-        this.fieldType = fieldType;
-    }
-    
-    public void setVariantType(String variantType)
-    {
-        this.variantType = variantType;
-    }
-    
-    public void setLength(int length)
-    {
-        this.length = length;
-    }
-    
-    public void setOrder(int order)
-    {
-        this.order = order;
-    }
-    
-    public void setDefaultValue(String defaultValue)
-    {
-        this.defaultValue = defaultValue;
-    }
-    
-    public void setProfileEnabled(String profileEnabled)
-    {
-        this.profileEnabled = profileEnabled;
-    }
-    
-    public void setSecure(boolean secure)
-    {
-        this.secure = secure;
-    }
-    
-    /*
-     * String representation of the object. Values of the object fields are included in 
-     * the String.
-     */
-    @Override
-    public String toString()
-    {
-        return String.format(
-        "Form Key=%s, Version=%s, FieldName=%s, FieldType=%s, VariantType=%s, "
-                + "Length=%s, Order=%s, DefaultValue=%s, ProfileEnabled=%s, secure=%s\n",        
-        this.processFormKey, this.processFormVersion, this.fieldName,
-        this.fieldType, this.variantType, this.length, this.order,
-        this.defaultValue, this.profileEnabled, this.secure);
     }
 }
