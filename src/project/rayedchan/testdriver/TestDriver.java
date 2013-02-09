@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package project.rayedchan.testdriver;
 
 import Thor.API.Exceptions.tcAPIException;
@@ -127,8 +123,8 @@ public class TestDriver
             
             
             
-                    //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
-        //printTcResultSetRecords(getAllProcessFormFields(formDefOps, 47L, 3));
+            //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
+            //printTcResultSetRecords(getAllProcessFormFields(formDefOps, 47L, 3));
            
             //int objKey = 45; //OBJ.obj_key from OIM schema
             //int objKeyDBAT = 61;
@@ -203,26 +199,5 @@ public class TestDriver
                 System.out.println("==================================================");
             }*/
    
-    }
-    
-    /*
-     * Prints the records of a tcResultSet.
-     * @param -
-     *      tcResultSetObj - tcResultSetObject
-     */
-    public static void printTcResultSetRecords(tcResultSet tcResultSetObj) throws tcAPIException, tcColumnNotFoundException
-    {
-        String[] columnNames = tcResultSetObj.getColumnNames();
-        int numRows = tcResultSetObj.getTotalRowCount();
-        
-        for(int i = 0; i < numRows; i++)
-        {
-            tcResultSetObj.goToRow(i);
-            for(String columnName: columnNames)
-            {
-                System.out.println(columnName + " = " + tcResultSetObj.getStringValue(columnName));
-            }
-            System.out.println();
-        }
     }
 }

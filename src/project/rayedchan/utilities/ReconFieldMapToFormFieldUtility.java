@@ -8,6 +8,9 @@ import Thor.API.tcResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import project.rayedchan.custom.objects.FormFieldColumnNameComparator;
+import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
+import project.rayedchan.custom.objects.ReconFieldComparator;
 
 /**
  *
@@ -116,86 +119,5 @@ public class ReconFieldMapToFormFieldUtility
             System.out.printf("%-30s%-30s\n", reconField, formField);
         }
                
-    }
-    /*
-     * Prints the records of a tcResultSet.
-     * @param -
-     *      tcResultSetObj - tcResultSetObject
-     */
-    public static void printTcResultSetRecords(tcResultSet tcResultSetObj) throws tcAPIException, tcColumnNotFoundException
-    {
-        String[] columnNames = tcResultSetObj.getColumnNames();
-        int numRows = tcResultSetObj.getTotalRowCount();
-        
-        for(int i = 0; i < numRows; i++)
-        {
-            tcResultSetObj.goToRow(i);
-            for(String columnName: columnNames)
-            {
-                System.out.println(columnName + " = " + tcResultSetObj.getStringValue(columnName));
-            }
-            System.out.println();
-        }
-    }
-    
-}
-
-/*
- * A class to represent a mapping between a reconciliation field and process
- * form field.
- */
-class ReconFieldAndFormFieldMap
-{
-    private String reconFieldName;
-    private String formFieldColumnName;
-    
-    public ReconFieldAndFormFieldMap(String reconFieldName, String formFieldColumnName)
-    {
-        this.reconFieldName = reconFieldName;
-        this.formFieldColumnName = formFieldColumnName;
-    }
-    
-    public void setReconFieldName(String reconFieldName)
-    {
-        this.reconFieldName = reconFieldName;
-    }
-    
-    public String getReconFieldName()
-    {
-        return this.reconFieldName;
-    }
-    
-    public void setFormFieldColumnName(String formFieldColumnName)
-    {
-        this.formFieldColumnName = formFieldColumnName;
-    }
-    
-    public String getFormFieldColumnName()
-    {
-        return this.formFieldColumnName;
-    }
-}
-
-/*
- * For comparing the reconField of two ReconFieldAndFormFieldMap objects.
- */
-class ReconFieldComparator implements Comparator<ReconFieldAndFormFieldMap> 
-{
-    @Override
-    public int compare(ReconFieldAndFormFieldMap obj1, ReconFieldAndFormFieldMap obj2) 
-    {
-        return obj1.getReconFieldName().compareTo(obj2.getReconFieldName());
-    }
-}
-
-/*
- * For comparing the formFieldColumnName of two ReconFieldAndFormFieldMap objects.
- */
-class FormFieldColumnNameComparator implements Comparator<ReconFieldAndFormFieldMap> 
-{
-    @Override
-    public int compare(ReconFieldAndFormFieldMap obj1, ReconFieldAndFormFieldMap obj2) 
-    {
-        return obj1.getFormFieldColumnName().compareTo(obj2.getFormFieldColumnName());
-    }
+    }   
 }
