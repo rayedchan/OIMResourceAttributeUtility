@@ -7,7 +7,6 @@ import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.tcResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import project.rayedchan.custom.objects.FormFieldColumnNameComparator;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconFieldComparator;

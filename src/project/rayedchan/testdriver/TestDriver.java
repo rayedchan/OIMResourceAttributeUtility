@@ -37,6 +37,7 @@ import oracle.iam.configservice.api.ConfigManager;
 import oracle.iam.platform.OIMClient;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.services.OIMClientResourceAttr;
+import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.ProcessFormUtility;
 import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
@@ -50,8 +51,15 @@ public class TestDriver
     public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient
-            
+        
+        //OIM service objects
         tcLookupOperationsIntf lookupOps = oimClient.getService(tcLookupOperationsIntf.class);
+        tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
+        
+            
+        /*
+         * Lookup Utility method calls
+         */
         /*String lookupName =  "Lookup.Test";
         String newCodeKeyToAdd = "codeKeyTest1";
         String newDecodeToAdd = "decodeTest";
@@ -77,7 +85,9 @@ public class TestDriver
         //LookupUtility.deleteEntriesFromLookupDSFF(lookupOps, fileNameDelete);
 
 
-        tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
+        /*
+         * ProcessFormUtility method calls 
+         */
         /*HashMap<String,String> updateFormFieldMap = new HashMap();
         updateFormFieldMap.put("Structure Utility.Additional Columns.Field Label", "test5");
         Long formFieldKey = 277L;
@@ -103,8 +113,12 @@ public class TestDriver
         //ProcessFormUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
         
 
-        //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
-        //printTcResultSetRecords(result);
+        
+        /*
+         * ReconFieldMapToFormFieldUtility
+         */
+        tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
+        HelperUtility.printTcResultSetRecords(result);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, 45L);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, 45L, 1, 1);
 
