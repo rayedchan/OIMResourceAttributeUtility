@@ -25,6 +25,10 @@ import com.thortech.xl.ejb.interfaces.tcORFDelegate;
 import com.thortech.xl.vo.workflow.AdapterMapping;
 import com.thortech.xl.vo.workflow.TaskDefinition;
 import com.thortech.xl.vo.workflow.WorkflowDefinition;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -37,6 +41,7 @@ import oracle.iam.configservice.api.ConfigManager;
 import oracle.iam.platform.OIMClient;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.services.OIMClientResourceAttr;
+import project.rayedchan.services.OIMDatabaseConnection;
 import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.ProcessFormUtility;
@@ -45,17 +50,26 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
 /**
  *
  * @author rayedchan
+ * //TODO: close resources
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException
     { 
-        OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient
+        OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
+        Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
         
         //OIM service objects
         tcLookupOperationsIntf lookupOps = oimClient.getService(tcLookupOperationsIntf.class);
         tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
         
+        /*
+         * Test Oracle Database connection
+         */
+        String query = "SELECT USR_LOGIN FROM USR";
+        Statement statement = oimDBConnection.createStatement(); //Create a statement
+        ResultSet resultSet = statement.executeQuery(query);
+        HelperUtility.printResultSetRecords(resultSet);
             
         /*
          * Lookup Utility method calls
@@ -117,8 +131,8 @@ public class TestDriver
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
-        HelperUtility.printTcResultSetRecords(result);
+        //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
+        //HelperUtility.printTcResultSetRecords(result);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, 45L);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, 45L, 1, 1);
 

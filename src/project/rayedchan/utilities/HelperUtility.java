@@ -3,6 +3,9 @@ package project.rayedchan.utilities;
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.tcResultSet;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 /**
  * @author rayedchan
@@ -45,5 +48,34 @@ public class HelperUtility
             System.out.println();
         }
     }
+    
+    /*
+     * Print the records of the ResultSet. 
+     * @param -
+     *      resultSet - the result set of a query
+     */
+    public static void printResultSetRecords(ResultSet resultSet) throws SQLException
+    {
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        int columnCount = resultSetMetaData.getColumnCount();
+        
+        //iterate all the records from the result set
+        while(resultSet.next())
+        {
+            //iterate all the columns of a record and print value. Column count starts at one.
+            for(int i = 1; i < columnCount + 1; i++)
+            {
+                String columnName = resultSetMetaData.getColumnName(i);
+                String columnValue = resultSet.getString(columnName);
+                System.out.println(columnName + " = " + columnValue);
+            }
+            
+            System.out.println();
+           
+        }
+  
+    }
+    
+    
     
 }
