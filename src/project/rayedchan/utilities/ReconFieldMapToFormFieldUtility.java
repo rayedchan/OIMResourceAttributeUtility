@@ -50,7 +50,7 @@ public class ReconFieldMapToFormFieldUtility
             String formField = mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.ColumnName");
             ReconFieldAndFormFieldMap mappingObj = new ReconFieldAndFormFieldMap(reconField, formField);
             mappingObjArray.add(mappingObj);   
-            //System.out.printf("%-30s%-30s\n", reconField, formField);
+            System.out.printf("%-30s%-30s\n", reconField, formField);
         }
         
         //Sort by Reconciliation Fields

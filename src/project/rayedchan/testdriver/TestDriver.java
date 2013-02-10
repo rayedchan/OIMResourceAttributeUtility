@@ -66,10 +66,13 @@ public class TestDriver
         /*
          * Test Oracle Database connection
          */
-        String query = "SELECT USR_LOGIN FROM USR";
+        /*String query = "SELECT PKG.PKG_KEY, TOS.TOS_KEY, SDK.SDK_KEY, PKG.PKG_NAME, SDK.SDK_NAME, OBJ.OBJ_KEY, OBJ.OBJ_NAME FROM "
+         + "TOS RIGHT OUTER JOIN PKG ON PKG.PKG_KEY = TOS.PKG_KEY "
+         + "LEFT OUTER JOIN SDK ON SDK.SDK_KEY = TOS.SDK_KEY "
+         + "LEFT OUTER JOIN OBJ ON OBJ.OBJ_KEY = PKG.OBJ_KEY ORDER BY PKG.PKG_NAME";
         Statement statement = oimDBConnection.createStatement(); //Create a statement
         ResultSet resultSet = statement.executeQuery(query);
-        HelperUtility.printResultSetRecords(resultSet);
+        HelperUtility.printResultSetRecords(resultSet);*/
             
         /*
          * Lookup Utility method calls
@@ -135,8 +138,8 @@ public class TestDriver
         //HelperUtility.printTcResultSetRecords(result);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, 45L);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, 45L, 1, 1);
-
-
+        //HelperUtility.printAllOIMObjects(oimDBConnection);
+        //HelperUtility.getAllProcessDefinitions(oimDBConnection);
 
 
 

@@ -3,9 +3,11 @@ package project.rayedchan.utilities;
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.tcResultSet;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author rayedchan
@@ -74,6 +76,63 @@ public class HelperUtility
            
         }
   
+    }
+    
+    /*
+     * Print all the Objects in OIM. Queries from the OBJ table.
+     * @param 
+     *      conn - connection to the OIM Schema 
+     */
+    public static void printAllOIMObjects(Connection conn) throws SQLException
+    {
+        String query = "SELECT OBJ_KEY, SDK_KEY, OBJ_TYPE, OBJ_NAME FROM OBJ ORDER BY OBJ_NAME";
+        Statement st = conn.createStatement(); 
+        ResultSet rs = st.executeQuery(query);
+
+        System.out.printf("%-25s%-25s%-25s%-25s\n", "Object Key", "Object Name", "Object Type", "SDK_KEY");
+        while(rs.next())
+        {
+            String objectKey = rs.getString("OBJ_KEY");
+            String objectName = rs.getString("OBJ_NAME");
+            String objectType = rs.getString("OBJ_TYPE"); 
+            String formKey = rs.getString("SDK_KEY");
+            System.out.printf("%-25s%-25s%-25s%-25s\n", objectKey, objectName, objectType, formKey); 
+        }
+        
+    }
+    
+    /*
+     * Print all process definitons with their corresponding keys.
+     * TOS = Process Definition
+     * SDK = Structure Utility (Process Form)
+     * OBJ = Resource Object Definition
+     * PKG = Service Processes
+     * 
+     * @param 
+     *      conn - connection to the OIM Schema 
+     */
+    public static void getAllProcessDefinitions(Connection conn) throws SQLException
+    {
+        String query = "SELECT PKG.PKG_KEY, TOS.TOS_KEY, SDK.SDK_KEY, PKG.PKG_NAME, SDK.SDK_NAME, OBJ.OBJ_KEY, OBJ.OBJ_NAME FROM "
+         + "TOS RIGHT OUTER JOIN PKG ON PKG.PKG_KEY = TOS.PKG_KEY "
+         + "LEFT OUTER JOIN SDK ON SDK.SDK_KEY = TOS.SDK_KEY "
+         + "LEFT OUTER JOIN OBJ ON OBJ.OBJ_KEY = PKG.OBJ_KEY ORDER BY PKG.PKG_NAME";
+        Statement st = conn.createStatement(); //Create a statement
+        ResultSet rs = st.executeQuery(query);
+        
+        System.out.printf("%-25s%-25s%-25s%-25s%-25s%-25s%-25s\n", "Package Key", "Package Name","Process Key", "Object Key", "Object Name", "Form Key", "Form Name");
+        while(rs.next())
+        {
+            String packageKey = rs.getString("PKG_KEY");
+            String packageName = rs.getString("PKG_NAME");
+            String processKey = rs.getString("TOS_KEY");
+            String objectKey = rs.getString("OBJ_KEY");
+            String objectName = rs.getString("OBJ_NAME");
+            String formName = rs.getString("SDK_NAME");
+            String formKey = rs.getString("SDK_KEY");
+            
+            System.out.printf("%-25s%-25s%-25s%-25s%-25s%-25s%-25s\n",packageKey, packageName, processKey, objectKey, objectName, formKey, formName);
+        }
     }
     
     
