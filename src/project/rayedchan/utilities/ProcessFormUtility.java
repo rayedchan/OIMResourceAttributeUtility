@@ -706,7 +706,7 @@ public class ProcessFormUtility
      * Get the process form name by process form key.
      * @params 
      *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - process form key
+     *      processFormKey - process form key (SDK.SDK_KEY)
      */
     public static String getProcessFormNameByFormKey(tcFormDefinitionOperationsIntf formDefOps, Long processFormKey) throws tcAPIException, tcColumnNotFoundException
     {
@@ -754,7 +754,7 @@ public class ProcessFormUtility
      * Get the process form name by process form key.
      * @params 
      *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - process form key
+     *      processFormKey - process form key (SDK.SDK_KEY)
      * 
      * @return - tcResultSet pointing to the process form record
      */
@@ -821,7 +821,7 @@ public class ProcessFormUtility
      * TODO: Optimize with direct SQL Query
      * @params
      *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - SDK_KEY
+     *      processFormKey - the form key (SDK_KEY)
      *      processFormVersion - SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
      *      fieldLabelCheck - field label to be checked
      * 
@@ -917,8 +917,8 @@ public class ProcessFormUtility
      * 
      * @params -
      *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - process form key
-     *      processFormVersion - version to be checked against
+     *      processFormKey - process form key (SDK.SDK_KEY)
+     *      processFormVersion - version to be checked against SDL_CURRENT_VERSION
      * 
      * @return - boolean value to indicate if the given form version is locked.
      *      
@@ -960,6 +960,7 @@ public class ProcessFormUtility
      * Removes a field from a process form.
      * @param -
      *          formDefOps - tcFormDefinitionOperationsIntf service object
+     *          formFieldKey - key of the form field (SDC.SDC_KEY)
      *      
      */
     public static void removeFormField(tcFormDefinitionOperationsIntf formDefOps, Long formFieldKey) throws tcAPIException, tcFormFieldNotFoundException, tcDeleteNotAllowedException

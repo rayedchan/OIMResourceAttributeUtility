@@ -54,7 +54,7 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -62,6 +62,7 @@ public class TestDriver
         //OIM service objects
         tcLookupOperationsIntf lookupOps = oimClient.getService(tcLookupOperationsIntf.class);
         tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
+        tcObjectOperationsIntf resourceObjectOps = oimClient.getService(tcObjectOperationsIntf.class);
         
         /*
          * Test Oracle Database connection
@@ -134,32 +135,21 @@ public class TestDriver
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
+        long packageKey = 45L;
+        long processFormKeyRf = 47L;
+        //HelperUtility.getAllProcessDefinitions(oimDBConnection);
+        //tcResultSet result = formDefOps.getReconDataFlowForProcess(packageKey);
         //HelperUtility.printTcResultSetRecords(result);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, 45L);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, 45L, 1, 1);
-        //HelperUtility.printAllOIMObjects(oimDBConnection);
-        //HelperUtility.getAllProcessDefinitions(oimDBConnection);
-
-
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            //tcResultSet result = formDefOps.getReconDataFlowForProcess(45L);
-            //printTcResultSetRecords(getAllProcessFormFields(formDefOps, 47L, 3));
-           
+        //ReconFieldMapToFormFieldUtility.getFormFields(formDefOps, processFormKeyRf);
+        //ReconFieldMapToFormFieldUtility.getReconFields(resourceObjectOps, packageKey);
+        //HelperUtility.printTcResultSetRecords(formDefOps.getFormFields(47L, 3));
+        
+        
+        
             //int objKey = 45; //OBJ.obj_key from OIM schema
             //int objKeyDBAT = 61;
-            //tcObjectOperationsIntf resourceObjectOps = oimClient.getService(tcObjectOperationsIntf.class);
             //tcResultSet reconFieldsResultSet = resourceObjectOps.getReconciliationFields(objKeyDBAT);
             //printTcResultSetRecords(reconFieldsResultSet);
             
@@ -175,6 +165,7 @@ public class TestDriver
             //PRF -Process Field and Reconcilation Fields Mapping
             //formDefOps.removeReconDataFlowMapping(processKey, objKey, reconFieldKey);
              
+        
             //TOS - Info on all the Process Definitions
             //Process info process key [Process.Process Definition.Process Key], form key [Structure Utility.Key]
             //printTcResultSetRecords(resourceObjectOps.getProcessesForObject(45L));
@@ -196,39 +187,6 @@ public class TestDriver
             {
                 System.out.println(attrMap.getAdapterVariableName());
             }*/
-            
-            
-            
-            /*
-             * Table - ORF 
-             * Columns for a Reconciliation Field
-             * 
-             * Objects.Key
-             * Objects.Reconciliation Fields.Key
-             * Objects.Reconciliation Fields.Name
-             * ORF_FIELDTYPE
-             * ORF_REQUIRED
-             * PARENTFIELD
-             * Objects.Reconciliation Fields.Row Version
-             */
-            
-           /* for(String columnName : columnNames)
-            {
-                System.out.println(columnName);
-            }
-            
-            for(int i = 0; i < reconFieldsResultSet.getTotalRowCount(); i++)
-            {
-                reconFieldsResultSet.goToRow(i);
-                System.out.println(reconFieldsResultSet.getStringValue("Objects.Key"));
-                System.out.println(reconFieldsResultSet.getStringValue("Objects.Reconciliation Fields.Key"));
-                System.out.println(reconFieldsResultSet.getStringValue("Objects.Reconciliation Fields.Name"));
-                System.out.println(reconFieldsResultSet.getStringValue("ORF_FIELDTYPE"));
-                System.out.println(reconFieldsResultSet.getStringValue("ORF_REQUIRED"));
-                System.out.println(reconFieldsResultSet.getStringValue("PARENTFIELD"));
-                System.out.println(reconFieldsResultSet.getStringValue("Objects.Reconciliation Fields.Row Version"));
-                System.out.println("==================================================");
-            }*/
-   
+         
     }
 }
