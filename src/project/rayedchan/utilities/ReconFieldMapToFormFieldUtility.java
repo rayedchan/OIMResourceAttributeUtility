@@ -26,9 +26,12 @@ public class ReconFieldMapToFormFieldUtility
     /*
      * Print the current mappings of the reconciliation fields and process form
      * fields with sorting options.
+     * 
+     * PRF Table contains all the process field and reconcilation field mappings
+     * 
      * @params 
      *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processKey - the resource process key (PKG.PKG_KEY)
+     *      processKey - the resource process key (PKG.PKG_KEY or TOS.TOS_KEY)
      *      columnToSort - sort by recon field or form field column
      *              0 = Reconciliation fields
      *              1 = Process form fields 
@@ -103,22 +106,26 @@ public class ReconFieldMapToFormFieldUtility
     /*
      * Prints the current mappings of the reconciliation fields and process form
      * fields.
+     * 
+     * PRF Table contains all the process field and reconcilation field mappings
+     * 
      * @params 
      *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processKey - the resource process key (PKG._PKG_KEY)
+     *      processKey - the resource process key (PKG._PKG_KEY or TOS.TOS_KEY)
      */
     public static void printReconFieldAndFormFieldMappings(tcFormDefinitionOperationsIntf formDefOps, Long processKey) throws tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException
     {
         tcResultSet mappingResultSet = formDefOps.getReconDataFlowForProcess(processKey);
         int numRows = mappingResultSet.getTotalRowCount();
         
-        System.out.printf("%-30s%-30s\n", "Reconciliation Field", "Form Field Column");
+        System.out.printf("%-30s%-30s%-30s\n", "ReconFieldKey" ,"Reconciliation Field", "Form Field Column");
         for(int i = 0; i < numRows; i++)
         {
             mappingResultSet.goToRow(i);
             String reconField = mappingResultSet.getStringValue("Objects.Reconciliation Fields.Name");
             String formField = mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.ColumnName");
-            System.out.printf("%-30s%-30s\n", reconField, formField);
+            String reconFieldKey = mappingResultSet.getStringValue("Objects.Reconciliation Fields.Key");
+            System.out.printf("%-30s%-30s%-30s\n", reconFieldKey ,reconField, formField);
         }
                
     }   
@@ -195,5 +202,59 @@ public class ReconFieldMapToFormFieldUtility
             String reconFieldType = trs.getStringValue("ORF_FIELDTYPE");
             System.out.printf("%-25s%-25s%-25s\n", reconFieldKey, reconFieldName, reconFieldType);
         }
+    }
+    
+    /*
+     * Add a mapping between a process form field and a reconciliation field.
+     * @params -
+     *      formDefOps - tcFormDefinitionOperationsIntf service object
+     *      processKey - the resource process key (PKG.PKG_KEY)
+     *      objectKey - the resource object key (OBJ.OBJ_KEY)
+     *      reconField_FormField_Map - ReconFieldAndFormFieldMap object
+     * 
+     * 
+     * Note: Mapping is one to one. Once a reconciliation field or a process 
+     * form field is defined in a mapping, it can no longer be used for another mapping.  
+     */
+    public static void addReconFieldAndFormFieldMap(tcFormDefinitionOperationsIntf formDefOps, Long processKey, Long objectKey, ReconFieldAndFormFieldMap reconField_FormField_Map) throws tcAPIException, tcProcessNotFoundException, tcObjectNotFoundException
+    {
+        String reconFieldKey = reconField_FormField_Map.getReconFieldKey();
+        String formFieldColumnName = reconField_FormField_Map.getFormFieldColumnName(); //process form field column name
+        Boolean isKeyField = reconField_FormField_Map.getIsKeyField();
+        Boolean isCaseInsensitive = reconField_FormField_Map.getIsCaseInsensitive();
+        
+        formDefOps.addReconDataFlow(processKey, objectKey, reconFieldKey, formFieldColumnName, isKeyField, isCaseInsensitive);
+    }
+    
+      /*
+     * Removes a mapping between a process form field and a reconciliation field.
+     * @params -
+     *      formDefOps - tcFormDefinitionOperationsIntf service object
+     *      processKey - the resource process key (PKG.PKG_KEY)
+     *      objectKey - the resource object key (OBJ.OBJ_KEY)
+     *      reconFieldKey - reconciliation field key (ORF.ORF_KEY)
+     */
+    public static void removeReconFieldAndFormFieldMap(tcFormDefinitionOperationsIntf formDefOps, Long processKey, Long objectKey, String reconFieldKey) throws tcAPIException, tcProcessNotFoundException, tcObjectNotFoundException
+    {
+       formDefOps.removeReconDataFlowMapping(processKey, objectKey, reconFieldKey);
+    }
+    
+    /*
+     * Map reconciliation fields and form fields specified in a flat file.
+     * File must be tab delimited.
+     * 
+     * File format
+     * <Process Name>
+     * <Object Name>
+     * <reconFieldName1>    <formFieldName1>
+     * <reconFieldName2>    <formFieldName2>
+     * 
+     * @params
+     *      formDefOps - tcFormDefinitionOperationsIntf service
+     *      fileName - path of file 
+     */
+    public static void addReconFieldAndFormFieldMapDSFF(tcFormDefinitionOperationsIntf formDefOps,String fileName)
+    {
+        
     }
 }

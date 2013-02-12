@@ -40,6 +40,7 @@ import javax.security.auth.login.LoginException;
 import oracle.iam.configservice.api.ConfigManager;
 import oracle.iam.platform.OIMClient;
 import project.rayedchan.custom.objects.ProcessFormField;
+import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
 import project.rayedchan.utilities.HelperUtility;
@@ -54,7 +55,7 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -102,7 +103,6 @@ public class TestDriver
         //LookupUtility.addEntriesToLookupDSFF(lookupOps,fileNameAdd);
         //LookupUtility.deleteEntriesFromLookupDSFF(lookupOps, fileNameDelete);
 
-
         /*
          * ProcessFormUtility method calls 
          */
@@ -129,47 +129,32 @@ public class TestDriver
         //formDefOps.updateFormField(formFieldKey, updateFormFieldMap);
         //ProcessFormField processFormFieldObj = new ProcessFormField (processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure);
         //ProcessFormUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
-        
+        //ProcessFormUtility.removeFormField(formDefOps, 162L);
 
-        
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        long packageKey = 45L;
         long processFormKeyRf = 47L;
+        long objKey = 45L; //OBJ.obj_key from OIM schema            
+        long processKey = 45L; //PKG_KEY
+        String reconFieldKey = "181";
+        String processFormFieldName = "UD_LDAP_USR_TEST2";
+        Boolean isKeyField  = false;
+        Boolean isCaseInsenstive = false; 
+        ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
         //HelperUtility.getAllProcessDefinitions(oimDBConnection);
         //tcResultSet result = formDefOps.getReconDataFlowForProcess(packageKey);
         //HelperUtility.printTcResultSetRecords(result);
-        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, 45L);
-        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, 45L, 1, 1);
+        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, processKey);
+        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, processKey, 1, 1);
         //ReconFieldMapToFormFieldUtility.getFormFields(formDefOps, processFormKeyRf);
         //ReconFieldMapToFormFieldUtility.getReconFields(resourceObjectOps, packageKey);
         //HelperUtility.printTcResultSetRecords(formDefOps.getFormFields(47L, 3));
+        //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMap(formDefOps, processKey, objKey, fieldMappings);
+        //ReconFieldMapToFormFieldUtility.removeReconFieldAndFormFieldMap(formDefOps, processKey, objKey, reconFieldKey);
+        //HelperUtility.printTcResultSetRecords(formDefOps.getObjects(45L));
         
-        
-        
-            //int objKey = 45; //OBJ.obj_key from OIM schema
-            //int objKeyDBAT = 61;
-            //tcResultSet reconFieldsResultSet = resourceObjectOps.getReconciliationFields(objKeyDBAT);
-            //printTcResultSetRecords(reconFieldsResultSet);
-            
-            //long processKey = 45L; //TOS_KEY =? OBJ_KEY
-            //long processKeyDBAT = 61L;
-            //String reconFieldKey = "162";
-            //String processFormFieldName = "UD_LDAP_USR_TEST1";
-            
-             
-            //tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
-            //formDefOps.addReconDataFlow(processKey, objKey, reconFieldKey, processFormFieldName, true, true);
-           
-            //PRF -Process Field and Reconcilation Fields Mapping
-            //formDefOps.removeReconDataFlowMapping(processKey, objKey, reconFieldKey);
-             
-        
-            //TOS - Info on all the Process Definitions
-            //Process info process key [Process.Process Definition.Process Key], form key [Structure Utility.Key]
-            //printTcResultSetRecords(resourceObjectOps.getProcessesForObject(45L));
-             
+         
             //tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
             //printTcResultSetRecords(wfDefOps.getAvailableAdapters()); //ADP - Adapters
             //printTcResultSetRecords(wfDefOps.getAdapterMappings("T", 31L)); //Info on the adapters, variable mappings, structure

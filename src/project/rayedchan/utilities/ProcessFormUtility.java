@@ -962,6 +962,8 @@ public class ProcessFormUtility
      *          formDefOps - tcFormDefinitionOperationsIntf service object
      *          formFieldKey - key of the form field (SDC.SDC_KEY)
      *      
+     * Note: Form Fields with a mapping to a reconciliation field can only be deleted when 
+     * the mapping is removed.
      */
     public static void removeFormField(tcFormDefinitionOperationsIntf formDefOps, Long formFieldKey) throws tcAPIException, tcFormFieldNotFoundException, tcDeleteNotAllowedException
     {      
