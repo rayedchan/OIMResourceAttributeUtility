@@ -25,6 +25,7 @@ import com.thortech.xl.ejb.interfaces.tcORFDelegate;
 import com.thortech.xl.vo.workflow.AdapterMapping;
 import com.thortech.xl.vo.workflow.TaskDefinition;
 import com.thortech.xl.vo.workflow.WorkflowDefinition;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -55,7 +56,7 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -134,16 +135,16 @@ public class TestDriver
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        long processFormKeyRf = 47L;
+        long formKey = 47L;
         long objKey = 45L; //OBJ.obj_key from OIM schema            
         long processKey = 45L; //PKG_KEY
         String reconFieldKey = "181";
-        String processFormFieldName = "UD_LDAP_USR_TEST2";
+        String processFormFieldName = "UD_LDAP_USR_TEST2"; //need to test case sensitivity 
         Boolean isKeyField  = false;
         Boolean isCaseInsenstive = false; 
         ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
         //HelperUtility.getAllProcessDefinitions(oimDBConnection);
-        //tcResultSet result = formDefOps.getReconDataFlowForProcess(packageKey);
+        //tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);
         //HelperUtility.printTcResultSetRecords(result);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, processKey);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, processKey, 1, 1);
@@ -153,9 +154,17 @@ public class TestDriver
         //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMap(formDefOps, processKey, objKey, fieldMappings);
         //ReconFieldMapToFormFieldUtility.removeReconFieldAndFormFieldMap(formDefOps, processKey, objKey, reconFieldKey);
         //HelperUtility.printTcResultSetRecords(formDefOps.getObjects(45L));
+        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsAddDSFF(formDefOps, processKey);
+        //System.out.println(ReconFieldMapToFormFieldUtility.doesProcessExist(oimDBConnection, 100L));
+        //System.out.println(ReconFieldMapToFormFieldUtility.doesObjectExist(oimDBConnection, 1L));
+        //System.out.println(ReconFieldMapToFormFieldUtility.doesReconFieldExist(oimDBConnection, 45L, "Email"));
+        System.out.println(ReconFieldMapToFormFieldUtility.doesFormFieldExist(formDefOps, formKey, "UD_LDAP_USR_USERI"));
+        //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
         
-         
-            //tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
+        
+        
+        
+        //tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
             //printTcResultSetRecords(wfDefOps.getAvailableAdapters()); //ADP - Adapters
             //printTcResultSetRecords(wfDefOps.getAdapterMappings("T", 31L)); //Info on the adapters, variable mappings, structure
             

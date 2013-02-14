@@ -10,8 +10,8 @@ public class ReconFieldAndFormFieldMap
     private String reconFieldName; //ORF.ORF_FIELDNAME
     private String formFieldColumnName; //SDC.SDC_NAME
     private String reconFieldKey; //ORF.ORF_KEY
-    private Boolean isKeyField;
-    private Boolean isCaseInsensitive;
+    private Boolean isKeyField = false;
+    private Boolean isCaseInsensitive = false;
     
     public ReconFieldAndFormFieldMap(String reconFieldName, String formFieldColumnName)
     {
