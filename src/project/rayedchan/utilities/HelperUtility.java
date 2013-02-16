@@ -202,5 +202,40 @@ public class HelperUtility
         }
         
     }
+    
+    /*
+     * Determine if a string can be parse into an integer.
+     * @param 
+     *       strValue - validate if string value can be parsed 
+     * 
+     * @return - boolean value to indicate if string is an integer
+     */
+    public static boolean isInteger(String strValue)
+    {
+        try 
+        {
+            Integer.parseInt(strValue);
+            return true;
+        }
+        
+        catch (NumberFormatException nfe)
+        {
+            return false;
+        }
+    }
+    
+     /*
+     * Determine if a string can be parse into an boolean.
+     * @param 
+     *       strValue - validate if string value can be parsed 
+     * 
+     * @return - boolean value to indicate if string is a boolean
+     */
+    public static boolean isBoolean(String strValue)
+    {
+        strValue = strValue.toLowerCase();
+        return "true".equalsIgnoreCase(strValue) || "false".equalsIgnoreCase(strValue);
+    }
+     
      
 }

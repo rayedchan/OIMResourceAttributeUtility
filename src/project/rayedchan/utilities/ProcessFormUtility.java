@@ -74,9 +74,17 @@ public class ProcessFormUtility
      * 
      * File Format
      * <Process Form Table Name>
-     * <Field attributes tab delimited>
+     * <Field attributes tab delimited [Field_Label	Variant_Type	Field_Type	Length	Order]>
      * <field record 1>
      * <field record 2>
+     * 
+     * For the line that contains the field attribute names, "Field Label" is required.
+     * The other field attribute will have these default values if not specified.
+     * VARIANTTYPE = "String";
+     * FIELDTYPE = "TextField"
+     * LENGTH = "100"
+     * ORDER = "50"
+     * 
      * 
      * @params - 
      *          formDefOps - tcFormDefinitionOperationsIntf service object
@@ -159,16 +167,23 @@ public class ProcessFormUtility
                 {
                     System.out.println("Field attribute name " + fieldAttributeName + "is invalid."
                     + "Here are all the possible attribute names:\n "
-                    + "Field_Label\n" +
-                    "Variant_Type\n" +
-                    "Field_Type\n" +
-                    "Length\n" +
-                    "Order");
+                    + FIELDLABEL + "\n" +
+                    VARIANTTYPE + "\n" +
+                    FIELDTYPE + "\n" +
+                    LENGTH + "\n" +
+                    ORDER );
                     return false;
                 }
    
             }
-          
+            
+            //Validate that the "field_label" attribute name is specified the file
+            if(!pf_fieldAttributeNameArray.contains(FIELDLABEL))
+            {
+                System.out.println("'"+ FIELDLABEL + "' is a required attribute to be specified in file");
+                return false;
+            }
+            
             //Read each process form field from file
             while ((strLine = br.readLine()) != null)  
             {
@@ -241,7 +256,7 @@ public class ProcessFormUtility
                         String length = fieldAttributeValueToken.nextToken();
                         
                         //Check if length is an int type
-                        if(!isInteger(length))
+                        if(!HelperUtility.isInteger(length))
                         {
                             System.out.println("[Warning]: Length '" + length + "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
@@ -257,7 +272,7 @@ public class ProcessFormUtility
                         String order = fieldAttributeValueToken.nextToken();
                         
                          //Check if order is an integer
-                        if(!isInteger(order))
+                        if(!HelperUtility.isInteger(order))
                         {
                             System.out.println("[Warning]: Order '" + order+ "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
@@ -876,27 +891,6 @@ public class ProcessFormUtility
         || fieldType.equalsIgnoreCase(FT_PASSWORDFIELD) || fieldType.equalsIgnoreCase(FT_CHECKBOX)
         || fieldType.equalsIgnoreCase(FT_DATACOMBOBOX) || fieldType.equalsIgnoreCase(FT_TEXTAREA)
         || fieldType.equalsIgnoreCase(FT_ITRESOURCELOOKUPFIELD) || fieldType.equalsIgnoreCase(FT_LOOKUPFIELD);
-    }
-    
-    /*
-     * Determine if a string can be parse into an integer.
-     * @param 
-     *       strValue - valid if string value can be parsed 
-     * 
-     * @return - boolean value to indicate if string is an integer
-     */
-    public static boolean isInteger(String strValue)
-    {
-        try 
-        {
-            Integer.parseInt(strValue);
-            return true;
-        }
-        
-        catch (NumberFormatException nfe)
-        {
-            return false;
-        }
     }
             
     /*

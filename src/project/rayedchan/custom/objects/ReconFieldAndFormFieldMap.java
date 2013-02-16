@@ -3,7 +3,9 @@ package project.rayedchan.custom.objects;
 /**
  * @author rayedchan
  * A class to represent a mapping between a reconciliation field and process
- * form field.
+ * form field. The PRF table contains all the existing reconciliation field to form field
+ * mappings. When creating a mapping, the reconciliation fields are taken from the ORF table 
+ * and the form fields are taken from the SDC table.
  */
 public class ReconFieldAndFormFieldMap
 {
@@ -12,6 +14,14 @@ public class ReconFieldAndFormFieldMap
     private String reconFieldKey; //ORF.ORF_KEY
     private Boolean isKeyField = false;
     private Boolean isCaseInsensitive = false;
+    
+    /*
+     * Constructors
+     */
+    public ReconFieldAndFormFieldMap()
+    {
+        
+    }
     
     public ReconFieldAndFormFieldMap(String reconFieldName, String formFieldColumnName)
     {
@@ -28,6 +38,9 @@ public class ReconFieldAndFormFieldMap
         this.isCaseInsensitive = isCaseInsensitive;
     }
     
+    /*
+     * Getter and Setter Methods
+     */
     public void setReconFieldName(String reconFieldName)
     {
         this.reconFieldName = reconFieldName;

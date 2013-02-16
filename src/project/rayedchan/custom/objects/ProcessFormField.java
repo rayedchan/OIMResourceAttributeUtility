@@ -12,7 +12,7 @@ public class ProcessFormField
     private String fieldType = "TextField";
     private String variantType = "String";
     private int length = 100;
-    private int order;
+    private int order = 50;
     private String defaultValue = null;
     private String profileEnabled = null;
     private boolean secure = false;

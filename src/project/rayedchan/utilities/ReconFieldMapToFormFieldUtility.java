@@ -37,6 +37,12 @@ import project.rayedchan.custom.objects.ReconFieldComparator;
  */
 public class ReconFieldMapToFormFieldUtility 
 {    
+    //List of possible attribute names to be specified in file for adding a mapping between a recon filed and a form field
+    public static String RECONFIELDNAME = "recon_field_name"; //required
+    public static String FORMFIELDCOLUMNNAME = "form_field_column_name"; //required
+    public static String ISKEYFIELD = "is_key_field"; //optional; default value = false
+    public static String IS_CASE_INSENSITIVE = "is_case_insensitive"; //optional: default value = false
+    
     /*
      * Print the current mappings of the reconciliation fields and process form
      * fields with sorting options.
@@ -262,26 +268,31 @@ public class ReconFieldMapToFormFieldUtility
      * PRF Table contains all the process field and reconcilation field mappings
      * 
      * @params 
+     *      oimDBConnection - connection to the OIM Schema
      *      formDefOps - tcFormDefinitionOperationsIntf service object
      *      processKey - the resource process key (PKG._PKG_KEY or TOS.TOS_KEY)
      */
-    public static void printReconFieldAndFormFieldMappingsAddDSFF(tcFormDefinitionOperationsIntf formDefOps, Long processKey) throws tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException
+    public static void printReconFieldAndFormFieldMappingsAddDSFF(Connection oimDBConnection,tcFormDefinitionOperationsIntf formDefOps, Long processKey) throws tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException
     {
         tcResultSet mappingResultSet = formDefOps.getReconDataFlowForProcess(processKey);
         int numRows = mappingResultSet.getTotalRowCount();
+        Long objKey = getObjKeyByProcKey(oimDBConnection, processKey); //get corresponding object key
         
         System.out.println(processKey);
-        System.out.println("<Object Key>");
+        System.out.println(objKey);
+        System.out.printf("%s\t%s\t%s\t%s\n",RECONFIELDNAME, FORMFIELDCOLUMNNAME, ISKEYFIELD, IS_CASE_INSENSITIVE);
         for(int i = 0; i < numRows; i++)
         {
             mappingResultSet.goToRow(i);
             String childTableName = mappingResultSet.getStringValue("Structure Utility.Table Name");
             String reconField = mappingResultSet.getStringValue("Objects.Reconciliation Fields.Name");
             String formField = mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.ColumnName");
+            String isKeyField = mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.Iskey");
+            String isCaseInsensitive = mappingResultSet.getStringValue("PRF_CASE_INSENSITIVE");
             
             if(childTableName == null || childTableName.isEmpty())
             {
-                System.out.printf("%s\t%s\n", reconField, formField);
+                System.out.printf("%s\t%s\t%s\t%s\n", reconField, formField, isKeyField, isCaseInsensitive);
             }
         }
                
@@ -304,6 +315,7 @@ public class ReconFieldMapToFormFieldUtility
      * File format
      * <ProcessKey>
      * <ObjectKey>
+     * <recon_field_name form_field_column_name	is_key_field[optional] is_case_insensitive[optional]>
      * <reconFieldName1>    <formFieldColumnName1>
      * <reconFieldName2>    <formFieldColumnName2>
      * 
@@ -352,53 +364,170 @@ public class ReconFieldMapToFormFieldUtility
                 return false;
             }
             
+            //Third line determines the ordering of the mappings attributes in the file
+            ArrayList<String> mappingAttributeNameArray = new ArrayList<String>(); //store the name of each mapping attribute name 
+            String mappingAttributeNames = br.readLine();
+            StringTokenizer mappingAttributeNameTokens = new StringTokenizer(mappingAttributeNames, "\t");
+            
+            while(mappingAttributeNameTokens.hasMoreTokens())
+            {
+                String mappingAttributeName = mappingAttributeNameTokens.nextToken().toLowerCase();
+ 
+                //Check if the name of the attribute is valid
+                if(mappingAttributeName.equalsIgnoreCase(RECONFIELDNAME))
+                {
+                    mappingAttributeNameArray.add(RECONFIELDNAME);
+                }
+                
+                else if(mappingAttributeName.equalsIgnoreCase(FORMFIELDCOLUMNNAME))
+                {
+                    mappingAttributeNameArray.add(FORMFIELDCOLUMNNAME);
+                }
+                
+                else if(mappingAttributeName.equalsIgnoreCase(ISKEYFIELD))
+                {
+                    mappingAttributeNameArray.add(ISKEYFIELD);
+                }
+                          
+                else if(mappingAttributeName.equalsIgnoreCase(IS_CASE_INSENSITIVE))
+                {
+                    mappingAttributeNameArray.add(IS_CASE_INSENSITIVE);
+                }
+                        
+                else
+                {
+                    System.out.println("Mapping attribute name " + mappingAttributeName + "is invalid."
+                    + "Here are all the possible mapping attribute names:\n "
+                    + RECONFIELDNAME + "\n" +
+                    FORMFIELDCOLUMNNAME + "\n" +
+                    ISKEYFIELD + "\n" +
+                    IS_CASE_INSENSITIVE + "\n");
+                    return false;
+                }
+   
+            }
+            
+            //Validate that "recon_field_name" is specified in the file.
+            if(mappingAttributeNameArray.contains(RECONFIELDNAME))
+            {
+                System.out.println("'"+ RECONFIELDNAME + "' is a required mapping attribute to be specified in file");
+                return false; 
+            }
+            
+            //Validate that "form_field_column_name" is specified in the file.
+            if(mappingAttributeNameArray.contains(FORMFIELDCOLUMNNAME))
+            {
+                System.out.println("'"+ FORMFIELDCOLUMNNAME + "' is a required mapping attribute to be specified in file");
+                return false; 
+            }
+            
             //Rest of the file should be the mappings 
             while ((strLine = br.readLine()) != null)  
             {
-                //System.out.println(strLine);
-                StringTokenizer fieldToken = new StringTokenizer(strLine, "\t");
-                int numTokens = fieldToken.countTokens();
-                
+                StringTokenizer mappingToken = new StringTokenizer(strLine, "\t");
+                int mappingAttrNameFileCount = mappingAttributeNameArray.size();
+                int numTokens = mappingToken.countTokens();
+                ReconFieldAndFormFieldMap fieldMapping = new ReconFieldAndFormFieldMap();
+                 
                 //validate the line format
-                if(numTokens != 2)
+                if(numTokens != mappingAttrNameFileCount)
                 {
                     System.out.println("[Warning]: Size of row is invalid. Mapping will not be added:\n" + strLine);
                     continue;
                 }
+                                
+                boolean isMappingFromFileValid = true;
+                String reconFieldName = null;
+                String formFieldColumnName = null;
                 
-                String reconFieldName = fieldToken.nextToken();
-                //validate the existence of the recon field on current line
-                if(doesReconFieldExist(oimDBConnection, objectKey, reconFieldName) == false)
+                for(int i = 0; i < mappingAttrNameFileCount; i++)
                 {
-                    System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be added:\n" + strLine);
-                    continue;
-                }
+                    String mappingAttributeName = mappingAttributeNameArray.get(i);
+                   
+                    if(mappingAttributeName.equalsIgnoreCase(RECONFIELDNAME))
+                    {
+                        reconFieldName = mappingToken.nextToken();
+                        //validate the existence of the recon field on current line
+                        if(doesReconFieldExist(oimDBConnection, objectKey, reconFieldName) == false)
+                        {
+                            System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be added:\n" + strLine);
+                            isMappingFromFileValid = false;
+                            break;
+                        }
+                        
+                        fieldMapping.setReconFieldName(reconFieldName);
+                    }
+
+                    else if(mappingAttributeName.equalsIgnoreCase(FORMFIELDCOLUMNNAME))
+                    {  
+                        formFieldColumnName = mappingToken.nextToken();
+                        //Validate the existence of the form field
+                        if(doesFormFieldExist(formDefOps, formKey, formFieldColumnName) == false)
+                        {
+                            System.out.println("[Warning]: Form Field '" + reconFieldName + "' does not exist. Mapping will not be added:\n" + strLine);
+                            isMappingFromFileValid = false;
+                            break;
+                        }
+                        
+                        fieldMapping.setFormFieldColumnName(formFieldColumnName);
+                    }
+
+                    else if(mappingAttributeName.equalsIgnoreCase(ISKEYFIELD))
+                    {
+                        String isKeyField = mappingToken.nextToken();
+                        
+                        //check if the type is valid
+                        if(!HelperUtility.isBoolean(isKeyField))
+                        {
+                            System.out.println("[Warning]: Key Field type '" + isKeyField + "' is not a boolean value. Mapping will not be added:\n" + strLine);
+                            isMappingFromFileValid = false;
+                            break; 
+                        }
+                        
+                        fieldMapping.setIsKeyField(Boolean.parseBoolean(isKeyField));
+                    }
+
+                    else if(mappingAttributeName.equalsIgnoreCase(IS_CASE_INSENSITIVE))
+                    {                       
+                        String isCaseInsensitive = mappingToken.nextToken();
+                        
+                        //check if the type is valid
+                        if(!HelperUtility.isBoolean(isCaseInsensitive))
+                        {
+                            System.out.println("[Warning]: 'is_case_insensitive' attribute type '" + isCaseInsensitive + "' is not a boolean value. Mapping will not be added:\n" + strLine);
+                            isMappingFromFileValid = false;
+                            break; 
+                        }
+                        
+                        fieldMapping.setIsCaseInsensitive(Boolean.parseBoolean(isCaseInsensitive));
+                    }
+
+                }//end for loop
                 
-                String formFieldColumnName = fieldToken.nextToken();
-                //Validate the existence of the form field
-                if(doesFormFieldExist(formDefOps, formKey, formFieldColumnName) == false)
-                {
-                    System.out.println("[Warning]: Form Field '" + reconFieldName + "' does not exist. Mapping will not be added:\n" + strLine);
-                    continue;
-                }
                 
-                //Validate if the mapping already exist
-                if(doesPRFMappingExist( oimDBConnection, processKey, reconFieldName, formFieldColumnName) == true)
-                {
-                    System.out.println("[Warning]: Mapping already exists. Mapping will not be added:\n" + strLine);
-                    continue; 
+                if(isMappingFromFileValid == true)
+                {                 
+                    //Validate if the mapping already exist
+                    if(doesPRFMappingExist( oimDBConnection, processKey, reconFieldName, formFieldColumnName) == true)
+                    {  
+                       System.out.println("[Warning]: Mapping already exists. Mapping will not be added:\n" + strLine);
+                       continue; 
+                    }
+                    
+                    //Enforce one to one mapping
+                    if(!mappings.containsValue(formFieldColumnName) && !mappings.containsKey(reconFieldName))
+                    { 
+                        mappings.put(reconFieldName, formFieldColumnName); 
+                    }
+                    
+                    else
+                    {
+                        System.out.println("[Warning]: Recon field or form field already exist in staging.Mapping will not be added:\n" + strLine);
+                    }
                 }
-                
-                //Enforce one to one mapping
-                if(!mappings.containsValue(formFieldColumnName) && !mappings.containsKey(reconFieldName))
-                {
-                    mappings.put(reconFieldName, formFieldColumnName); 
-                }
-                
-            }
-            
-            
-            
+                   
+            }//end while loop
+                 
         } 
         
         catch (FileNotFoundException ex) 
@@ -647,6 +776,7 @@ public class ReconFieldMapToFormFieldUtility
      *      processKey - process key (TOS.TOS_KEY or PKG.PKG_KEY)
      *      objectKey - resource object key (OBJ.OBJ_KEY)
      *      
+     * @return - form key associated with given object key and process key
      */
     public static Long getFormKeyByObjAndProcKey(Connection conn, Long processKey, Long objectKey)
     {
@@ -765,5 +895,69 @@ public class ReconFieldMapToFormFieldUtility
         }
         
         return false;
+    }
+    
+    
+    /*
+     * Get the corresponding object key associated with a process key.
+     * 
+     * @param 
+     *      conn - connection to the OIM Schema 
+     *      processKey - process key (TOS.TOS_KEY or PKG.PKG_KEY)
+     * 
+     * @return - corresponding object key
+     */
+    public static Long getObjKeyByProcKey(Connection conn, Long processKey)
+    {
+        Statement st = null;
+        ResultSet rs = null;
+        
+        try 
+        {
+            String query = "SELECT OBJ.OBJ_KEY FROM "
+             + "TOS RIGHT OUTER JOIN PKG ON PKG.PKG_KEY = TOS.PKG_KEY "
+             + "LEFT OUTER JOIN SDK ON SDK.SDK_KEY = TOS.SDK_KEY "
+             + "LEFT OUTER JOIN OBJ ON OBJ.OBJ_KEY = PKG.OBJ_KEY "
+             + "WHERE PKG.PKG_KEY = " + processKey;
+            //System.out.println(query);
+            
+            st = conn.createStatement(); //Create a statement
+            rs = st.executeQuery(query);
+
+            if(rs.next())
+            {
+                String objKey = rs.getString("OBJ_KEY");
+                return (objKey == null || objKey.isEmpty()) ? null : Long.parseLong(objKey) ;
+            }
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        finally
+        {
+            if(rs != null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(st != null)
+            {
+                try {
+                    st.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }
+        
+        return null;
+        
     }
 }

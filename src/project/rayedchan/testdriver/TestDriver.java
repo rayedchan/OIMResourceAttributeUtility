@@ -143,9 +143,9 @@ public class TestDriver
         Boolean isKeyField  = false;
         Boolean isCaseInsenstive = false; 
         ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
-        HelperUtility.getAllProcessDefinitions(oimDBConnection);
-        tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);
-        HelperUtility.printTcResultSetRecords(result);
+        //HelperUtility.getAllProcessDefinitions(oimDBConnection);
+        //tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);
+        //HelperUtility.printTcResultSetRecords(result);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, processKey);
         //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, processKey, 1, 1);
         //ReconFieldMapToFormFieldUtility.getFormFields(formDefOps, formKey);
@@ -154,15 +154,15 @@ public class TestDriver
         //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMap(formDefOps, processKey, objKey, fieldMappings);
         //ReconFieldMapToFormFieldUtility.removeReconFieldAndFormFieldMap(formDefOps, processKey, objKey, reconFieldKey);
         //HelperUtility.printTcResultSetRecords(formDefOps.getObjects(45L));
-        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsAddDSFF(formDefOps, processKey);
+        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsAddDSFF(oimDBConnection,formDefOps, processKey);
         //System.out.println(ReconFieldMapToFormFieldUtility.doesProcessExist(oimDBConnection, 100L));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesObjectExist(oimDBConnection, 1L));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesReconFieldExist(oimDBConnection, 45L, "Email"));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesFormFieldExist(formDefOps, formKey, "UD_LDAP_USR_USERI"));
         //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
         //System.out.println(ReconFieldMapToFormFieldUtility.getFormKeyByObjAndProcKey(oimDBConnection, processKey, objKey));
-        System.out.println(ReconFieldMapToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
-        
+        //System.out.println(ReconFieldMapToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
+        System.out.println(Boolean.parseBoolean("false"));
         
         //tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
             //printTcResultSetRecords(wfDefOps.getAvailableAdapters()); //ADP - Adapters
