@@ -56,7 +56,7 @@ public class LookupUtility
      *   
      * @return - boolean value to indicate success or failure
      */
-    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException, tcColumnNotFoundException
+    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcInvalidLookupException
     {
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -136,11 +136,20 @@ public class LookupUtility
            
            System.out.println("[Info]: Entries to be added: " + entries); 
            Iterator it = entries.entrySet().iterator();
-    
+
            while (it.hasNext()) 
            {
                Map.Entry pairs = (Map.Entry)it.next();
-               addEntryToLookup(lookupOps, lookupName, pairs.getKey().toString(), pairs.getValue().toString(), "", "");
+                try {
+                    addEntryToLookup(lookupOps, lookupName, pairs.getKey().toString(), pairs.getValue().toString(), "", "");
+                } catch (tcInvalidLookupException ex) {
+                    Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcInvalidValueException ex) {
+                    Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
                it.remove(); // avoids a ConcurrentModificationException
            }
            
@@ -214,7 +223,7 @@ public class LookupUtility
      *   
      * @return - boolean value to indicate success or failure
      */
-    public static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException, tcColumnNotFoundException
+    public static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException 
     {
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -271,7 +280,15 @@ public class LookupUtility
            while (it.hasNext()) 
            {
                Map.Entry pairs = (Map.Entry)it.next();
-               removeEntryFromLookup(lookupOps, lookupName, pairs.getKey().toString());
+                try {
+                    removeEntryFromLookup(lookupOps, lookupName, pairs.getKey().toString());
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcInvalidLookupException ex) {
+                    Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcInvalidValueException ex) {
+                    Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
                it.remove(); // avoids a ConcurrentModificationException
            }
            

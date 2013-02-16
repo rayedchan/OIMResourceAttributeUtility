@@ -311,6 +311,16 @@ public class ProcessFormUtility
                 {
                     Logger.getLogger(ProcessFormUtility.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                catch (tcAPIException ex)
+                {
+                    Logger.getLogger(ProcessFormUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                catch (tcFormNotFoundException ex) 
+                {
+                    Logger.getLogger(ProcessFormUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } 
             }
             
             return true;
@@ -364,8 +374,9 @@ public class ProcessFormUtility
      * Uses a flat file as a datasource to remove fields from the latest version of a process form.
      * File must be in a specific format.
      * 
-     * Sanity - Check to make sure field label exists. If duplicate field label exists, 
-     * only remove one of them.
+     * Sanity - 
+     * Check to make sure field label exists. 
+     * Check for duplication in file are not process.
      * 
      * File Format
      * <Name of Process Form>
@@ -373,7 +384,7 @@ public class ProcessFormUtility
      * <Field Label2>
      * 
      */
-    public static boolean removeFieldsFromProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException
+    public static boolean removeFieldsFromProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException
     {    
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -424,6 +435,12 @@ public class ProcessFormUtility
                 
                 if(fieldKey != null)
                 {
+                    //check if the field has been added to map
+                    if(fieldKeys.containsKey(fieldKey))
+                    {
+                        System.out.println("[Warning]: Duplication of field label '" + fieldLabel + "' does not exists.");
+                        continue;
+                    }
                     //add form key to hash map
                     fieldKeys.put(fieldKey, "");
                 }
@@ -438,7 +455,15 @@ public class ProcessFormUtility
             {   
                 Map.Entry pairs = (Map.Entry)it.next();
                 Long fieldKey = (Long) pairs.getKey();
-                removeFormField(formDefOps, fieldKey);
+                try {
+                    removeFormField(formDefOps, fieldKey);
+                } catch (tcFormFieldNotFoundException ex) {
+                    Logger.getLogger(ProcessFormUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcDeleteNotAllowedException ex) {
+                    Logger.getLogger(ProcessFormUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(ProcessFormUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 it.remove(); // avoids a ConcurrentModificationException
             }
 

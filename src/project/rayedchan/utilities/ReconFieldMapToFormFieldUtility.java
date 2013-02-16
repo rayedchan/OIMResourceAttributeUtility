@@ -21,6 +21,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -111,8 +113,7 @@ public class ReconFieldMapToFormFieldUtility
             }
             
         }
-        
-        
+
         //iterate mappingObjArray
         for(ReconFieldAndFormFieldMap mappingObj: mappingObjArray)
         {
@@ -287,8 +288,8 @@ public class ReconFieldMapToFormFieldUtility
             String childTableName = mappingResultSet.getStringValue("Structure Utility.Table Name");
             String reconField = mappingResultSet.getStringValue("Objects.Reconciliation Fields.Name");
             String formField = mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.ColumnName");
-            String isKeyField = mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.Iskey");
-            String isCaseInsensitive = mappingResultSet.getStringValue("PRF_CASE_INSENSITIVE");
+            boolean isKeyField = ((mappingResultSet.getStringValue("Process Definition.Reconciliation Fields Mappings.Iskey").equalsIgnoreCase("1"))? true : false);
+            boolean isCaseInsensitive = ((mappingResultSet.getStringValue("PRF_CASE_INSENSITIVE").equalsIgnoreCase("1"))? true : false);
             
             if(childTableName == null || childTableName.isEmpty())
             {
@@ -306,6 +307,7 @@ public class ReconFieldMapToFormFieldUtility
      * 
      * By default all mappings will not be case insensitive and a key field.
      * Form Field Column Name must be all uppercase or it will be deemed invalid
+     * A reconciliation field can only map to one form field.
      * 
      * Checks:
      * Do not add existing mappings.
@@ -338,7 +340,7 @@ public class ReconFieldMapToFormFieldUtility
             fstream = new FileInputStream(fileName); //Open File
             in = new DataInputStream(fstream); //Get the object of DataInputStream
             br = new BufferedReader(new InputStreamReader(in));
-            
+            ArrayList<ReconFieldAndFormFieldMap> mappingsToBeAdded = new ArrayList<ReconFieldAndFormFieldMap>();
             String strLine; //var to store a line of a file
             
             //First line of the file should be the process key
@@ -408,14 +410,14 @@ public class ReconFieldMapToFormFieldUtility
             }
             
             //Validate that "recon_field_name" is specified in the file.
-            if(mappingAttributeNameArray.contains(RECONFIELDNAME))
+            if(!mappingAttributeNameArray.contains(RECONFIELDNAME))
             {
                 System.out.println("'"+ RECONFIELDNAME + "' is a required mapping attribute to be specified in file");
                 return false; 
             }
             
             //Validate that "form_field_column_name" is specified in the file.
-            if(mappingAttributeNameArray.contains(FORMFIELDCOLUMNNAME))
+            if(!mappingAttributeNameArray.contains(FORMFIELDCOLUMNNAME))
             {
                 System.out.println("'"+ FORMFIELDCOLUMNNAME + "' is a required mapping attribute to be specified in file");
                 return false; 
@@ -455,6 +457,8 @@ public class ReconFieldMapToFormFieldUtility
                             break;
                         }
                         
+                        String reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
+                        fieldMapping.setReconFieldKey(reconFieldKey);
                         fieldMapping.setReconFieldName(reconFieldName);
                     }
 
@@ -479,7 +483,7 @@ public class ReconFieldMapToFormFieldUtility
                         //check if the type is valid
                         if(!HelperUtility.isBoolean(isKeyField))
                         {
-                            System.out.println("[Warning]: Key Field type '" + isKeyField + "' is not a boolean value. Mapping will not be added:\n" + strLine);
+                            System.out.println("[Warning]: 'is_key_field' attibute type '" + isKeyField + "' is not a boolean value. Mapping will not be added:\n" + strLine);
                             isMappingFromFileValid = false;
                             break; 
                         }
@@ -507,7 +511,7 @@ public class ReconFieldMapToFormFieldUtility
                 
                 if(isMappingFromFileValid == true)
                 {                 
-                    //Validate if the mapping already exist
+                    //Validate if the mapping already exist in OIM
                     if(doesPRFMappingExist( oimDBConnection, processKey, reconFieldName, formFieldColumnName) == true)
                     {  
                        System.out.println("[Warning]: Mapping already exists. Mapping will not be added:\n" + strLine);
@@ -518,6 +522,7 @@ public class ReconFieldMapToFormFieldUtility
                     if(!mappings.containsValue(formFieldColumnName) && !mappings.containsKey(reconFieldName))
                     { 
                         mappings.put(reconFieldName, formFieldColumnName); 
+                        mappingsToBeAdded.add(fieldMapping);
                     }
                     
                     else
@@ -527,6 +532,24 @@ public class ReconFieldMapToFormFieldUtility
                 }
                    
             }//end while loop
+            
+            
+            System.out.println("Mappings to be added: " + mappingsToBeAdded.toString());
+            for(ReconFieldAndFormFieldMap reconField_FormField_Map : mappingsToBeAdded)
+            {
+                try {
+                    addReconFieldAndFormFieldMap(formDefOps, processKey, objectKey, reconField_FormField_Map);
+                } catch (tcProcessNotFoundException ex) {
+                    Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcObjectNotFoundException ex) {
+                    Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch(tcAPIException ex){
+                    Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+            
+            return true;
                  
         } 
         
@@ -537,6 +560,127 @@ public class ReconFieldMapToFormFieldUtility
         
         return false;
     }
+    
+     /*
+     * Remove reconciliation fields and form fields mappings specified in a flat file.
+     * Removal will be based on the reconciliation fields.
+     * Removal of mulitvalued is not supported.
+     * Process Key and Object Key must be associated with a process form.
+     * 
+     * Checks:
+     * Cannot remove mappings that do not exist.
+     * HashMap is used to prevent duplication of recon fields in file.
+     * 
+     * File format
+     * <ProcessKey>
+     * <ObjectKey>
+     * <reconFieldName1>    
+     * <reconFieldName2>  
+     * 
+     * @params
+     *      oimDBConnection - connection to the OIM Schema
+     *      formDefOps - tcFormDefinitionOperationsIntf service
+     *      fileName - path of file    
+     * 
+     * @return - true for success; false otherwise 
+     */
+    public static Boolean removeReconFieldAndFormFieldMapDSFF(Connection oimDBConnection, tcFormDefinitionOperationsIntf formDefOps, String fileName) throws IOException
+    {        
+        HashMap<String,String> mappingsToRemove = new HashMap<String,String>(); //store all the mappings to be removed
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        
+        try 
+        {     
+            fstream = new FileInputStream(fileName); //Open File
+            in = new DataInputStream(fstream); //Get the object of DataInputStream
+            br = new BufferedReader(new InputStreamReader(in));
+            String strLine; //var to store a line of a file
+            
+            //First line of the file should be the process key
+            Long processKey = Long.parseLong(br.readLine());
+            if(doesProcessExist(oimDBConnection, processKey) == false)
+            {
+                System.out.println("[Error]: Process Key "+ processKey + " does not exist.");
+                return false;
+            }
+            
+            //Second line of the file should be the name of the object key
+            Long objectKey = Long.parseLong(br.readLine());
+            if(doesObjectExist(oimDBConnection, objectKey) == false)
+            {
+                System.out.println("[Error]: Object Key "+ objectKey + " does not exist.");
+                return false;
+            }
+
+            //Rest of the file should be the the reconciliation field names
+            while ((strLine = br.readLine()) != null)  
+            {
+                 String reconFieldName = strLine;
+                                    
+                 //validate the existence of the recon field on current line
+                 if(doesReconFieldExist(oimDBConnection, objectKey, reconFieldName) == false)
+                 {      
+                     System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be removed.");
+                     continue;
+                 }
+                        
+                 String reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
+                              
+                 //Validate if the mapping exist in OIM
+                 if(doesPRFMappingExist(oimDBConnection, processKey, reconFieldKey) == false)
+                 {   
+                     System.out.println("[Warning]: Mapping for reconciliation field does not exists. Mapping will not be added:\n" + strLine);
+                     continue; 
+                 }
+                    
+                 //Check if the reconciliation field already exist in mappingsToRemove 
+                 if(!mappingsToRemove.containsValue(reconFieldName) && !mappingsToRemove.containsKey(reconFieldKey))
+                 { 
+                     mappingsToRemove.put(reconFieldKey, reconFieldName); 
+                 }
+                    
+                 else
+                 {
+                     System.out.println("[Warning]: Mapping for reconciliation field has already been added . Mapping will not be added:\n" + strLine);
+                     continue; 
+                 }                          
+            }
+            
+            System.out.println("Mappings to remove: " + mappingsToRemove.toString());
+            
+            //Remove fields from the process form 
+            Iterator it = mappingsToRemove.entrySet().iterator();
+    
+            while (it.hasNext()) 
+            {   
+                Map.Entry pairs = (Map.Entry)it.next();
+                String reconFieldKeyToRemove = (String) pairs.getKey();
+                try {
+                    removeReconFieldAndFormFieldMap(formDefOps, processKey, objectKey, reconFieldKeyToRemove);
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcProcessNotFoundException ex) {
+                    Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (tcObjectNotFoundException ex) {
+                    Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+               
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+
+            return true;     
+        } 
+        
+        catch (FileNotFoundException ex) 
+        {
+            Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
+    
     
     /*
      * Determine if a process exist.
@@ -677,7 +821,7 @@ public class ReconFieldMapToFormFieldUtility
         try 
         {
             String query = "SELECT COUNT(*) AS numRows FROM ORF WHERE OBJ_KEY = " + objectKey + " AND ORF_FIELDNAME = '" + reconFieldName + "'";
-            System.out.println(query);
+            //System.out.println(query);
             
             st = oimDBConnection.createStatement(); //Create a statement
             rs = st.executeQuery(query);
@@ -897,6 +1041,68 @@ public class ReconFieldMapToFormFieldUtility
         return false;
     }
     
+    /*
+     * Determine a reconciliation field and form field mapping exist.
+     * Queries from PRF (process and reconcilaition field mapping table) table. 
+     * 
+     * @params
+     *      oimDBConnection - connection to the OIM Schema
+     *      processKey - resource object key (TOS.TOS_KEY)
+     *      reconFieldKey - reconciliation field name (ORF.ORF_FIELDNAME)
+     *      
+     * @return - true for if it exists, false otherwise
+     */
+    public static Boolean doesPRFMappingExist(Connection oimDBConnection, Long processKey, String reconFieldKey)
+    {        
+        Statement st = null;
+        ResultSet rs = null;
+            
+        try 
+        {
+            String query = "SELECT COUNT(*) AS numRows  FROM PRF "
+                    + "WHERE TOS_KEY = '" + processKey + "' AND "
+                    + "ORF_KEY = '" + reconFieldKey + "'";
+            //System.out.println(query);
+            
+            st = oimDBConnection.createStatement(); //Create a statement
+            rs = st.executeQuery(query);
+            rs.next();
+            
+            if(Integer.parseInt(rs.getString("numRows")) == 1)
+            {
+               return true;  
+            }    
+ 
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        finally
+        {
+            if(rs != null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(st != null)
+            {
+                try {
+                    st.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }
+        
+        return false;
+    }
     
     /*
      * Get the corresponding object key associated with a process key.
@@ -959,5 +1165,65 @@ public class ReconFieldMapToFormFieldUtility
         
         return null;
         
+    }
+    
+     /*
+     * Get the reconciliation field key.
+     * 
+     * @params
+     *      oimDBConnection - connection to the OIM Schema
+     *      objectKey - resource object key (OBJ.OBJ_KEY)
+     *      reconFieldName - reconciliation field name (ORF_FIELD_NAME)
+     *      
+     * @return - recon field key; otherwise null
+     */
+    public static String getReconFieldKey(Connection oimDBConnection, Long objectKey, String reconFieldName)
+    {        
+        Statement st = null;
+        ResultSet rs = null;
+            
+        try 
+        {
+            String query = "SELECT ORF_KEY FROM ORF WHERE OBJ_KEY = " + objectKey + " AND ORF_FIELDNAME = '" + reconFieldName + "'";
+            //System.out.println(query);
+            
+            st = oimDBConnection.createStatement(); //Create a statement
+            rs = st.executeQuery(query);
+
+            if(rs.next())
+            {
+                String reconKey = rs.getString("ORF_KEY");
+                return reconKey;
+            }
+ 
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(ReconFieldMapToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        finally
+        {
+            if(rs != null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(st != null)
+            {
+                try {
+                    st.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }
+        
+        return null;
     }
 }

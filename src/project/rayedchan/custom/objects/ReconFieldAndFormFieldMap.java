@@ -90,4 +90,17 @@ public class ReconFieldAndFormFieldMap
     {
         return this.isCaseInsensitive;
     }
+    
+    /*
+     * String representation of the object. Values of the object fields are included in 
+     * the String.
+     */
+    @Override
+    public String toString()
+    {
+        return String.format(
+        "ReconFieldName=%s, FormFieldColumnName=%s, ReconFieldKey=%s, isKeyField=%s, isCaseInsensitive=%s\n",
+        this.reconFieldName, this.formFieldColumnName, this.reconFieldKey,
+        this.isKeyField, this.isCaseInsensitive);
+    }
 }

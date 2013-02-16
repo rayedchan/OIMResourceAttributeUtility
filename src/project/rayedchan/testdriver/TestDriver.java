@@ -162,7 +162,8 @@ public class TestDriver
         //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
         //System.out.println(ReconFieldMapToFormFieldUtility.getFormKeyByObjAndProcKey(oimDBConnection, processKey, objKey));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
-        System.out.println(Boolean.parseBoolean("false"));
+        //System.out.println(Boolean.parseBoolean("false"));
+        //ReconFieldMapToFormFieldUtility.removeReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testRemoveMapPRF");
         
         //tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
             //printTcResultSetRecords(wfDefOps.getAvailableAdapters()); //ADP - Adapters
