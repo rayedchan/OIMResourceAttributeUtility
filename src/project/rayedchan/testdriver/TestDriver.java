@@ -13,23 +13,31 @@ import Thor.API.Exceptions.tcInvalidValueException;
 import Thor.API.Exceptions.tcObjectNotFoundException;
 import Thor.API.Exceptions.tcProcessFormException;
 import Thor.API.Exceptions.tcProcessNotFoundException;
+import Thor.API.Operations.tcExportOperationsIntf;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
+import Thor.API.Operations.tcImportOperationsIntf;
 import Thor.API.Operations.tcLookupOperationsIntf;
 import Thor.API.Operations.tcObjectOperationsIntf;
 import Thor.API.Operations.tcObjectOperationsIntfExtended;
 import Thor.API.Operations.tcWorkflowDefinitionOperationsIntf;
 import Thor.API.tcResultSet;
 import com.thortech.xl.client.dataobj.tcORFClient;
+//import com.thortech.xl.dataobj.util.ReconHorizontalTableConfigUtils;
 import com.thortech.xl.ejb.interfaces.tcORF;
 import com.thortech.xl.ejb.interfaces.tcORFDelegate;
+import com.thortech.xl.orb.dataaccess.tcDataSetData;
+import com.thortech.xl.vo.ddm.RootObject;
 import com.thortech.xl.vo.workflow.AdapterMapping;
 import com.thortech.xl.vo.workflow.TaskDefinition;
 import com.thortech.xl.vo.workflow.WorkflowDefinition;
 import java.io.IOException;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -37,9 +45,26 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import oracle.iam.configservice.api.ConfigManager;
 import oracle.iam.platform.OIMClient;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.services.OIMClientResourceAttr;
@@ -56,7 +81,7 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -65,6 +90,135 @@ public class TestDriver
         tcLookupOperationsIntf lookupOps = oimClient.getService(tcLookupOperationsIntf.class);
         tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
         tcObjectOperationsIntf resourceObjectOps = oimClient.getService(tcObjectOperationsIntf.class);
+        tcExportOperationsIntf exportOps = oimClient.getService(tcExportOperationsIntf.class);
+        
+        //Add "xlDDM.jar" from "/home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/lib" directory to classpath in order to use the import service
+        tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class); 
+
+        String type = "Resource";
+        String resourceObjectName = "LDAP User";
+        Collection objects = exportOps.findObjects(type, resourceObjectName);
+        System.out.println(objects);
+        
+        /*
+         *  <ReconField repo-type="RDBMS" name="test3">
+         *  <ORF_UPDATE>1361032854000</ORF_UPDATE>
+         *  <ORF_FIELDTYPE>String</ORF_FIELDTYPE>
+         *  <ORF_REQUIRED>0</ORF_REQUIRED>
+         *  </ReconField
+         */
+        
+        String resourceObjectXML = exportOps.getExportXML(objects, null);
+        //System.out.println(resourceObjectXML);
+        
+        String RECON_FIELD_TAG = "ReconField";
+        //ReconField Attribute tags
+        String ORF_UPDATE_TAG = "ORF_UPDATE";
+        String ORF_FIELDTYPE_TAG = "ORF_FIELDTYPE";
+        String ORF_REQUIRED_TAG = "ORF_REQUIRED";
+        ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
+        
+        try
+        {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = (Document) builder.parse(new InputSource(new StringReader(resourceObjectXML)));
+            XPathFactory xPathFactory = XPathFactory.newInstance();
+            XPath xpath = xPathFactory.newXPath();
+            
+            NodeList nodes =  (NodeList) xpath.evaluate("xl-ddm-data/Resource", document, XPathConstants.NODESET);
+            
+            Element newReconField = document.createElement(RECON_FIELD_TAG);
+            Element rfAttrUpdate = document.createElement(ORF_UPDATE_TAG);
+            Element rfAttrFieldType = document.createElement(ORF_FIELDTYPE_TAG);
+            Element rfAttrIsRequired = document.createElement(ORF_REQUIRED_TAG);
+            newReconField.setAttribute("repo-type", "RDBMS");
+            newReconField.setAttribute("name", "test10");
+            rfAttrUpdate.setTextContent("1358632739000");
+            rfAttrFieldType.setTextContent("String");
+            rfAttrIsRequired.setTextContent("0");
+            newReconField.appendChild(rfAttrUpdate);
+            newReconField.appendChild(rfAttrFieldType);
+            newReconField.appendChild(rfAttrIsRequired);
+            Node resourceNode = nodes.item(0);
+            resourceNode.appendChild(newReconField);
+            //System.out.println(document);
+            
+            DOMImplementationLS domImplementation = (DOMImplementationLS)  document.getImplementation();
+            LSSerializer lsSerializer = domImplementation.createLSSerializer();
+            System.out.println(lsSerializer.writeToString(document));
+            
+            //XPathExpression expr = xpath.compile("//ReconField"); //Get all tags with "ReconField" tag name regardless of depth
+            //NodeList reconFieldNodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
+            
+            /*NodeList reconFieldNodes = (NodeList) xpath.evaluate("xl-ddm-data/Resource/ReconField", document, XPathConstants.NODESET);
+            int numReconFieldNodes = reconFieldNodes.getLength();
+
+            for(int i = 0; i < numReconFieldNodes; i++)
+            {
+                String reconFieldName = null;
+                String reconFieldType = null;
+                String isRequired = null;
+                Boolean isMultiValued = false;
+                Node reconFieldNode = reconFieldNodes.item(i);
+                NodeList rfAttributeNodes = reconFieldNode.getChildNodes();
+                Element rfElement = (Element) reconFieldNode;
+                reconFieldName = rfElement.getAttribute("name");
+                int numAttributes = rfAttributeNodes.getLength();
+                
+                //System.out.println(reconFieldName);
+               
+                //iterate all the reconciliation field attributes
+                for(int j = 0; j < numAttributes; j++)
+                {
+                    Element attrElement = (Element) rfAttributeNodes.item(j);
+                    String attributeName = attrElement.getTagName();
+                        
+                    if(attributeName.equalsIgnoreCase(ORF_FIELDTYPE_TAG))
+                    {
+                        reconFieldType = attrElement.getTextContent();
+                        if(reconFieldType.equalsIgnoreCase("Multi-Valued"))
+                        {
+                            isMultiValued = true;
+                            break;
+                        }
+                    }
+                    
+                    else if(attributeName.equalsIgnoreCase(ORF_REQUIRED_TAG))
+                    {
+                        isRequired = attrElement.getTextContent();
+                    }
+                   
+                }
+                
+                if(isMultiValued == false)
+                {
+                    ReconciliationField reconField = new ReconciliationField(reconFieldName, reconFieldType, isRequired);
+                    reconFieldArray.add(reconField);
+                }
+                           
+            }*/
+            
+            //System.out.println(reconFieldArray);
+            
+            
+        } 
+        
+        catch (XPathExpressionException ex) { 
+            Logger.getLogger(TestDriver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (SAXException ex) {
+            Logger.getLogger(TestDriver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (ParserConfigurationException ex) {        
+            Logger.getLogger(TestDriver.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+        
+        //importOps.acquireLock(true);
+        //Collection<RootObject> justImported = importOps.addXMLFile("fileName", "xmlContent");
+        //importOps.performImport(justImported);
+        
+        
         
         /*
          * Test Oracle Database connection
@@ -183,5 +337,32 @@ public class TestDriver
                 System.out.println(attrMap.getAdapterVariableName());
             }*/
          
+    }
+    
+}
+
+class ReconciliationField
+{
+    private String reconFieldName = null;
+    private String reconFieldType = null;
+    private String isRequired = null;   
+    
+    public ReconciliationField(String reconFieldName, String reconFieldType, String isRequired)
+    {  
+        this.reconFieldName = reconFieldName;
+        this.reconFieldType = reconFieldType;
+        this.isRequired = isRequired;  
+    }
+    
+        /*
+     * String representation of the object. Values of the object fields are included in 
+     * the String.
+     */
+    @Override
+    public String toString()
+    {
+        return String.format(
+        "%-25s%-25s%-25s\n",        
+        this.reconFieldName, this.reconFieldType, this.isRequired);
     }
 }
