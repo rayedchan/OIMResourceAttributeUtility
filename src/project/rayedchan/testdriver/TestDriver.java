@@ -2,6 +2,7 @@ package project.rayedchan.testdriver;
 
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcAddFieldFailedException;
+import Thor.API.Exceptions.tcBulkException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.Exceptions.tcDeleteNotAllowedException;
 import Thor.API.Exceptions.tcDuplicateLookupCodeException;
@@ -22,6 +23,8 @@ import Thor.API.Operations.tcObjectOperationsIntfExtended;
 import Thor.API.Operations.tcWorkflowDefinitionOperationsIntf;
 import Thor.API.tcResultSet;
 import com.thortech.xl.client.dataobj.tcORFClient;
+import com.thortech.xl.ddm.exception.DDMException;
+import com.thortech.xl.ddm.exception.TransformationException;
 //import com.thortech.xl.dataobj.util.ReconHorizontalTableConfigUtils;
 import com.thortech.xl.ejb.interfaces.tcORF;
 import com.thortech.xl.ejb.interfaces.tcORFDelegate;
@@ -32,6 +35,7 @@ import com.thortech.xl.vo.workflow.TaskDefinition;
 import com.thortech.xl.vo.workflow.WorkflowDefinition;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,6 +54,12 @@ import javax.security.auth.login.LoginException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -81,7 +91,7 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -95,10 +105,11 @@ public class TestDriver
         //Add "xlDDM.jar" from "/home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/lib" directory to classpath in order to use the import service
         tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class); 
 
+        //System.out.println(System.getProperty("file.encoding"));
         String type = "Resource";
         String resourceObjectName = "LDAP User";
         Collection objects = exportOps.findObjects(type, resourceObjectName);
-        System.out.println(objects);
+        //System.out.println(objects);
         
         /*
          *  <ReconField repo-type="RDBMS" name="test3">
@@ -110,6 +121,17 @@ public class TestDriver
         
         String resourceObjectXML = exportOps.getExportXML(objects, null);
         //System.out.println(resourceObjectXML);
+        //System.out.println();
+        //System.out.println();
+        
+        //User has to click the "Create Reconciliation Profile"
+        //When creating a mapping between a process form field and a reconcilition form field,
+        //make sure the process form is active to the current version. The API allows you to
+        //map process form on any process form version active/nonactive. An error will occur if
+        //you add create a mapping with a process form field that is not in the active process form 
+        //whenerver you try to "Create Reconciliation Profile"
+        //Design console only allows user to map form field on the active form.
+        
         
         String RECON_FIELD_TAG = "ReconField";
         //ReconField Attribute tags
@@ -123,6 +145,7 @@ public class TestDriver
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = (Document) builder.parse(new InputSource(new StringReader(resourceObjectXML)));
+            
             XPathFactory xPathFactory = XPathFactory.newInstance();
             XPath xpath = xPathFactory.newXPath();
             
@@ -144,9 +167,22 @@ public class TestDriver
             resourceNode.appendChild(newReconField);
             //System.out.println(document);
             
-            DOMImplementationLS domImplementation = (DOMImplementationLS)  document.getImplementation();
-            LSSerializer lsSerializer = domImplementation.createLSSerializer();
-            System.out.println(lsSerializer.writeToString(document));
+            
+            //Converts to UTF-16
+            //DOMImplementationLS domImplementation = (DOMImplementationLS)  document.getImplementation();
+            //LSSerializer lsSerializer = domImplementation.createLSSerializer();
+            //String newResourceXML = lsSerializer.writeToString(document);
+            //System.out.println(newResourceXML);
+    
+            StringWriter output = new StringWriter();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(output));
+            String newObjectResourceXML = output.toString();
+            //System.out.println(newObjectResourceXML);
+            
+            //importOps.acquireLock(true);
+            //Collection<RootObject> justImported = importOps.addXMLFile("TestReconFieldAdd", newObjectResourceXML);
+            //importOps.performImport(justImported);
             
             //XPathExpression expr = xpath.compile("//ReconField"); //Get all tags with "ReconField" tag name regardless of depth
             //NodeList reconFieldNodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
@@ -202,8 +238,7 @@ public class TestDriver
             //System.out.println(reconFieldArray);
             
             
-        } 
-        
+        }
         catch (XPathExpressionException ex) { 
             Logger.getLogger(TestDriver.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -214,9 +249,7 @@ public class TestDriver
             Logger.getLogger(TestDriver.class.getName()).log(Level.SEVERE, null, ex);
         }        
         
-        //importOps.acquireLock(true);
-        //Collection<RootObject> justImported = importOps.addXMLFile("fileName", "xmlContent");
-        //importOps.performImport(justImported);
+
         
         
         
@@ -313,7 +346,7 @@ public class TestDriver
         //System.out.println(ReconFieldMapToFormFieldUtility.doesObjectExist(oimDBConnection, 1L));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesReconFieldExist(oimDBConnection, 45L, "Email"));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesFormFieldExist(formDefOps, formKey, "UD_LDAP_USR_USERI"));
-        //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
+        ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
         //System.out.println(ReconFieldMapToFormFieldUtility.getFormKeyByObjAndProcKey(oimDBConnection, processKey, objKey));
         //System.out.println(ReconFieldMapToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
         //System.out.println(Boolean.parseBoolean("false"));
