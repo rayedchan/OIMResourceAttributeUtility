@@ -31,13 +31,22 @@ import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconFieldComparator;
 
 /**
- *
  * @author rayedchan
  * A utility to map reconciliation fields to process form fields. A flat file 
  * may be used as a data source to define this mappings. This does not support 
  * multivalued fields at the moment.
  * 
- * Note: Only form fields on the current active process form will be mapped.
+ * Note: Only form fields on the current active process form will be mapped for 
+ * this utility.
+ * 
+ * Differences between Design Console and API:
+ * The API allows you to map process form on any process form version active/nonactive. 
+ * An error will occur if you add create a mapping with a process form field 
+ * that is not in the current active process form whenever you try to "Create Reconciliation Profile"
+ * Design console only allows user to map form field on the active form.
+ * 
+ * TODO: Filter Multi-valued recon fields
+ * Catch type mismatch between form field and recon field
  */
 public class MappingReconFieldToFormFieldUtility 
 {    
@@ -821,7 +830,7 @@ public class MappingReconFieldToFormFieldUtility
     }
     
     /*
-     * Determine if a reconciliation field.
+     * Determine if a reconciliation field exist.
      * Queries from the ORF table.
      * 
      * @params
