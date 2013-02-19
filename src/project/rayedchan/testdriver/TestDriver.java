@@ -14,6 +14,7 @@ import Thor.API.Exceptions.tcInvalidValueException;
 import Thor.API.Exceptions.tcObjectNotFoundException;
 import Thor.API.Exceptions.tcProcessFormException;
 import Thor.API.Exceptions.tcProcessNotFoundException;
+import Thor.API.Exceptions.tcUpdateNotAllowedException;
 import Thor.API.Operations.tcExportOperationsIntf;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.Operations.tcImportOperationsIntf;
@@ -81,8 +82,8 @@ import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
 import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
-import project.rayedchan.utilities.ProcessFormUtility;
-import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
+import project.rayedchan.utilities.ProcessFormFieldUtility;
+import project.rayedchan.utilities.MappingReconFieldToFormFieldUtility;
 
 /**
  *
@@ -91,7 +92,7 @@ import project.rayedchan.utilities.ReconFieldMapToFormFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -307,50 +308,55 @@ public class TestDriver
         String defaultValue = null;
         String profileEnabled = null;
         boolean secure = false;*/
-        //ProcessFormUtility.printProcessFormColumnNames(formDefOps);
-        //ProcessFormUtility.printAllProcessFormInfo(formDefOps);
-        //ProcessFormUtility.printProcessFormFieldColumnNames(formDefOps);
-        //ProcessFormUtility.printProcessFormFields(formDefOps, 47L, 1);
-        //ProcessFormUtility.printProcessFormFieldsFileFormatAdd(formDefOps, "UD_LDAP_USR");
-        //ProcessFormUtility.addFieldsToProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldAdd");
-        //ProcessFormUtility.removeFieldsFromProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldRemove");
+        //ProcessFormFieldUtility.printProcessFormColumnNames(formDefOps);
+        //ProcessFormFieldUtility.printAllProcessFormInfo(formDefOps);
+        //ProcessFormFieldUtility.printProcessFormFieldColumnNames(formDefOps);
+        //ProcessFormFieldUtility.printProcessFormFields(formDefOps, 47L, 1);
+        //ProcessFormFieldUtility.printProcessFormFieldsFileFormatAdd(formDefOps, "UD_LDAP_USR");
+        //ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldAdd");
+        //ProcessFormFieldUtility.removeFieldsFromProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldRemove");
         //formDefOps.updateFormField(formFieldKey, updateFormFieldMap);
         //ProcessFormField processFormFieldObj = new ProcessFormField (processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure);
-        //ProcessFormUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
-        //ProcessFormUtility.removeFormField(formDefOps, 162L);
+        //ProcessFormFieldUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
+        //ProcessFormFieldUtility.removeFormField(formDefOps, 162L);
 
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        long formKey = 47L;
+        /*long formKey = 47L;
         long objKey = 45L; //OBJ.obj_key from OIM schema            
         long processKey = 45L; //PKG_KEY
         String reconFieldKey = "181";
         String processFormFieldName = "UD_LDAP_USR_TEST2"; //need to test case sensitivity 
         Boolean isKeyField  = false;
-        Boolean isCaseInsenstive = false; 
-        ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
+        Boolean isCaseInsenstive = false;*/
+        //ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
         //HelperUtility.getAllProcessDefinitions(oimDBConnection);
         //tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);
         //HelperUtility.printTcResultSetRecords(result);
-        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, processKey);
-        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, processKey, 1, 1);
-        //ReconFieldMapToFormFieldUtility.getFormFields(formDefOps, formKey);
-        //ReconFieldMapToFormFieldUtility.getReconFields(resourceObjectOps, packageKey);
+        //MappingReconFieldToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, processKey);
+        //MappingReconFieldToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, processKey, 1, 1);
+        //MappingReconFieldToFormFieldUtility.getFormFields(formDefOps, formKey);
+        //MappingReconFieldToFormFieldUtility.getReconFields(resourceObjectOps, objKey);
         //HelperUtility.printTcResultSetRecords(formDefOps.getFormFields(47L, 3));
-        //ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMap(formDefOps, processKey, objKey, fieldMappings);
-        //ReconFieldMapToFormFieldUtility.removeReconFieldAndFormFieldMap(formDefOps, processKey, objKey, reconFieldKey);
+        //MappingReconFieldToFormFieldUtility.addReconFieldAndFormFieldMap(formDefOps, processKey, objKey, fieldMappings);
+        //MappingReconFieldToFormFieldUtility.removeReconFieldAndFormFieldMap(formDefOps, processKey, objKey, reconFieldKey);
         //HelperUtility.printTcResultSetRecords(formDefOps.getObjects(45L));
-        //ReconFieldMapToFormFieldUtility.printReconFieldAndFormFieldMappingsAddDSFF(oimDBConnection,formDefOps, processKey);
-        //System.out.println(ReconFieldMapToFormFieldUtility.doesProcessExist(oimDBConnection, 100L));
-        //System.out.println(ReconFieldMapToFormFieldUtility.doesObjectExist(oimDBConnection, 1L));
-        //System.out.println(ReconFieldMapToFormFieldUtility.doesReconFieldExist(oimDBConnection, 45L, "Email"));
-        //System.out.println(ReconFieldMapToFormFieldUtility.doesFormFieldExist(formDefOps, formKey, "UD_LDAP_USR_USERI"));
-        ReconFieldMapToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
-        //System.out.println(ReconFieldMapToFormFieldUtility.getFormKeyByObjAndProcKey(oimDBConnection, processKey, objKey));
-        //System.out.println(ReconFieldMapToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
+        //MappingReconFieldToFormFieldUtility.printReconFieldAndFormFieldMappingsAddDSFF(oimDBConnection,formDefOps, processKey);
+        //System.out.println(MappingReconFieldToFormFieldUtility.doesProcessExist(oimDBConnection, 100L));
+        //System.out.println(MappingReconFieldToFormFieldUtility.doesObjectExist(oimDBConnection, 1L));
+        //System.out.println(MappingReconFieldToFormFieldUtility.doesReconFieldExist(oimDBConnection, 45L, "Email"));
+        //System.out.println(MappingReconFieldToFormFieldUtility.doesFormFieldExist(formDefOps, formKey, "UD_LDAP_USR_USERI"));
+        //MappingReconFieldToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testMapRfToPFF");
+        //System.out.println(MappingReconFieldToFormFieldUtility.getFormKeyByObjAndProcKey(oimDBConnection, processKey, objKey));
+        //System.out.println(MappingReconFieldToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
         //System.out.println(Boolean.parseBoolean("false"));
-        //ReconFieldMapToFormFieldUtility.removeReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testRemoveMapPRF");
+        //MappingReconFieldToFormFieldUtility.removeReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testRemoveMapPRF");
+        
+        
+        
+        
+        
         
         //tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
             //printTcResultSetRecords(wfDefOps.getAvailableAdapters()); //ADP - Adapters
