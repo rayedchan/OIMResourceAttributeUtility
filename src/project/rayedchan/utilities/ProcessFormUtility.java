@@ -26,6 +26,13 @@ import project.rayedchan.custom.objects.ProcessFormField;
 
 /**
  * @author rayedchan
+ * A utility to add and delete a form field. Changes are made to the current 
+ * process form version which has never been active. A flat file can be used 
+ * as a data source. 
+ * 
+ * Note: Once a process form version has been made active, no changes can ever
+ * be made to that form version.
+ * 
  * TODO: Auto-increment order field 
  */
 public class ProcessFormUtility
