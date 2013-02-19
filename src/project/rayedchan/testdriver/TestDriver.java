@@ -84,6 +84,7 @@ import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.ProcessFormFieldUtility;
 import project.rayedchan.utilities.MappingReconFieldToFormFieldUtility;
+import project.rayedchan.utilities.ReconFieldUtility;
 
 /**
  *
@@ -102,15 +103,19 @@ public class TestDriver
         tcFormDefinitionOperationsIntf formDefOps = oimClient.getService(tcFormDefinitionOperationsIntf.class);
         tcObjectOperationsIntf resourceObjectOps = oimClient.getService(tcObjectOperationsIntf.class);
         tcExportOperationsIntf exportOps = oimClient.getService(tcExportOperationsIntf.class);
-        
-        //Add "xlDDM.jar" from "/home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/lib" directory to classpath in order to use the import service
         tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class); 
 
-        //System.out.println(System.getProperty("file.encoding"));
+        
+        /*
+         * ReconFieldUtility
+         */       
         String type = "Resource";
         String resourceObjectName = "LDAP User";
         Collection objects = exportOps.findObjects(type, resourceObjectName);
-        //System.out.println(objects);
+        
+        //System.out.println(System.getProperty("file.encoding"));
+        System.out.println(objects);
+        //ReconFieldUtility.printReconFieldsofResourceObject(oimDBConnection, 45L);
         
         /*
          *  <ReconField repo-type="RDBMS" name="test3">
@@ -125,13 +130,7 @@ public class TestDriver
         //System.out.println();
         //System.out.println();
         
-        //User has to click the "Create Reconciliation Profile"
-        //When creating a mapping between a process form field and a reconcilition form field,
-        //make sure the process form is active to the current version. The API allows you to
-        //map process form on any process form version active/nonactive. An error will occur if
-        //you add create a mapping with a process form field that is not in the active process form 
-        //whenerver you try to "Create Reconciliation Profile"
-        //Design console only allows user to map form field on the active form.
+
         
         
         String RECON_FIELD_TAG = "ReconField";
@@ -139,7 +138,7 @@ public class TestDriver
         String ORF_UPDATE_TAG = "ORF_UPDATE";
         String ORF_FIELDTYPE_TAG = "ORF_FIELDTYPE";
         String ORF_REQUIRED_TAG = "ORF_REQUIRED";
-        ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
+       // ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
         
         try
         {
@@ -323,13 +322,13 @@ public class TestDriver
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        /*long formKey = 47L;
+        long formKey = 47L;
         long objKey = 45L; //OBJ.obj_key from OIM schema            
         long processKey = 45L; //PKG_KEY
         String reconFieldKey = "181";
         String processFormFieldName = "UD_LDAP_USR_TEST2"; //need to test case sensitivity 
         Boolean isKeyField  = false;
-        Boolean isCaseInsenstive = false;*/
+        Boolean isCaseInsenstive = false;
         //ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
         //HelperUtility.getAllProcessDefinitions(oimDBConnection);
         //tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);
@@ -337,7 +336,7 @@ public class TestDriver
         //MappingReconFieldToFormFieldUtility.printReconFieldAndFormFieldMappings(formDefOps, processKey);
         //MappingReconFieldToFormFieldUtility.printReconFieldAndFormFieldMappingsBySort(formDefOps, processKey, 1, 1);
         //MappingReconFieldToFormFieldUtility.getFormFields(formDefOps, formKey);
-        //MappingReconFieldToFormFieldUtility.getReconFields(resourceObjectOps, objKey);
+        /*MappingReconFieldToFormFieldUtility.getReconFields(resourceObjectOps, objKey);*/
         //HelperUtility.printTcResultSetRecords(formDefOps.getFormFields(47L, 3));
         //MappingReconFieldToFormFieldUtility.addReconFieldAndFormFieldMap(formDefOps, processKey, objKey, fieldMappings);
         //MappingReconFieldToFormFieldUtility.removeReconFieldAndFormFieldMap(formDefOps, processKey, objKey, reconFieldKey);
@@ -378,30 +377,4 @@ public class TestDriver
          
     }
     
-}
-
-class ReconciliationField
-{
-    private String reconFieldName = null;
-    private String reconFieldType = null;
-    private String isRequired = null;   
-    
-    public ReconciliationField(String reconFieldName, String reconFieldType, String isRequired)
-    {  
-        this.reconFieldName = reconFieldName;
-        this.reconFieldType = reconFieldType;
-        this.isRequired = isRequired;  
-    }
-    
-        /*
-     * String representation of the object. Values of the object fields are included in 
-     * the String.
-     */
-    @Override
-    public String toString()
-    {
-        return String.format(
-        "%-25s%-25s%-25s\n",        
-        this.reconFieldName, this.reconFieldType, this.isRequired);
-    }
 }
