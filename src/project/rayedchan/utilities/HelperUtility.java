@@ -3,6 +3,9 @@ package project.rayedchan.utilities;
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.tcResultSet;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -10,6 +13,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * @author rayedchan
@@ -78,62 +95,6 @@ public class HelperUtility
            
         }
   
-    }
-    
-    /*
-     * Print all the Objects in OIM. Queries from the OBJ table.
-     * @param 
-     *      conn - connection to the OIM Schema 
-     */
-    public static void printAllOIMObjects(Connection conn) 
-    {
-        Statement st = null;
-        ResultSet rs = null;
-            
-        try 
-        {
-            String query = "SELECT OBJ_KEY, SDK_KEY, OBJ_TYPE, OBJ_NAME FROM OBJ ORDER BY OBJ_NAME";
-            st = conn.createStatement();
-            rs = st.executeQuery(query);
-
-            System.out.printf("%-25s%-25s%-25s%-25s\n", "Object Key", "Object Name", "Object Type", "SDK_KEY");
-            while(rs.next())
-            {
-                String objectKey = rs.getString("OBJ_KEY");
-                String objectName = rs.getString("OBJ_NAME");
-                String objectType = rs.getString("OBJ_TYPE"); 
-                String formKey = rs.getString("SDK_KEY");
-                System.out.printf("%-25s%-25s%-25s%-25s\n", objectKey, objectName, objectType, formKey); 
-            
-            }
-        } 
-        
-        catch (SQLException ex) {
-            Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        finally
-        {
-            if(rs != null)
-            {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            if(st != null)
-            {
-                try {
-                    st.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-        }
-
     }
     
     /*
@@ -237,5 +198,52 @@ public class HelperUtility
         return "true".equalsIgnoreCase(strValue) || "false".equalsIgnoreCase(strValue);
     }
      
+    /*
+     * Parses a String Object, which stores xml content, into a Document Object.
+     * @param
+     *      xmlContent - xml content
+     * 
+     * @return - document representation of the given xml  
+     */
+    public static Document parseStringXMLIntoDocument(String xmlContent) throws ParserConfigurationException, SAXException, IOException
+    {    
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = (Document) builder.parse(new InputSource(new StringReader(xmlContent)));
+        return document;   
+    }
+    
+    /*
+     * Converts a Document into String representation
+     * UTF-8 conversion
+     * @param
+     *      document - Document object to be parsed
+     * 
+     * @return - String representation of xml content
+     */
+    public static String parseDocumentIntoStringXML(Document document) throws TransformerConfigurationException, TransformerException
+    {
+        StringWriter output = new StringWriter();
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(output));
+        String newObjectResourceXML = output.toString();
+        return newObjectResourceXML;
+    }
+    
+     /*
+     * Converts a Document into String representation
+     * UTF-16 conversion
+     * @param
+     *      document - Document object to be parsed
+     * 
+     * @return - String representation of xml content
+     */
+    public static String parseDocumentIntoStringXMLVersion2(Document document) throws TransformerConfigurationException, TransformerException
+    {  
+        DOMImplementationLS domImplementation = (DOMImplementationLS)  document.getImplementation();
+        LSSerializer lsSerializer = domImplementation.createLSSerializer();
+        String newResourceObjectXML = lsSerializer.writeToString(document);
+        return newResourceObjectXML;
+    }
      
 }

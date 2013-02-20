@@ -78,6 +78,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
+import project.rayedchan.custom.objects.ReconciliationField;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
 import project.rayedchan.utilities.HelperUtility;
@@ -108,82 +109,26 @@ public class TestDriver
         
         /*
          * ReconFieldUtility
-         */       
-        String type = "Resource";
+         */   
         String resourceObjectName = "LDAP User";
-        Collection objects = exportOps.findObjects(type, resourceObjectName);
-        
-        //System.out.println(System.getProperty("file.encoding"));
-        System.out.println(objects);
-        //ReconFieldUtility.printReconFieldsofResourceObject(oimDBConnection, 45L);
-        
-        /*
-         *  <ReconField repo-type="RDBMS" name="test3">
-         *  <ORF_UPDATE>1361032854000</ORF_UPDATE>
-         *  <ORF_FIELDTYPE>String</ORF_FIELDTYPE>
-         *  <ORF_REQUIRED>0</ORF_REQUIRED>
-         *  </ReconField
-         */
-        
-        String resourceObjectXML = exportOps.getExportXML(objects, null);
+        //System.out.println(ReconFieldUtility.doesResourceObjectExist(oimDBConnection, resourceObjectName));
+        String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName);
         //System.out.println(resourceObjectXML);
-        //System.out.println();
-        //System.out.println();
-        
-
-        
-        
-        String RECON_FIELD_TAG = "ReconField";
-        //ReconField Attribute tags
-        String ORF_UPDATE_TAG = "ORF_UPDATE";
-        String ORF_FIELDTYPE_TAG = "ORF_FIELDTYPE";
-        String ORF_REQUIRED_TAG = "ORF_REQUIRED";
-       // ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
+        //System.out.println(System.getProperty("file.encoding"));
+        //ReconFieldUtility.printAllResourceObjects(oimDBConnection);
+        //ReconFieldUtility.printReconFieldsofResourceObject(oimDBConnection, 45L);
+        //ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
         
         try
         {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = (Document) builder.parse(new InputSource(new StringReader(resourceObjectXML)));
-            
-            XPathFactory xPathFactory = XPathFactory.newInstance();
-            XPath xpath = xPathFactory.newXPath();
-            
-            NodeList nodes =  (NodeList) xpath.evaluate("xl-ddm-data/Resource", document, XPathConstants.NODESET);
-            
-            Element newReconField = document.createElement(RECON_FIELD_TAG);
-            Element rfAttrUpdate = document.createElement(ORF_UPDATE_TAG);
-            Element rfAttrFieldType = document.createElement(ORF_FIELDTYPE_TAG);
-            Element rfAttrIsRequired = document.createElement(ORF_REQUIRED_TAG);
-            newReconField.setAttribute("repo-type", "RDBMS");
-            newReconField.setAttribute("name", "test10");
-            rfAttrUpdate.setTextContent("1358632739000");
-            rfAttrFieldType.setTextContent("String");
-            rfAttrIsRequired.setTextContent("0");
-            newReconField.appendChild(rfAttrUpdate);
-            newReconField.appendChild(rfAttrFieldType);
-            newReconField.appendChild(rfAttrIsRequired);
-            Node resourceNode = nodes.item(0);
-            resourceNode.appendChild(newReconField);
-            //System.out.println(document);
-            
-            
-            //Converts to UTF-16
-            //DOMImplementationLS domImplementation = (DOMImplementationLS)  document.getImplementation();
-            //LSSerializer lsSerializer = domImplementation.createLSSerializer();
-            //String newResourceXML = lsSerializer.writeToString(document);
-            //System.out.println(newResourceXML);
-    
-            StringWriter output = new StringWriter();
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.transform(new DOMSource(document), new StreamResult(output));
-            String newObjectResourceXML = output.toString();
+            ReconciliationField reconField = new ReconciliationField("test15", "String", false);
+            Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML);
+            ReconFieldUtility.addReconField(document, reconField);
+            String newObjectResourceXML = HelperUtility.parseDocumentIntoStringXML(document);
             //System.out.println(newObjectResourceXML);
-            
-            //importOps.acquireLock(true);
-            //Collection<RootObject> justImported = importOps.addXMLFile("TestReconFieldAdd", newObjectResourceXML);
-            //importOps.performImport(justImported);
-            
+            //System.out.println(ReconFieldUtility.getResourceObjectUpdateTimestamp(document));
+            //ReconFieldUtility.importResourceObject(importOps, newObjectResourceXML, "TestReconFieldAdd");
+
             //XPathExpression expr = xpath.compile("//ReconField"); //Get all tags with "ReconField" tag name regardless of depth
             //NodeList reconFieldNodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
             
