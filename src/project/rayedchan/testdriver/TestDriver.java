@@ -118,6 +118,10 @@ public class TestDriver
         //ReconFieldUtility.printAllResourceObjects(oimDBConnection);
         //ReconFieldUtility.printReconFieldsofResourceObject(oimDBConnection, 45L);
         //ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
+        //ReconFieldUtility.printReconFieldsofResourceObjectFileFormatAdd(oimDBConnection, 45L);
+        //System.out.println(ReconFieldUtility.getResourceObjectName(oimDBConnection, 45L));
+        //System.out.println(ReconFieldUtility.getResourceObjectKey(oimDBConnection, "DBAT_TEST_GTC"));
+        //System.out.println(ReconFieldUtility.doesReconFieldNameExist(oimDBConnection, 45L, "User ID"));
         
         try
         {

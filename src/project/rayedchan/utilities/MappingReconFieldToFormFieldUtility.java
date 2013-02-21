@@ -385,7 +385,7 @@ public class MappingReconFieldToFormFieldUtility
             
             while(mappingAttributeNameTokens.hasMoreTokens())
             {
-                String mappingAttributeName = mappingAttributeNameTokens.nextToken().toLowerCase();
+                String mappingAttributeName = mappingAttributeNameTokens.nextToken();
  
                 //Check if the name of the attribute is valid
                 if(mappingAttributeName.equalsIgnoreCase(RECONFIELDNAME))

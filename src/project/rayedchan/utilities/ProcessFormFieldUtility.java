@@ -38,7 +38,7 @@ import project.rayedchan.custom.objects.ProcessFormField;
 public class ProcessFormFieldUtility
 {
     //List of possible field attribute names to be specified in file for adding fields
-    public static String FIELDLABEL = "field_label";
+    public static String FIELDLABEL = "field_label"; //required
     public static String VARIANTTYPE = "variant_type";
     public static String FIELDTYPE = "field_type";
     public static String LENGTH = "length";
@@ -142,7 +142,7 @@ public class ProcessFormFieldUtility
             while(attributeNameToken.hasMoreTokens())
             {
                 //System.out.println();
-                String fieldAttributeName = attributeNameToken.nextToken().toLowerCase();
+                String fieldAttributeName = attributeNameToken.nextToken();
                 
                 //Check if the name of the attribute is valid
                 if(fieldAttributeName.equalsIgnoreCase(FIELDLABEL))
@@ -343,7 +343,7 @@ public class ProcessFormFieldUtility
             Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-         finally
+        finally
         {
             if(br != null)
             {

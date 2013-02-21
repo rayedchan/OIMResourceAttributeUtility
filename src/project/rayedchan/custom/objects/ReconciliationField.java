@@ -6,9 +6,9 @@ package project.rayedchan.custom.objects;
  */
 public class ReconciliationField
 {
-    private String reconFieldName = null;
-    private String reconFieldType = null;
-    private Boolean isRequired = null;   
+    private String reconFieldName;
+    private String reconFieldType;
+    private Boolean isRequired = false;   
     
     /*
      * Constructors
@@ -18,6 +18,11 @@ public class ReconciliationField
         this.reconFieldName = reconFieldName;
         this.reconFieldType = reconFieldType;
         this.isRequired = isRequired;  
+    }
+    
+    public ReconciliationField()
+    {  
+ 
     }
     
     /*
