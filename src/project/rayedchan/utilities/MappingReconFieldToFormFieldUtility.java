@@ -342,7 +342,7 @@ public class MappingReconFieldToFormFieldUtility
      */
     public static Boolean addReconFieldAndFormFieldMapDSFF(Connection oimDBConnection, tcFormDefinitionOperationsIntf formDefOps, String fileName) throws IOException, tcAPIException, tcFormNotFoundException, tcColumnNotFoundException
     {        
-        HashMap<String,String> mappings = new HashMap<String,String>(); //store all the mappings of a recon field and a form field
+        HashMap<String,String> mappings = new HashMap<String,String>(); //store all the mappings of a recon field and a form field in staging
         FileInputStream fstream = null;
         DataInputStream in = null;
         BufferedReader br = null;
@@ -545,7 +545,7 @@ public class MappingReconFieldToFormFieldUtility
                         continue;
                     }
                     
-                    //Enforce one to one mapping
+                    //Enforce one to one mapping and make sure recon field or process form field are not duplicated
                     if(!mappings.containsValue(formFieldColumnName) && !mappings.containsKey(reconFieldName))
                     { 
                         mappings.put(reconFieldName, formFieldColumnName); 

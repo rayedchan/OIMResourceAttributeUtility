@@ -125,18 +125,20 @@ public class TestDriver
         
         try
         {
-            ReconciliationField reconField = new ReconciliationField("test15", "String", false);
+            //ReconciliationField reconField = new ReconciliationField("test15", "String", false);
             Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML);
-            ReconFieldUtility.addReconField(document, reconField);
+            //ReconFieldUtility.addReconField(document, reconField);
+            ReconFieldUtility.removeReconField(document, "test7");
             String newObjectResourceXML = HelperUtility.parseDocumentIntoStringXML(document);
-            //System.out.println(newObjectResourceXML);
+            //ReconFieldUtility.addReconFieldsDSFF(oimDBConnection, exportOps, importOps, "/home/oracle/Desktop/testReconFieldAdd");
+           
+            System.out.println(newObjectResourceXML);
             //System.out.println(ReconFieldUtility.getResourceObjectUpdateTimestamp(document));
-            //ReconFieldUtility.importResourceObject(importOps, newObjectResourceXML, "TestReconFieldAdd");
+            ReconFieldUtility.importResourceObject(importOps, newObjectResourceXML, "TestReconFieldRemove");
 
             //XPathExpression expr = xpath.compile("//ReconField"); //Get all tags with "ReconField" tag name regardless of depth
             //NodeList reconFieldNodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
-            
-            /*NodeList reconFieldNodes = (NodeList) xpath.evaluate("xl-ddm-data/Resource/ReconField", document, XPathConstants.NODESET);
+            /*NodeList reconFieldNodes = (NodeList) xpath.evaluate("xl-ddm-data/Resource/ReconField", document, XPathConstants.NODESET); //do not get the mulitvalued reconField
             int numReconFieldNodes = reconFieldNodes.getLength();
 
             for(int i = 0; i < numReconFieldNodes; i++)
@@ -324,6 +326,12 @@ public class TestDriver
                 System.out.println(attrMap.getAdapterVariableName());
             }*/
          
+        
+        
+        //HashMap<String, String> map = new HashMap<String,String>();
+        //map.put("hello", null);
+        //map.put("test1", null);
+        //System.out.println(map.toString());
     }
     
 }

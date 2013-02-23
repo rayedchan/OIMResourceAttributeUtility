@@ -191,6 +191,8 @@ public class ProcessFormFieldUtility
                 return false;
             }
             
+            HashMap<String, String> formFieldDuplicationValidator = new HashMap<String, String>(); // used to make sure duplications are not being 
+            
             //Read each process form field from file
             while ((strLine = br.readLine()) != null)  
             {
@@ -224,6 +226,15 @@ public class ProcessFormFieldUtility
                             break;
                         }
                         
+                        //Validate if form field label has already been added to staging
+                        if(formFieldDuplicationValidator.containsKey(fieldName))
+                        {
+                            System.out.println("[Warning]: Field label '" + fieldName + "' exists in staging. Field will not be added:\n" + strLine);
+                            isFieldRecordFromFileValid = false;
+                            break; 
+                        }
+                           
+                        formFieldDuplicationValidator.put(fieldName, null);
                         processFormFieldObj.setFieldName(fieldName);
                     }
 
@@ -244,7 +255,6 @@ public class ProcessFormFieldUtility
 
                     else if(fieldAttributeName.equalsIgnoreCase(FIELDTYPE))
                     {
-                        
                         String fieldType = fieldAttributeValueToken.nextToken();
                         
                         //check if the field type is valid

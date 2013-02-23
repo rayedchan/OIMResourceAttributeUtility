@@ -19,10 +19,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -32,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ReconciliationField;
 
 /**
@@ -40,9 +49,11 @@ import project.rayedchan.custom.objects.ReconciliationField;
  * from an object resource. Removal and creation of a reconciliation field 
  * are done at the meta-data level.
  * 
- * Note: When using this utility to add or remove reconciliation fields, 
- * the "Create Reconciliation Profile" button in design console may have to be
- * clicked.(Need to verify this)
+ * Note: When using this utility to add reconciliation fields, 
+ * the "Create Reconciliation Profile" is initiated by the import utility.
+ * The import utility merges with the existing data. If data is removed from the
+ * xml and imported back, that data will be removed if and only if there is 
+ * no mapping for the reconciliation field.
  * 
  * Add "xlDDM.jar" is required to use tcImportOperationsIntf service 
  * "/home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/lib" 
@@ -166,7 +177,9 @@ public class ReconFieldUtility
                 return false;
             }
             
-                        
+                     
+            HashMap<String,String> reconFieldDuplicationValidator = new HashMap<String,String>(); //validate if a recon field has already been added to staging
+                    
             //Read each recon field from file
             while ((strLine = br.readLine()) != null)  
             {
@@ -200,23 +213,39 @@ public class ReconFieldUtility
                             break;
                         }
                         
+                        //Check if reconciliation field has already been added to staging
+                        if(reconFieldDuplicationValidator.containsKey(fieldName))
+                        {
+                            System.out.println("[Warning]: Field label '" + fieldName + "' exists in staging. Field will not be added:\n" + strLine);
+                            isFieldRecordFromFileValid = false;
+                            break;
+                        }
+                        
+                        reconFieldDuplicationValidator.put(fieldName, null);
                         reconFieldObj.setReconFieldName(fieldName);
                     }
 
-                    /*else if(fieldAttributeName.equalsIgnoreCase(RECON_FIELD_ATTR_TYPE))
+                    else if(fieldAttributeName.equalsIgnoreCase(RECON_FIELD_ATTR_TYPE))
                     {
                         String fieldType = fieldAttributeValueToken.nextToken();
                         
-                         //check if the variant type is valid
-                        if(!isFieldVariantTypeValid(fieldType))
+                        if(fieldType.equalsIgnoreCase(RECON_FIELD_TYPE_MULTI_VALUE))
                         {
-                            System.out.println("[Warning]: Variant type '" + fieldType + "' is not valid. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning]: Field type '" + fieldType + "' is not supported. Field will not be added:\n" + strLine);
+                            isFieldRecordFromFileValid = false;
+                            break; 
+                        }
+                        
+                         //check if the variant type is valid
+                        if(!isReconFieldTypeValid(fieldType))
+                        {
+                            System.out.println("[Warning]: Field type '" + fieldType + "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break; 
                         }
                         
                         reconFieldObj.setReconFieldType(fieldType);
-                    }*/
+                    }
 
                     else if(fieldAttributeName.equalsIgnoreCase(RECON_FIELD_ATTR_ISREQUIRED))
                     {
@@ -242,8 +271,79 @@ public class ReconFieldUtility
                 
             }
             
+            System.out.println(newReconFieldArray);
+            String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName); //Export the resource metadata as a String
+            Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML); //convert xml to a Document
+            
+            //Add reconciliation fields to the resource metadata
+            for(ReconciliationField newReconFieldToAdd: newReconFieldArray)
+            {
+                try 
+                {
+                    addReconField(document, newReconFieldToAdd);
+                } 
+                
+                catch (XPathExpressionException ex) 
+                {
+                    Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            String newObjectResourceXML = HelperUtility.parseDocumentIntoStringXML(document);
+            System.out.println(newObjectResourceXML);
+            importResourceObject(importOps, newObjectResourceXML, "TestReconFieldAdd");
             return true;
         } 
+        
+        catch (SQLException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (NamingException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (DDMException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (TransformationException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (tcBulkException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (TransformerConfigurationException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (TransformerException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (ParserConfigurationException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (SAXException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (tcAPIException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         catch (FileNotFoundException ex) 
         {
@@ -254,9 +354,7 @@ public class ReconFieldUtility
         { 
             Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-
-        
+       
         finally
         {
             if(br != null)
@@ -297,7 +395,7 @@ public class ReconFieldUtility
      * <ORF_UPDATE>1361032854000</ORF_UPDATE>
      * <ORF_FIELDTYPE>String</ORF_FIELDTYPE>
      * <ORF_REQUIRED>0</ORF_REQUIRED>
-     * </ReconField
+     * </ReconField>
      * 
      * Set the ORF_UPDATE to the date of when the object was last updated (OBJ_UPDATE).
      * 
@@ -339,6 +437,43 @@ public class ReconFieldUtility
         //Get the resource node tag and insert reconField within the resource tag
         Node resourceNode = nodes.item(0); 
         resourceNode.appendChild(newReconField); 
+    }
+    
+    /*
+     * Removes a reconciliation field from the resource xml.
+     * The reconciliation field can only be removed if and only if the
+     * reconciliation field has not been mapped to a form field.
+     * 
+     * @param 
+     *      document - object representation of an object resource xml
+     *      reconFieldName - reconciliation field to remove from document
+     */
+    public static void removeReconField(Document document, String reconFieldName) throws XPathExpressionException
+    {  
+        XPathFactory xpf = XPathFactory.newInstance();
+        XPath xpath = xpf.newXPath();
+        XPathExpression expression = xpath.compile("xl-ddm-data/Resource/ReconField[@name=\""+ reconFieldName +"\"]");
+            
+        Node reconFieldNode = (Node) expression.evaluate(document, XPathConstants.NODE); //pinpoint recon field to remove
+        reconFieldNode.getParentNode().removeChild(reconFieldNode); //Get the parent node then remove target child node        
+        //System.out.println(reconFieldNode.getTextContent());
+            
+        /*try 
+        {
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer t = tf.newTransformer();
+            t.transform(new DOMSource(document), new StreamResult(System.out));
+        } 
+            
+        catch (TransformerConfigurationException ex)
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        catch (TransformerException ex)
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }*/ 
     }
     
     
@@ -645,6 +780,20 @@ public class ReconFieldUtility
         }   
         
         return false;
+    }
+    
+    /*
+     * Determine if the field type of a reconciliation field is valid.
+     * @param
+     *      fieldType - name of field type
+     * 
+     * @return - boolean value to indicate if a variant type is valid
+     */
+    public static boolean isReconFieldTypeValid(String fieldType)
+    {
+        return fieldType.equalsIgnoreCase(RECON_FIELD_TYPE_STRING) || fieldType.equalsIgnoreCase(RECON_FIELD_TYPE_MULTI_VALUE)  
+        || fieldType.equalsIgnoreCase(RECON_FIELD_TYPE_NUMBER) || fieldType.equalsIgnoreCase(RECON_FIELD_TYPE_IT_RESOURCE) 
+        || fieldType.equalsIgnoreCase(RECON_FIELD_TYPE_DATE);
     }
     
     /*
