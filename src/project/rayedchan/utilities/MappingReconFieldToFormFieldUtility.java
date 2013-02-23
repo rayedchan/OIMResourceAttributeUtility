@@ -470,6 +470,22 @@ public class MappingReconFieldToFormFieldUtility
                             break;
                         }
                         
+                        //Check if the recon field is a multivalued attribute
+                        if(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, objectKey, reconFieldName) == true)
+                        {
+                            System.out.println("[Warning]: Recon Field'" + reconFieldName + "' is a mulitvalued attribute. Mapping will not be added:\n" + strLine);
+                            isMappingFromFileValid = false;
+                            break;
+                        }
+
+                        //Check if the recon field is a child attribute
+                        if(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, objectKey , reconFieldName) == true)
+                        {
+                            System.out.println("[Warning]: Recon Field'" + reconFieldName + "' is a child attribute. Mapping will not be added:\n" + strLine);
+                            isMappingFromFileValid = false;
+                            break; 
+                        }
+                        
                         reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
                         fieldMapping.setReconFieldKey(reconFieldKey);
                         fieldMapping.setReconFieldName(reconFieldName);
@@ -649,6 +665,20 @@ public class MappingReconFieldToFormFieldUtility
                  //validate the existence of the recon field on current line
                  if(doesReconFieldExist(oimDBConnection, objectKey, reconFieldName) == false)
                  {      
+                     System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be removed.");
+                     continue;
+                 }
+                                
+                 //Check if the recon field is a multivalued attribute
+                 if(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, objectKey, reconFieldName) == true)
+                 {
+                     System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be removed.");
+                     continue;
+                 }
+
+                 //Check if the recon field is a child attribute
+                 if(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, objectKey , reconFieldName) == true)
+                 {
                      System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be removed.");
                      continue;
                  }
@@ -1089,6 +1119,67 @@ public class MappingReconFieldToFormFieldUtility
             String query = "SELECT COUNT(*) AS numRows  FROM PRF "
                     + "WHERE TOS_KEY = '" + processKey + "' AND "
                     + "ORF_KEY = '" + reconFieldKey + "'";
+            //System.out.println(query);
+            
+            st = oimDBConnection.createStatement(); //Create a statement
+            rs = st.executeQuery(query);
+            rs.next();
+            
+            if(Integer.parseInt(rs.getString("numRows")) == 1)
+            {
+               return true;  
+            }    
+ 
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(MappingReconFieldToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        finally
+        {
+            if(rs != null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(st != null)
+            {
+                try {
+                    st.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }
+        
+        return false;
+    }
+    
+    /*
+     * Determine if a reconciliation field has already been mapped.
+     * Queries from PRF (process and reconcilaition field mapping table) table. 
+     * 
+     * @params
+     *      oimDBConnection - connection to the OIM Schema
+     *      reconFieldKey - reconciliation field name (ORF.ORF_FIELDNAME)
+     *      
+     * @return - true for if it exists, false otherwise
+     */
+    public static Boolean isReconFieldMapped(Connection oimDBConnection, String reconFieldKey)
+    {        
+        Statement st = null;
+        ResultSet rs = null;
+            
+        try 
+        {
+            String query = "SELECT COUNT(*) AS numRows  FROM PRF "
+                    + "WHERE ORF_KEY = '" + reconFieldKey + "'";
             //System.out.println(query);
             
             st = oimDBConnection.createStatement(); //Create a statement

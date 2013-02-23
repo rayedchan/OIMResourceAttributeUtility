@@ -91,6 +91,10 @@ import project.rayedchan.utilities.ReconFieldUtility;
  *
  * @author rayedchan
  * //TODO: close resources
+ * TODO: ProcessFormUtility 
+ *      make active form function
+ *      validation method on deleting form field
+ *
  */
 public class TestDriver 
 {
@@ -106,7 +110,6 @@ public class TestDriver
         tcExportOperationsIntf exportOps = oimClient.getService(tcExportOperationsIntf.class);
         tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class); 
 
-        
         /*
          * ReconFieldUtility
          */   
@@ -122,19 +125,23 @@ public class TestDriver
         //System.out.println(ReconFieldUtility.getResourceObjectName(oimDBConnection, 45L));
         //System.out.println(ReconFieldUtility.getResourceObjectKey(oimDBConnection, "DBAT_TEST_GTC"));
         //System.out.println(ReconFieldUtility.doesReconFieldNameExist(oimDBConnection, 45L, "User ID"));
+        //System.out.println(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, 45L, "Group Name"));
+        //System.out.println(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, 45L, "test6"));
+        
         
         try
         {
-            //ReconciliationField reconField = new ReconciliationField("test15", "String", false);
+            ReconciliationField reconField = new ReconciliationField("test15", "String", false);
             Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML);
-            //ReconFieldUtility.addReconField(document, reconField);
-            ReconFieldUtility.removeReconField(document, "test7");
+            ReconFieldUtility.addReconField(document, reconField);
+            //ReconFieldUtility.removeReconField(document, "test7");
             String newObjectResourceXML = HelperUtility.parseDocumentIntoStringXML(document);
             //ReconFieldUtility.addReconFieldsDSFF(oimDBConnection, exportOps, importOps, "/home/oracle/Desktop/testReconFieldAdd");
-           
-            System.out.println(newObjectResourceXML);
+            //ReconFieldUtility.removeReconFieldDSFF(oimDBConnection, exportOps, importOps, "/home/oracle/Desktop/testReconFieldRemove");
+            
+            //System.out.println(newObjectResourceXML);
             //System.out.println(ReconFieldUtility.getResourceObjectUpdateTimestamp(document));
-            ReconFieldUtility.importResourceObject(importOps, newObjectResourceXML, "TestReconFieldRemove");
+            //ReconFieldUtility.importResourceObject(importOps, newObjectResourceXML, "TestReconFieldRemove");
 
             //XPathExpression expr = xpath.compile("//ReconField"); //Get all tags with "ReconField" tag name regardless of depth
             //NodeList reconFieldNodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
@@ -273,13 +280,13 @@ public class TestDriver
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        long formKey = 47L;
+        /*long formKey = 47L;
         long objKey = 45L; //OBJ.obj_key from OIM schema            
         long processKey = 45L; //PKG_KEY
         String reconFieldKey = "181";
         String processFormFieldName = "UD_LDAP_USR_TEST2"; //need to test case sensitivity 
         Boolean isKeyField  = false;
-        Boolean isCaseInsenstive = false;
+        Boolean isCaseInsenstive = false;*/
         //ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
         //HelperUtility.getAllProcessDefinitions(oimDBConnection);
         //tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);

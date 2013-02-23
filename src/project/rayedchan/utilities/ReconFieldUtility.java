@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -196,7 +197,6 @@ public class ReconFieldUtility
                 
                 boolean isFieldRecordFromFileValid = true;
                 
-                
                 for(int i = 0; i < numFieldAttributeNames; i++)
                 {
                     String fieldAttributeName = reconFieldAttributeNameArray.get(i);
@@ -208,7 +208,7 @@ public class ReconFieldUtility
                         //Check if the recon field name exist
                         if(doesReconFieldNameExist(oimDBConnection, resourceObjectKey, fieldName) == true)
                         {
-                            System.out.println("[Warning]: Field label '" + fieldName + "' exists. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning]: Recon Field '" + fieldName + "' exists. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break;
                         }
@@ -216,7 +216,7 @@ public class ReconFieldUtility
                         //Check if reconciliation field has already been added to staging
                         if(reconFieldDuplicationValidator.containsKey(fieldName))
                         {
-                            System.out.println("[Warning]: Field label '" + fieldName + "' exists in staging. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning]: Recon Field '" + fieldName + "' exists in staging. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break;
                         }
@@ -387,6 +387,215 @@ public class ReconFieldUtility
         
         return false;
     }
+    
+    /*
+     * Remove reconciliation fields specified in a flat file.
+     * This method does not remove mulitvalued attributes.
+     * 
+     * Checks:
+     * Check existence of resource object
+     * Validate existence of reconciliation field in OIM
+     * Make sure there exist no mapping for the reconciliation field
+     * 
+     * File Format
+     * <Resource Object Name>
+     * <reconFieldName1>
+     * <reconFieldName2>
+     * 
+     * @params
+     *       oimDBConnection - connection to the OIM Schema
+     *       exportOps - tcExportOperationsIntf service object
+     *       importOps - tcImportOperationsIntf service object
+     *       fileName - file that contains the reconciliation fields to add
+     */
+    public static Boolean removeReconFieldDSFF(Connection oimDBConnection, tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName)
+    {     
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+            
+        try 
+        {    
+            fstream = new FileInputStream(fileName); //Open File
+            in = new DataInputStream(fstream); //Get the object of DataInputStream
+            br = new BufferedReader(new InputStreamReader(in));
+            String strLine; //var to store a line of a file
+           
+            //First line of the file should be the name resource object
+            String resourceObjectName = br.readLine();
+            if(doesResourceObjectExist(oimDBConnection, resourceObjectName) == false)
+            {
+                System.out.println("[Error]: Resource Object name "+ resourceObjectName + " does not exist.");
+                return false;
+            }
+            
+            Long resourceObjectKey = getResourceObjectKey(oimDBConnection, resourceObjectName);         
+            HashMap<String,String> reconFieldToRemove = new HashMap<String,String>(); //store the recon field names to be removed
+                    
+            //Read each recon field name from file
+            while ((strLine = br.readLine()) != null)  
+            {               
+                String fieldName = strLine;
+      
+                //Check if the recon field name exist
+                if(doesReconFieldNameExist(oimDBConnection, resourceObjectKey, fieldName) == false)
+                {      
+                    System.out.println("[Warning]: Recon Field '" + fieldName + "' does not exists.");
+                    continue;
+                }
+                
+                //Check if the recon field is a multivalued attribute
+                if(isReconFieldMulitvalued(oimDBConnection, resourceObjectKey, fieldName) == true)
+                {
+                    System.out.println("[Warning]: Recon Field'" + fieldName + "' is a mulitvalued attribute.");
+                    continue;
+                }
+                
+                //Check if the recon field is a child attribute
+                if(isReconFieldChildAttribute(oimDBConnection, resourceObjectKey , fieldName) == true)
+                {
+                    System.out.println("[Warning]: Recon Field'" + fieldName + "' is a child attribute.");
+                    continue;   
+                }
+                        
+                //Check if reconciliation field has already been added to staging
+                if(reconFieldToRemove.containsKey(fieldName))
+                {      
+                    System.out.println("[Warning]: Recon Field '" + fieldName + "' exists in staging.");
+                    continue;
+                }
+                
+                String reconFieldKey = MappingReconFieldToFormFieldUtility.getReconFieldKey(oimDBConnection, resourceObjectKey, fieldName);
+             
+                //Validate if a recon field has a mapping
+                if(MappingReconFieldToFormFieldUtility.isReconFieldMapped(oimDBConnection, reconFieldKey) == true)
+                {   
+                     System.out.println("[Warning]: Reconciliation field '"+ fieldName + "'cannot be removed until mapping is removed");
+                     continue; 
+                }
+                
+                reconFieldToRemove.put(fieldName, null);  
+            }
+
+            System.out.println(reconFieldToRemove);
+            String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName); //Export the resource metadata as a String
+            Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML); //convert xml to a Document
+            
+            //Add reconciliation fields to the resource metadata
+            for(Map.Entry<String,String> entry: reconFieldToRemove.entrySet())
+            {
+                String reconFieldName = entry.getKey();
+                try 
+                {
+                    removeReconField(document,reconFieldName);
+                } 
+                
+                catch (XPathExpressionException ex) 
+                {
+                    Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            String newObjectResourceXML = HelperUtility.parseDocumentIntoStringXML(document);
+            System.out.println(newObjectResourceXML);
+            importResourceObject(importOps, newObjectResourceXML, "TestReconFieldRemove");
+            return true;
+        } 
+        
+        catch (SQLException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (NamingException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (DDMException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (TransformationException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (tcBulkException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (TransformerConfigurationException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (TransformerException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (ParserConfigurationException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (SAXException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (tcAPIException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (FileNotFoundException ex) 
+        {
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        catch (IOException ex) 
+        { 
+            Logger.getLogger(ReconFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        finally
+        {
+            if(br != null)
+            {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(in != null)
+            {
+                try {
+                    in.close(); //Close the input stream
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(fstream != null)
+            {
+                try {
+                    fstream.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }      
+        
+        return false;
+        
+    }
+    
     
     /*
      * Adds a reconciliation field to the resource xml.
@@ -727,9 +936,10 @@ public class ReconFieldUtility
      * Determine if the reconciliation field name exists.
      * @param 
      *      conn - connection to the OIM Schema 
-     *      reconFieldName - recon field name to check  
+     *      resourceObjectKey - resource object
+     *      reconFieldName - recon field name to check
      * 
-     * @return - corresponding resource object name
+     * @return - true if the recon field name exists; false otherwise
      */
     public static Boolean doesReconFieldNameExist(Connection conn, Long resourceObjectKey ,String reconFieldName)
     {
@@ -963,4 +1173,133 @@ public class ReconFieldUtility
             
         }
     }
+    
+    /*
+     * Determines if a reconciliation field is multivalued.
+     * @params    
+     *      conn - connection to the OIM Schema 
+     *      resourceObjectKey - resource object
+     *      reconFieldName - recon field name to check
+     * 
+     * @return - boolean value
+     */
+    public static Boolean isReconFieldMulitvalued(Connection conn, Long resourceObjectKey ,String reconFieldName)
+    {
+        Statement st = null;
+        ResultSet rs = null;
+        
+        try 
+        {
+            String query = "SELECT ORF_FIELDTYPE FROM ORF WHERE "
+                    + "OBJ_KEY = '" + resourceObjectKey + "' AND "
+                    + "ORF_FIELDNAME = '" + reconFieldName + "'" ;
+            
+            st = conn.createStatement();
+            rs = st.executeQuery(query);
+            
+            if(rs.next())
+            {
+               String type = rs.getString("ORF_FIELDTYPE");
+               if(type.equalsIgnoreCase(RECON_FIELD_TYPE_MULTI_VALUE))
+               {
+                   return true;
+               }
+            }    
+        } 
+        
+        catch (SQLException ex)
+        {
+            Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        finally
+        {
+            if(rs != null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(st != null)
+            {
+                try {
+                    st.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }   
+        
+        return false;
+    }
+    
+    
+    /*
+     * Determines if a reconciliation field is a child attribute.
+     * @params    
+     *      conn - connection to the OIM Schema 
+     *      resourceObjectKey - resource object
+     *      reconFieldName - recon field name to check
+     * 
+     * @return - boolean value
+     */
+    public static Boolean isReconFieldChildAttribute(Connection conn, Long resourceObjectKey ,String reconFieldName)
+    {
+        Statement st = null;
+        ResultSet rs = null;
+        
+        try 
+        {
+            String query = "SELECT ORF_PARENT_ORF_KEY FROM ORF WHERE "
+                    + "OBJ_KEY = '" + resourceObjectKey + "' AND "
+                    + "ORF_FIELDNAME = '" + reconFieldName + "'" ;
+            
+            st = conn.createStatement();
+            rs = st.executeQuery(query);
+            
+            if(rs.next())
+            {
+               String isChildAttribute = rs.getString("ORF_PARENT_ORF_KEY");
+               if(isChildAttribute != null && !isChildAttribute.isEmpty())
+               {
+                   return true;
+               }
+            }    
+        } 
+        
+        catch (SQLException ex)
+        {
+            Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        finally
+        {
+            if(rs != null)
+            {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(st != null)
+            {
+                try {
+                    st.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }   
+        
+        return false;
+    }
+    
+    
 }
