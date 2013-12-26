@@ -29,7 +29,6 @@ import java.util.logging.Logger;
  * Differences between API and Design Console:
  * Design Console allows duplicate code key; API restricts duplicate code key.
  * Lookup definition name cannot be changed in Design Console, but through API the name can be changed.
- * 
  */
 public class LookupUtility 
 {
