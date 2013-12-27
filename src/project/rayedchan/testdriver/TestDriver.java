@@ -37,6 +37,8 @@ import com.thortech.xl.vo.workflow.StatusMapping;
 import com.thortech.xl.vo.workflow.TaskAssignment;
 import com.thortech.xl.vo.workflow.TaskDefinition;
 import com.thortech.xl.vo.workflow.WorkflowDefinition;
+import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -45,6 +47,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +59,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -85,6 +94,7 @@ import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconciliationField;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
+import project.rayedchan.swing.gui.LoginFrame;
 import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.ProcessFormFieldUtility;
@@ -103,7 +113,69 @@ import project.rayedchan.utilities.ReconFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException
+    public static void main(String[] args)
+    {
+         new LoginFrame();
+    }
+    
+    //Handles the creation of the JFrame and all it's components
+    private static void createGuiFrame()
+    {
+        JFrame guiFrame = new JFrame();
+        
+        //make sure the program exits when the frame closes
+        guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        guiFrame.setTitle("Dialog Box Example");
+        guiFrame.setSize(500,300);
+        
+        //This will center the JFrame in the middle of the screen
+        guiFrame.setLocationRelativeTo(null);
+        guiFrame.setVisible(true);
+        
+        //Using a JPanel as the message for the JOptionPane
+        JPanel userPanel = new JPanel();
+        userPanel.setLayout(new GridLayout(2,2));
+
+        //Labels for the textfield components        
+        JLabel usernameLbl = new JLabel("User ID:");
+        JLabel passwordLbl = new JLabel("Password:");
+
+        //Input components
+        JTextField usernameFld = new JTextField();
+        JPasswordField passwordFld = new JPasswordField();
+
+        //Add the components to the JPanel        
+        userPanel.add(usernameLbl);
+        userPanel.add(usernameFld);
+        userPanel.add(passwordLbl);
+        userPanel.add(passwordFld);
+
+        //As the JOptionPane accepts an object as the message
+        //it allows us to use any component we like - in this case 
+        //a JPanel containing the dialog components we want
+        String title = "Custom OIM Resource Console";
+        int input = JOptionPane.showConfirmDialog(guiFrame, userPanel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            
+        //User attempts to login
+        if(input == JOptionPane.OK_OPTION)
+        {
+            //Get values from input field
+            String username = usernameFld.getText();
+            char[] password = passwordFld.getPassword(); 
+            
+            System.out.println(username);
+            System.out.println(password);
+            
+            //Fill password array with zeroes
+            Arrays.fill(password, '0');
+        }
+    }
+    
+    
+    
+    
+    
+    public static void others(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
