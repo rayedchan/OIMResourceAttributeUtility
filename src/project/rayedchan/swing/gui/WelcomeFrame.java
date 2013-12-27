@@ -2,6 +2,8 @@ package project.rayedchan.swing.gui;
 
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -11,14 +13,27 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * @author rayedchan
+ * Displays the options for utility.
  */
 public class WelcomeFrame extends JFrame
 {
+    private JButton lookupBtn;
+    private JButton processFormFieldBtn;
+    private JButton processTaskBtn;
+    private JButton reconFieldBtn;
+    private JButton rfToPffMappingBtn;
+    
+    /*
+     * Constructor
+     */
     public WelcomeFrame()
     {
         initUI();
     }
-    
+     
+    /*
+     * Handles the creation of the JFrame and all it's components
+     */
     public final void initUI()
     {
         JPanel panel = new JPanel();
@@ -26,11 +41,21 @@ public class WelcomeFrame extends JFrame
         panel.setBorder(new EmptyBorder(new Insets(40, 60, 40, 60)));
              
         //Panel Components
-        JButton lookupBtn = new JButton("Lookups");
-        JButton processFormFieldBtn = new JButton("Process Form Fields");
-        JButton processTaskBtn = new JButton("Process Tasks");
-        JButton reconFieldBtn = new JButton("Reconciliation Fields");
-        JButton rfToPffMappingBtn = new JButton("Recon Field - Form Field Mapping");
+        lookupBtn = new JButton("Lookups");
+        processFormFieldBtn = new JButton("Process Form Fields");
+        processTaskBtn = new JButton("Process Tasks");
+        reconFieldBtn = new JButton("Reconciliation Fields");
+        rfToPffMappingBtn = new JButton("Recon Field - Form Field Mapping");
+        
+        //Add functionality to buttons
+        lookupBtn.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                LookupDialog loginDlg = new LookupDialog(WelcomeFrame.this);
+                loginDlg.setVisible(true);
+            }
+        });
         
         //Add buttons to panel
         panel.add(lookupBtn);
@@ -47,7 +72,7 @@ public class WelcomeFrame extends JFrame
         pack();
 
         //Set JFrame Properties
-        setTitle("Options");
+        setTitle("Utility Options");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);

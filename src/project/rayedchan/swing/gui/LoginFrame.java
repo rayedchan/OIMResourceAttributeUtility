@@ -100,7 +100,8 @@ public class LoginFrame extends JFrame
                     char[] password = passwordFld.getPassword(); 
                     System.out.printf("%s\n%s\n%s\n", oimServerURL, username, password);
                     
-                    OIMClientResourceAttr oimClientResAttr = new OIMClientResourceAttr(oimServerURL,username, password); //Authentication Test 
+                    OIMClientResourceAttr oimClientResAttr = new OIMClientResourceAttr(); //Test purposes
+                    //OIMClientResourceAttr oimClientResAttr = new OIMClientResourceAttr(oimServerURL,username, password); //Authentication Test 
                     tcOIMDatabaseConnection dbConnection = new tcOIMDatabaseConnection(oimClientResAttr.getOIMClient());
                     
                     dispose();

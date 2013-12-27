@@ -33,13 +33,13 @@ import java.util.logging.Logger;
 public class LookupUtility 
 {
     /*
-     * Add entries from a flat file to a lookup. 
+     * Add entries from a flat file to an existing lookup. 
      * Sanity Check: Name of lookup definition must exist. File format must be correct.
      * If a code key already exist in the lookup, it will be skipped and reported to the user.
      * If there are duplicates code keys in the file, the last one in the file will be added.
      * Beginning and trailing whitespaces are removed from code key and decode.
      * 
-     * File Format - the file is tab delimited
+     * File Format - the file is tab delimited and a newline for each record
      * <Lookup Definition Name>
      * <code key>   <decode>
      * <code key>   <decode>
@@ -49,11 +49,9 @@ public class LookupUtility
      * codeKey1 decode2
      * codeKey2 decode2
      * 
-     * @param -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      fileName - name of file that contains the data
-     *   
-     * @return - boolean value to indicate success or failure
+     * @param  lookupOps    tcLookupOperationsIntf service object
+     * @param  fileName     Path of file on local machine that contains the data
+     * @return boolean value to indicate success or failure
      */
     public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcInvalidLookupException
     {
