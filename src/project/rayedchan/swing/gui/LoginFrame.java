@@ -1,6 +1,5 @@
 package project.rayedchan.swing.gui;
 
-import Thor.API.Operations.tcLookupOperationsIntf;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,11 +13,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import project.rayedchan.services.OIMClientResourceAttr;
+import project.rayedchan.services.tcOIMDatabaseConnection;
 
 /**
  * @author rayedchan
  * User Login graphical user interface (GUI). A user must enter a OIM username 
- * and a password. OIM client will handle the authentication process. 
+ * ,a password, and OIM server URL. OIM client will handle the authentication process.
+ * Then the OIM client is used to establish a connection to the OIM Schema.
  */
 public class LoginFrame extends JFrame
 {
@@ -28,9 +29,17 @@ public class LoginFrame extends JFrame
     JLabel usernameLbl, passwordLbl, oimServerURLLbl;
     
     /*
-     * Constructor: Handles the creation of the JFrame and all it's components
+     * Constructor
      */
     public LoginFrame()
+    {
+        initUI();
+    }
+    
+    /*
+     * Handles the creation of the JFrame and all it's components
+     */
+    public final void initUI()
     {
         //JFrame properties
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //make sure the program exits when the frame closes
@@ -65,7 +74,7 @@ public class LoginFrame extends JFrame
        
         //Initially focus on User Id Field
         oimServerURLFld.requestFocus();
-        
+                
         //Causes this Window to be sized to fit the preferred size and layouts of its subcomponents.
         pack();
         
@@ -92,7 +101,8 @@ public class LoginFrame extends JFrame
                     System.out.printf("%s\n%s\n%s\n", oimServerURL, username, password);
                     
                     OIMClientResourceAttr oimClientResAttr = new OIMClientResourceAttr(oimServerURL,username, password); //Authentication Test 
-                    oimClientResAttr.getOIMClient().getService(tcLookupOperationsIntf.class); //Test OIM service access in order to validate OIM URL.
+                    tcOIMDatabaseConnection dbConnection = new tcOIMDatabaseConnection(oimClientResAttr.getOIMClient());
+                    
                     dispose();
                     new WelcomeFrame();
                     System.out.println("Authentication successful.");
@@ -109,7 +119,13 @@ public class LoginFrame extends JFrame
                     Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage("Invalid OIM URL");
                 }
-                 
+                
+                catch(com.thortech.xl.dataaccess.tcDataSetException ex)
+                {
+                    Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage("Invalid username or password");
+                }
+                
                 catch(Exception ex)
                 {
                     Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);

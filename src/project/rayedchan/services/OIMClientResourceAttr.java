@@ -3,6 +3,7 @@ package project.rayedchan.services;
 import java.util.Hashtable;
 import javax.security.auth.login.LoginException;
 import oracle.iam.platform.OIMClient;
+import oracle.iam.selfservice.uself.uselfmgmt.api.UnauthenticatedSelfService;
 import project.rayedchan.constants.Constants;
 
 /**
@@ -20,8 +21,10 @@ public class OIMClientResourceAttr
      * @param   username            OIM Administrator username
      * @param   password            OIM Administrator password
      */
-    public OIMClientResourceAttr(String oimServerURL, String username, char[] password) throws LoginException 
+    public OIMClientResourceAttr(String oimServerURL, String username, char[] password) throws LoginException
     { 
+        if(username == null)
+            System.out.println("Hi");
         String ctxFactory = Constants.WL_CXTFACTORY; //WebLogic Context
         String authwlConfigPath = Constants.AUTHWL_CONFIG_PATH; //Path to login configuration
         System.setProperty(Constants.PROPERTY_AUTHWL_CONFIG, authwlConfigPath); //set the login configuration
@@ -29,7 +32,8 @@ public class OIMClientResourceAttr
         env.put(OIMClient.JAVA_NAMING_FACTORY_INITIAL, ctxFactory);
         env.put(OIMClient.JAVA_NAMING_PROVIDER_URL, oimServerURL);
         this.oimClient = new OIMClient(env); //Create an OIMClient object
-        this.oimLogin(username, password, env); //Attempts to login user in OIM
+        this.oimClient.getService(UnauthenticatedSelfService.class); //Test OIM service access in order to validate OIM URL.
+        this.oimLogin(username, password); //Attempts to login user in OIM
     }
     
     /*
@@ -45,9 +49,9 @@ public class OIMClientResourceAttr
      * @param   username    OIM Administrator username
      * @param   password    OIM Administrator password 
      */
-    private void oimLogin(String username, char[] password, Hashtable env) throws LoginException
+    private void oimLogin(String username, char[] password) throws LoginException
     {
-        oimClient.login(username, password, env); //login to OIM  
+        oimClient.login(username, password); //login to OIM  
     }
        
     /*

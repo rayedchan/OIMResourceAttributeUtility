@@ -65,6 +65,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -115,7 +116,14 @@ public class TestDriver
 {
     public static void main(String[] args)
     {
-         new LoginFrame();
+        SwingUtilities.invokeLater(new Runnable() 
+        {
+            @Override
+            public void run() 
+            {
+                new LoginFrame();
+            }
+        }); 
     }
     
     //Handles the creation of the JFrame and all it's components
