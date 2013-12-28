@@ -4,6 +4,10 @@
  */
 package project.rayedchan.swing.gui;
 
+import java.awt.Dialog;
+import java.io.File;
+import javax.swing.JFileChooser;
+
 /**
  *
  * @author oracle
@@ -30,6 +34,22 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lookupDialog = new javax.swing.JDialog();
+        lookup_Panel = new javax.swing.JPanel();
+        lookup_lookupNameLbl = new javax.swing.JLabel();
+        lookup_fileNameLbl = new javax.swing.JLabel();
+        lookup_OperationLbl = new javax.swing.JLabel();
+        lookup_lookupNameFld = new javax.swing.JTextField();
+        lookup_fileNameFld = new javax.swing.JTextField();
+        lookup_browseFileBtn = new javax.swing.JButton();
+        lookup_addRadioBtn = new javax.swing.JRadioButton();
+        lookup_deleteRadioBtn = new javax.swing.JRadioButton();
+        lookup_exportRadioBtn = new javax.swing.JRadioButton();
+        lookup_submitBtn = new javax.swing.JButton();
+        lookup_cancelBtn = new javax.swing.JButton();
+        processFormFieldDialog = new javax.swing.JDialog();
+        fileChooser = new javax.swing.JFileChooser();
+        lookup_buttonOpGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -51,13 +71,152 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         jScrollPane5 = new javax.swing.JScrollPane();
         jTextArea5 = new javax.swing.JTextArea();
 
+        lookup_Panel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Lookup Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
+
+        lookup_lookupNameLbl.setText("Lookup Name:");
+
+        lookup_fileNameLbl.setText("File Name:");
+
+        lookup_OperationLbl.setText("Operation:");
+
+        lookup_fileNameFld.setEditable(false);
+
+        lookup_browseFileBtn.setText("Browse");
+        lookup_browseFileBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lookup_browseFileBtnActionPerformed(evt);
+            }
+        });
+
+        lookup_buttonOpGroup.add(lookup_addRadioBtn);
+        lookup_addRadioBtn.setText("Add");
+
+        lookup_buttonOpGroup.add(lookup_deleteRadioBtn);
+        lookup_deleteRadioBtn.setText("Delete");
+
+        lookup_buttonOpGroup.add(lookup_exportRadioBtn);
+        lookup_exportRadioBtn.setText("Export");
+
+        lookup_submitBtn.setText("Submit");
+
+        lookup_cancelBtn.setText("Cancel");
+        lookup_cancelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lookup_cancelBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout lookup_PanelLayout = new javax.swing.GroupLayout(lookup_Panel);
+        lookup_Panel.setLayout(lookup_PanelLayout);
+        lookup_PanelLayout.setHorizontalGroup(
+            lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lookup_PanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(lookup_PanelLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(lookup_addRadioBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lookup_deleteRadioBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lookup_exportRadioBtn)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(lookup_PanelLayout.createSequentialGroup()
+                        .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(lookup_PanelLayout.createSequentialGroup()
+                                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lookup_lookupNameLbl)
+                                    .addComponent(lookup_fileNameLbl))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lookup_lookupNameFld)
+                                    .addGroup(lookup_PanelLayout.createSequentialGroup()
+                                        .addComponent(lookup_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lookup_browseFileBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE))))
+                            .addGroup(lookup_PanelLayout.createSequentialGroup()
+                                .addComponent(lookup_OperationLbl)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(lookup_PanelLayout.createSequentialGroup()
+                                .addComponent(lookup_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lookup_cancelBtn)))
+                        .addContainerGap())))
+        );
+
+        lookup_PanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {lookup_cancelBtn, lookup_submitBtn});
+
+        lookup_PanelLayout.setVerticalGroup(
+            lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lookup_PanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lookup_lookupNameLbl)
+                    .addComponent(lookup_lookupNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(16, 16, 16)
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lookup_fileNameLbl)
+                    .addComponent(lookup_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lookup_browseFileBtn))
+                .addGap(12, 12, 12)
+                .addComponent(lookup_OperationLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lookup_addRadioBtn)
+                    .addComponent(lookup_deleteRadioBtn)
+                    .addComponent(lookup_exportRadioBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lookup_submitBtn)
+                    .addComponent(lookup_cancelBtn))
+                .addGap(26, 26, 26))
+        );
+
+        lookup_PanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lookup_cancelBtn, lookup_submitBtn});
+
+        javax.swing.GroupLayout lookupDialogLayout = new javax.swing.GroupLayout(lookupDialog.getContentPane());
+        lookupDialog.getContentPane().setLayout(lookupDialogLayout);
+        lookupDialogLayout.setHorizontalGroup(
+            lookupDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lookup_Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        lookupDialogLayout.setVerticalGroup(
+            lookupDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lookup_Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        lookupDialog.getAccessibleContext().setAccessibleParent(null);
+
+        javax.swing.GroupLayout processFormFieldDialogLayout = new javax.swing.GroupLayout(processFormFieldDialog.getContentPane());
+        processFormFieldDialog.getContentPane().setLayout(processFormFieldDialogLayout);
+        processFormFieldDialogLayout.setHorizontalGroup(
+            processFormFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        processFormFieldDialogLayout.setVerticalGroup(
+            processFormFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        fileChooser.setFileFilter(new MyCustomFilter());
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Utility Options", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
 
         lookupBtn.setText("Lookups");
+        lookupBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lookupBtnActionPerformed(evt);
+            }
+        });
 
         processFormFieldBtn.setText("Process Form Fields");
+        processFormFieldBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                processFormFieldBtnActionPerformed(evt);
+            }
+        });
 
         processTaskBtn.setText("Process Tasks");
 
@@ -185,6 +344,46 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void lookupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookupBtnActionPerformed
+        // TODO add your handling code here:
+       lookupDialog.setTitle("Lookup Utility Option");
+       lookupDialog.pack();
+       lookupDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
+       lookupDialog.setResizable(true);
+       lookupDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL); //Modal dialog blocks input from top-level windows
+       lookupDialog.setVisible(true); //Display lookup dialog
+    }//GEN-LAST:event_lookupBtnActionPerformed
+
+    private void processFormFieldBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processFormFieldBtnActionPerformed
+        // TODO add your handling code here:
+       processFormFieldDialog.setTitle("Process Form Field Option");
+       processFormFieldDialog.pack();
+       processFormFieldDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
+       processFormFieldDialog.setResizable(true);
+       processFormFieldDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+       processFormFieldDialog.setVisible(true); //Display lookup dialog
+    }//GEN-LAST:event_processFormFieldBtnActionPerformed
+
+    private void lookup_browseFileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookup_browseFileBtnActionPerformed
+        // TODO add your handling code here:
+        int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
+        if (returnVal == JFileChooser.APPROVE_OPTION) 
+        {
+            File file = fileChooser.getSelectedFile(); //Get details of selected file
+            lookup_fileNameFld.setText(file.getAbsolutePath()); //Populate file name field
+        }
+        
+        else 
+        {
+            System.out.println("File access cancelled by user.");
+        }
+    }//GEN-LAST:event_lookup_browseFileBtnActionPerformed
+
+    private void lookup_cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookup_cancelBtnActionPerformed
+        // TODO add your handling code here:
+        lookupDialog.dispose();
+    }//GEN-LAST:event_lookup_cancelBtnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -220,6 +419,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFileChooser fileChooser;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -236,9 +436,38 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea4;
     private javax.swing.JTextArea jTextArea5;
     private javax.swing.JButton lookupBtn;
+    private javax.swing.JDialog lookupDialog;
+    private javax.swing.JLabel lookup_OperationLbl;
+    private javax.swing.JPanel lookup_Panel;
+    private javax.swing.JRadioButton lookup_addRadioBtn;
+    private javax.swing.JButton lookup_browseFileBtn;
+    private javax.swing.ButtonGroup lookup_buttonOpGroup;
+    private javax.swing.JButton lookup_cancelBtn;
+    private javax.swing.JRadioButton lookup_deleteRadioBtn;
+    private javax.swing.JRadioButton lookup_exportRadioBtn;
+    private javax.swing.JTextField lookup_fileNameFld;
+    private javax.swing.JLabel lookup_fileNameLbl;
+    private javax.swing.JTextField lookup_lookupNameFld;
+    private javax.swing.JLabel lookup_lookupNameLbl;
+    private javax.swing.JButton lookup_submitBtn;
     private javax.swing.JButton processFormFieldBtn;
+    private javax.swing.JDialog processFormFieldDialog;
     private javax.swing.JButton processTaskBtn;
     private javax.swing.JButton reconFieldBtn;
     private javax.swing.JButton rfToPffMappingBtn;
     // End of variables declaration//GEN-END:variables
 }
+
+class MyCustomFilter extends javax.swing.filechooser.FileFilter {
+        @Override
+        public boolean accept(File file) {
+            // Allow only directories, or files with ".txt" extension
+            return file.isDirectory() || file.getAbsolutePath().endsWith(".txt");
+        }
+        @Override
+        public String getDescription() {
+            // This description will be displayed in the dialog,
+            // hard-coded = ugly, should be done via I18N
+            return "Text documents (*.txt)";
+        }
+} 
