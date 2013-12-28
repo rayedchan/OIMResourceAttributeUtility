@@ -177,7 +177,7 @@ public class LoginJFrame extends javax.swing.JFrame {
             tcOIMDatabaseConnection dbConnection = new tcOIMDatabaseConnection(oimClientResAttr.getOIMClient());
 
             dispose();
-            new WelcomeFrame();
+            new WelcomeJFrame();
             System.out.println("Authentication successful.");
         } 
 
