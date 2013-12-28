@@ -95,7 +95,7 @@ import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconciliationField;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
-import project.rayedchan.swing.gui.LoginFrame;
+import project.rayedchan.swing.gui.LoginJFrame;
 import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.ProcessFormFieldUtility;
@@ -121,7 +121,7 @@ public class TestDriver
             @Override
             public void run() 
             {
-                new LoginFrame();
+                new LoginJFrame().setVisible(true);
             }
         }); 
     }
