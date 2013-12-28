@@ -4,9 +4,25 @@
  */
 package project.rayedchan.swing.gui;
 
+import Thor.API.Exceptions.tcAPIException;
+import Thor.API.Exceptions.tcColumnNotFoundException;
+import Thor.API.Exceptions.tcInvalidLookupException;
+import Thor.API.Operations.tcLookupOperationsIntf;
+import java.awt.Component;
 import java.awt.Dialog;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.LookupNameNotFoundException;
+import project.rayedchan.services.OIMClientResourceAttr;
+import project.rayedchan.services.tcOIMDatabaseConnection;
+import project.rayedchan.utilities.LookupUtility;
 
 /**
  *
@@ -14,15 +30,20 @@ import javax.swing.JFileChooser;
  */
 public class WelcomeJFrame extends javax.swing.JFrame {
 
+    private OIMClientResourceAttr oimClientResAttr;
+    private tcOIMDatabaseConnection dbConnection;
+    
     /**
      * Creates new form WelcomeJFrame
      */
-    public WelcomeJFrame() {
+    public WelcomeJFrame(OIMClientResourceAttr oimClientResAttr, tcOIMDatabaseConnection dbConnection) {
         initComponents();
         setTitle("Welcome");
         setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
         setResizable(false); //Frame not resizable 
         setVisible(true);
+        this.oimClientResAttr = oimClientResAttr;
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -98,6 +119,11 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         lookup_exportRadioBtn.setText("Export");
 
         lookup_submitBtn.setText("Submit");
+        lookup_submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lookup_submitBtnActionPerformed(evt);
+            }
+        });
 
         lookup_cancelBtn.setText("Cancel");
         lookup_cancelBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -346,6 +372,8 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
     private void lookupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookupBtnActionPerformed
         // TODO add your handling code here:
+       clearLookupUtilityFields();
+         
        lookupDialog.setTitle("Lookup Utility Option");
        lookupDialog.pack();
        lookupDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
@@ -384,40 +412,135 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         lookupDialog.dispose();
     }//GEN-LAST:event_lookup_cancelBtnActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+    private void lookup_submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookup_submitBtnActionPerformed
+        // TODO add your handling code here:
+         
+        tcLookupOperationsIntf lookupOps = null;
+        try
+        {
+            String lookupName = lookup_lookupNameFld.getText();
+            String fileName = lookup_fileNameFld.getText();
+            lookupOps = oimClientResAttr.getOIMClient().getService(tcLookupOperationsIntf.class);
+
+            System.out.println("Lookup Name: " + lookupName);
+            System.out.println("File Name: " + fileName);
+
+            //Add entries to lookup
+            if(lookup_addRadioBtn.isSelected())
+            {
+                try 
+                {
+                    LookupUtility.addEntriesToLookupDSFF(lookupOps, lookupName, fileName);
+                    errorDialogMessage(lookupDialog, "Add successful.");
+                    lookupDialog.dispose();
+                } catch (BadFileFormatException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Bad File format.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Reading file issue.");
+                } catch (LookupNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Lookup Definition does not exist.");
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Add failed.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Add failed.");
+                } catch (tcInvalidLookupException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Lookup Definition does not exist.");
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(WelcomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(WelcomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(WelcomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(WelcomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new WelcomeJFrame().setVisible(true);
+            else if(lookup_deleteRadioBtn.isSelected())
+            {
+                try {
+                    LookupUtility.deleteEntriesFromLookupDSFF(lookupOps,lookupName, fileName);
+                    errorDialogMessage(lookupDialog, "Delete successful.");
+                    lookupDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Delete failed.");
+                } catch (tcInvalidLookupException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Lookup Definition does not exist.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Delete failed.");
+                } catch (LookupNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Lookup Definition does not exist.");
+                } catch (BadFileFormatException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Bad File format.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Reading file issue.");
+                }
             }
-        });
+
+            else if(lookup_exportRadioBtn.isSelected())
+            {
+                try {
+                    LookupUtility.exportLookupFileFormat(lookupOps, lookupName, fileName);                  
+                    errorDialogMessage(lookupDialog, "Export successful.");
+                    lookupDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Export failed.");
+                } catch (tcInvalidLookupException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Lookup Definition does not exist.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Export failed.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "File not found.");
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (LookupNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(lookupDialog, "Lookup Definition does not exist.");
+                }
+            }
+
+            else
+            {
+                errorDialogMessage(lookupDialog, "An operation must be selected.");
+            }
+        }
+        
+        finally
+        {
+            if(lookupOps != null)
+            {
+                lookupOps.close();
+            }
+        }
+        
+    }//GEN-LAST:event_lookup_submitBtnActionPerformed
+
+    private void errorDialogMessage(Component component, String message)
+    {
+        JOptionPane.showMessageDialog(component, message);
     }
+    
+    private void clearLookupUtilityFields()
+    {
+        lookup_lookupNameFld.setText("");
+        lookup_fileNameFld.setText("");
+        lookup_buttonOpGroup.clearSelection(); 
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JPanel jPanel1;

@@ -14,12 +14,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.LookupNameNotFoundException;
 
 /**
  * @author rayedchan
@@ -36,28 +40,28 @@ public class LookupUtility
      * Add entries from a flat file to an existing lookup. 
      * Sanity Check: Name of lookup definition must exist. File format must be correct.
      * If a code key already exist in the lookup, it will be skipped and reported to the user.
-     * If there are duplicates code keys in the file, the last one in the file will be added.
+     * If there are duplicates code keys in the file, the first one in the file will be added.
      * Beginning and trailing whitespaces are removed from code key and decode.
      * 
      * File Format - the file is tab delimited and a newline for each record
-     * <Lookup Definition Name>
      * <code key>   <decode>
      * <code key>   <decode>
      * 
      * Example
-     * Lookup.Test
      * codeKey1 decode2
      * codeKey2 decode2
      * 
-     * @param  lookupOps    tcLookupOperationsIntf service object
-     * @param  fileName     Path of file on local machine that contains the data
+     * @param   lookupOps    tcLookupOperationsIntf service object
+     * @param   lookupName   Name of existing lookup
+     * @param   fileName     Path of file on local machine that contains the data
      * @return boolean value to indicate success or failure
      */
-    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcInvalidLookupException
+    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String lookupName, String fileName) throws tcAPIException, tcColumnNotFoundException, tcInvalidLookupException, LookupNameNotFoundException, FileNotFoundException, IOException, BadFileFormatException
     {
         FileInputStream fstream = null;
         DataInputStream in = null;
         BufferedReader br = null;
+        int lineNumber = 0;
          
         try
         {
@@ -66,19 +70,19 @@ public class LookupUtility
            br = new BufferedReader(new InputStreamReader(in));
            String strLine;
            HashMap<String,String> entries = new HashMap<String,String>(); //stores all the entries 
-        
-           //First line should contain the name of the lookup definition
-           String lookupName = br.readLine();
            
+           //Validate if the lookup exists
            if(doesLookupExist(lookupOps, lookupName) == false)
            {
                System.out.println("[ERROR]: Lookup Definition does not exist.");
-               return false;
+               throw new LookupNameNotFoundException();
            }
            
            //Read the entries from file
            while ((strLine = br.readLine()) != null)  
            {
+                lineNumber++;
+                
                 //System.out.println(strLine);
                 StringTokenizer st = new StringTokenizer(strLine, "\t"); 
                 String key = null;
@@ -100,8 +104,8 @@ public class LookupUtility
                     
                     else
                     {
-                        System.out.println("[Error]: File format is incorrect. Fix Line: " + strLine);
-                        return false;
+                        System.out.println("[Error]: File format is incorrect. Fix Line["+ lineNumber +"]: " + strLine);
+                        throw new BadFileFormatException(String.format("File format is incorrect. Fix Line[%s]: %s ", lineNumber,  strLine));
                     }
                     
                     counter++;
@@ -115,20 +119,24 @@ public class LookupUtility
                         System.out.println("[Warning]: Entry ["+ key + ", " + value +"] will not be added. Code key exists in lookup.");
                     }
                     
+                    //duplicate code key exist in file
+                    else if(entries.containsKey(key))
+                    {
+                        System.out.println("[Warning]: Entry ["+ key + ", " + value +"] will not be added. Duplicate Code key in file.");
+                    }
+                    
                     //code key does not exist in lookup -> add to hashmap
                     else
                     {
-                        //if duplicate code key exist in file, the last entry of the duplicate code key will override the others. 
                         entries.put(key, value); //add lookup entry values to map
                     }
                 }
                 
                 else
                 {    
-                    System.out.println("[Error]: File format is incorrect. Fix Line: " + strLine);
-                    return false;
-                }
-                   
+                     System.out.println("[Error]: File format is incorrect. Fix Line["+ lineNumber +"]: " + strLine);
+                     throw new BadFileFormatException(String.format("File format is incorrect. Fix Line[%s]: %s ", lineNumber,  strLine));
+                }  
            }
            
            System.out.println("[Info]: Entries to be added: " + entries); 
@@ -153,16 +161,6 @@ public class LookupUtility
            return true;
         } 
          
-        catch (FileNotFoundException ex) 
-        {        
-            Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-        
-        catch (IOException ex) 
-        {
-            Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
         finally
         {
             if(br != null)
@@ -192,8 +190,6 @@ public class LookupUtility
                 }
             }
         }      
-        
-        return false;
     }
     
     /*
@@ -205,27 +201,25 @@ public class LookupUtility
      * Beginning and trailing whitespaces are removed from code key and decode.
      * 
      * File Format
-     * <Lookup Definition Name>
      * <code Key>
      * <code Key>
      * 
      * Example
-     * Lookup.Test
      * code1
      * code2
      * 
-     * @param -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      fileName - name of file that contains the data
-     *   
-     * @return - boolean value to indicate success or failure
+     *@param   lookupOps    tcLookupOperationsIntf service object
+     *@param   lookupName   Name of existing lookup
+     *@param   fileName     name of file that contains the data
+     *@return  boolean value to indicate success or failure
      */
-    public static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String fileName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException 
+    public static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String lookupName, String fileName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException, LookupNameNotFoundException, BadFileFormatException, FileNotFoundException, IOException 
     {
         FileInputStream fstream = null;
         DataInputStream in = null;
         BufferedReader br = null;
-         
+        int lineNumber = 0;
+        
         try
         {
            fstream = new FileInputStream(fileName); //Open File
@@ -234,24 +228,28 @@ public class LookupUtility
            String strLine;
            HashMap<String,String> entries = new HashMap<String,String>(); //stores all the entries 
         
-           //First line should contain the name of the lookup definition
-           String lookupName = br.readLine();
-           
+           //Validate if the lookup exists
            if(doesLookupExist(lookupOps, lookupName) == false)
            {
                System.out.println("[ERROR]: Lookup Definition does not exist.");
-               return false;
+               throw new LookupNameNotFoundException();
            }
            
            //Read the code key from file
            while ((strLine = br.readLine()) != null)  
            {
+                lineNumber++;
                 String codeKey = strLine;
                 
-                if(codeKey != null)   
+                if(codeKey != null && !codeKey.equalsIgnoreCase(""))   
                 {
+                    if(entries.containsKey(codeKey))
+                    {
+                        System.out.println("[Warning]: Duplicate Code key '" + codeKey  +" on line " + lineNumber);
+                    }
+                    
                     //check if the code key exist in the lookup
-                    if(doesEntryExist(lookupOps, lookupName, "Lookup Definition.Lookup Code Information.Code Key", codeKey))
+                    else if(doesEntryExist(lookupOps, lookupName, "Lookup Definition.Lookup Code Information.Code Key", codeKey))
                     {
                         entries.put(codeKey, null); //add lookup code key; Keys are unique in a hashmap
                     }
@@ -265,10 +263,9 @@ public class LookupUtility
                 
                 else
                 {    
-                    System.out.println("[Error]: File format is incorrect. Fix Line: " + strLine);
-                    return false;
-                }
-                   
+                    System.out.println("[Error]: File format is incorrect. Fix Line["+ lineNumber +"]: " + strLine);
+                    throw new BadFileFormatException(String.format("File format is incorrect. Fix Line[%s]: %s ", lineNumber,  strLine));
+                }      
            }
            
            System.out.println("[Info]: Entries to be removed: " + entries); 
@@ -276,7 +273,7 @@ public class LookupUtility
     
            while (it.hasNext()) 
            {
-               Map.Entry pairs = (Map.Entry)it.next();
+                Map.Entry pairs = (Map.Entry)it.next();
                 try {
                     removeEntryFromLookup(lookupOps, lookupName, pairs.getKey().toString());
                 } catch (tcAPIException ex) {
@@ -286,22 +283,12 @@ public class LookupUtility
                 } catch (tcInvalidValueException ex) {
                     Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               it.remove(); // avoids a ConcurrentModificationException
+                it.remove(); // avoids a ConcurrentModificationException
            }
            
            return true;
         } 
-         
-        catch (FileNotFoundException ex) 
-        {        
-            Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }        
         
-        catch (IOException ex) 
-        {
-            Logger.getLogger(LookupUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
         finally
         {
             if(br != null)
@@ -331,8 +318,6 @@ public class LookupUtility
                 }
             }
         }      
-        
-        return false;
     }
     
     /*
@@ -353,9 +338,8 @@ public class LookupUtility
      * Lookup Definition.Lookup Code Information.Language [LKV_LANGUAGE] = Language of the entry
      * Lookup Definition.Lookup Code Information.Country [LKV_COUNTRY] = Country of the entry
      * 
-     * @params 
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition
+     * @param   lookupOps   tcLookupOperationsIntf service object 
+     * @param   lookupName  Name of the lookup definition    
      */
     public static void printLookupEntryColumns(tcLookupOperationsIntf lookupOps, String lookupName) throws tcAPIException, tcInvalidLookupException
     {
@@ -369,9 +353,8 @@ public class LookupUtility
     
     /*
      * Print all the entries of a lookup.
-     * @params 
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition
+     * @param   lookupOps   tcLookupOperationsIntf service object
+     * @param   lookupName  Name of the lookup definition
      */
     public static void printLookupEntries(tcLookupOperationsIntf lookupOps, String lookupName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException
     {
@@ -390,36 +373,50 @@ public class LookupUtility
     }
     
     /*
-     * Print lookup name and its entries in a format used for this utility.
+     * Export lookup name and its entries in a format used for this utility.
      * Tab delimited for entries.
-     * 
-     * @params -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition
+     * @param   lookupOps   tcLookupOperationsIntf service object
+     * @param   lookupName  Name of the lookup definition
+     * @param   fileName    Absolute path of file on local machine
      */
-    public static void printLookupFileFormat(tcLookupOperationsIntf lookupOps, String lookupName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException
+    public static void exportLookupFileFormat(tcLookupOperationsIntf lookupOps, String lookupName, String fileName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException, FileNotFoundException, UnsupportedEncodingException, LookupNameNotFoundException
     {
-        tcResultSet lookupResultSet = lookupOps.getLookupValues(lookupName); //get all the entries of a lookup
+        PrintWriter writer = null;
         
-        System.out.println("=====================Lookup File Format=====================");
-        System.out.println(lookupName);
-        for(int i = 0; i < lookupResultSet.getTotalRowCount(); i++)
-        {
-            lookupResultSet.goToRow(i);
-            String code = lookupResultSet.getStringValue("Lookup Definition.Lookup Code Information.Code Key");
-            String decode = lookupResultSet.getStringValue("Lookup Definition.Lookup Code Information.Decode");
-            System.out.printf("%s\t%s\n",code,decode);
+        try
+        {      
+            //Validate if the lookup exists
+            if(doesLookupExist(lookupOps, lookupName) == false)
+            {
+                System.out.println("[ERROR]: Lookup Definition does not exist.");
+                throw new LookupNameNotFoundException();
+            }
+           
+            tcResultSet lookupResultSet = lookupOps.getLookupValues(lookupName); //get all the entries of a lookup
+            writer = new PrintWriter(fileName, "UTF-8");
+            
+            for(int i = 0; i < lookupResultSet.getTotalRowCount(); i++)
+            {
+                lookupResultSet.goToRow(i);
+                String code = lookupResultSet.getStringValue("Lookup Definition.Lookup Code Information.Code Key");
+                String decode = lookupResultSet.getStringValue("Lookup Definition.Lookup Code Information.Decode");
+                writer.printf("%s\t%s\n",code,decode);
+            }
         }
-        System.out.println("============================================================");
+        
+        finally
+        {
+            if(writer != null)
+            {
+                writer.close();
+            }
+        }
     }
            
-    
     /*
-     * Add a lookup definition.
-     * @params 
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition to be created
-     * 
+     * Creates a lookup definition.
+     * @param   lookupOps    tcLookupOperationsIntf service object
+     * @param   lookupName   Name of the lookup definition to be created
      * Note: "Group" Field must be specified for lookup definition when using the Design Console.
      * May need to call update operation on Group field.
      */
@@ -429,12 +426,11 @@ public class LookupUtility
     }
     
     /*
-     * Updates a lookup definition.
-     * @param -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition to be updated
-     *      field - Name of field to be updated
-     *      fieldValue - New value for field 
+     * Updates a lookup definition. 
+     * @param     lookupOps - tcLookupOperationsIntf service object
+     * @param     lookupName - Name of the lookup definition to be updated
+     * @param     field - Name of field to be updated
+     * @param     fieldValue - New value for field 
      * 
      * Fields
      * LKU_GROUP - Lookup Group (Description) Field
@@ -451,13 +447,12 @@ public class LookupUtility
     
     /*
      * Adds an entry to an existing lookup.
-     * @params 
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition 
-     *      codeKey - Value of an entry's code key
-     *      decode - Value of an entry's decode
-     *      language - language of entry
-     *      country - country of entry
+     * @param   lookupOps   tcLookupOperationsIntf service object
+     * @param   lookupName  Name of the lookup definition 
+     * @param   codeKey     Value of an entry's code key
+     * @param   decode      Value of an entry's decode
+     * @param   language    language of entry
+     * @param   country     country of entry
      */
     public static void addEntryToLookup(tcLookupOperationsIntf lookupOps, String lookupName, String codeKey, String decode, String language, String country) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException
     {
@@ -466,11 +461,9 @@ public class LookupUtility
     
     /*
      * Removes an entry from a lookup. Delete is determined by an entry's code key.
-     * @params -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition 
-     *      codeKey - Value of an entry's code key
-     * 
+     * @param   lookupOps    tcLookupOperationsIntf service object
+     * @param   lookupName   Name of the lookup definition  
+     * @param   codeKey      Value of an entry's code key 
      * Note: If there are duplicates of the code key in your lookup, only one of them will be removed.
      */
     public static void removeEntryFromLookup(tcLookupOperationsIntf lookupOps, String lookupName, String codeKey) throws tcAPIException, tcInvalidLookupException, tcInvalidValueException
@@ -480,13 +473,11 @@ public class LookupUtility
     
     /*
      * Update an existing entry in a lookup. Update is determined by entry's code key.
-     * @params -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition 
-     *      existingCodeKey - An exisiting entry's code key
-     *      newCodeKey - code key to be changed to
-     *      newDecode - decode value to be changed to
-     * 
+     * @param   lookupOps           tcLookupOperationsIntf service object
+     * @param   lookupName          Name of the lookup definition 
+     * @param   existingCodeKey     An exisiting entry's code key
+     * @param   newCodeKey          code key to be changed to
+     * @param   newDecode           decode value to be changed to
      * Note: If there are duplicates of the code key in your lookup, only one of them will be updated.
      */
     public static void updateEntryFromLookup(tcLookupOperationsIntf lookupOps, String lookupName, String existingCodeKey, String newCodeKey, String newDecode) throws tcAPIException, tcInvalidLookupException, tcInvalidLookupException, tcInvalidAttributeException, tcInvalidValueException
@@ -499,29 +490,17 @@ public class LookupUtility
    
     /*
      * Determines if an entry in a lookup exists.
-     * 
-     * @params -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition 
-     *      columnNameFilter - Name of one the entry columns
-     *      columnValueFilter - Value of the entry column to be searched by
-     * 
-     * @return - boolean value to indicates if entry exist in the specified lookup
+     * @param   lookupOps           tcLookupOperationsIntf service object
+     * @param   lookupName          Name of the lookup definition 
+     * @param   columnNameFilter    Name of one the entry columns
+     * @param   columnValueFilter   Value of the entry column to be searched by
+     * @return  boolean value to indicates if entry exist in the specified lookup
      */
     public static boolean doesEntryExist(tcLookupOperationsIntf lookupOps, String lookupName, String columnNameFilter, String columnValueFilter) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException
     {
         HashMap<String,String> entryFilter = new HashMap<String,String>();
         entryFilter.put(columnNameFilter, columnValueFilter);
-        tcResultSet searchResultSet = lookupOps.getLookupValues(lookupName, entryFilter);
-        
-        //Print Check
-        /*for(int i = 0; i < searchResultSet.getTotalRowCount(); i++)
-        {
-            searchResultSet.goToRow(i);
-            String codeValue = searchResultSet.getStringValue("Lookup Definition.Lookup Code Information.Code Key");
-            String decodeValue = searchResultSet.getStringValue("Lookup Definition.Lookup Code Information.Decode");
-            System.out.printf("%-25s%-25s\n",codeValue,decodeValue); 
-        }*/
+        tcResultSet searchResultSet = lookupOps.getLookupValues(lookupName, entryFilter);   
         
         if(searchResultSet.getTotalRowCount() >= 1)
         {
@@ -533,11 +512,9 @@ public class LookupUtility
     
     /*
      * Checks if a lookup exists
-     * @params -
-     *      lookupOps - tcLookupOperationsIntf service object
-     *      lookupName - Name of the lookup definition
-     * 
-     * @return - boolean value to indicate if lookup exists.
+     * @param   lookupOps   tcLookupOperationsIntf service object
+     * @param   lookupName  Name of the lookup definition
+     * @return  boolean value to indicate if lookup exists.
      */
     public static boolean doesLookupExist(tcLookupOperationsIntf lookupOps, String lookupName)
     {
