@@ -1,30 +1,48 @@
 package project.rayedchan.swing.gui;
 
 import Thor.API.Exceptions.tcAPIException;
+import Thor.API.Exceptions.tcBulkException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.Exceptions.tcFormNotFoundException;
 import Thor.API.Exceptions.tcInvalidLookupException;
+import Thor.API.Operations.tcExportOperationsIntf;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
+import Thor.API.Operations.tcImportOperationsIntf;
 import Thor.API.Operations.tcLookupOperationsIntf;
+import Thor.API.Operations.tcObjectOperationsIntf;
+import com.thortech.xl.dataaccess.tcDataProvider;
+import com.thortech.xl.dataaccess.tcDataSetException;
+import com.thortech.xl.ddm.exception.DDMException;
+import com.thortech.xl.ddm.exception.TransformationException;
+import com.thortech.xl.orb.dataaccess.tcDataAccessException;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
+import org.xml.sax.SAXException;
 import project.rayedchan.exception.BadFileFormatException;
 import project.rayedchan.exception.LookupNameNotFoundException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.ProcessFormNotFoundException;
 import project.rayedchan.exception.ProcessFormVersionLockedException;
+import project.rayedchan.exception.ResourceObjectNameNotFoundException;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.tcOIMDatabaseConnection;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.ProcessFormFieldUtility;
+import project.rayedchan.utilities.ReconFieldUtility;
 
 /**
  * @author rayedchan
@@ -86,6 +104,20 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         fileChooser = new javax.swing.JFileChooser();
         lookup_buttonOpGroup = new javax.swing.ButtonGroup();
         processFormField_buttonOpGroup = new javax.swing.ButtonGroup();
+        reconFieldDialog = new javax.swing.JDialog();
+        jPanel3 = new javax.swing.JPanel();
+        rf_resourceObjectNameLbl = new javax.swing.JLabel();
+        rf_fileNameLbl = new javax.swing.JLabel();
+        rf_operationLbl = new javax.swing.JLabel();
+        rf_resourceObjectNameFld = new javax.swing.JTextField();
+        rf_fileNameFld = new javax.swing.JTextField();
+        rf_addRadioBtn = new javax.swing.JRadioButton();
+        rf_deleteRadioBtn = new javax.swing.JRadioButton();
+        rf_exportRadioBtn = new javax.swing.JRadioButton();
+        rf_browseBtn = new javax.swing.JButton();
+        rf_submitBtn = new javax.swing.JButton();
+        rf_cancelBtn = new javax.swing.JButton();
+        rf_buttonOpGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -353,6 +385,122 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
         fileChooser.setFileFilter(new MyCustomFilter());
 
+        reconFieldDialog.setPreferredSize(new java.awt.Dimension(439, 251));
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reconciliation Field Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
+
+        rf_resourceObjectNameLbl.setText("Resource Object Name:");
+
+        rf_fileNameLbl.setText("File Name:");
+
+        rf_operationLbl.setText("Operation:");
+
+        rf_fileNameFld.setEditable(false);
+
+        rf_buttonOpGroup.add(rf_addRadioBtn);
+        rf_addRadioBtn.setText("Add");
+
+        rf_buttonOpGroup.add(rf_deleteRadioBtn);
+        rf_deleteRadioBtn.setText("Delete");
+
+        rf_buttonOpGroup.add(rf_exportRadioBtn);
+        rf_exportRadioBtn.setText("Export");
+
+        rf_browseBtn.setText("Browse");
+        rf_browseBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rf_browseBtnActionPerformed(evt);
+            }
+        });
+
+        rf_submitBtn.setText("Submit");
+        rf_submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rf_submitBtnActionPerformed(evt);
+            }
+        });
+
+        rf_cancelBtn.setText("Cancel");
+        rf_cancelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rf_cancelBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(rf_resourceObjectNameLbl)
+                            .addComponent(rf_fileNameLbl))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(rf_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(rf_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE))
+                            .addComponent(rf_resourceObjectNameFld)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(rf_addRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(rf_deleteRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(rf_exportRadioBtn))
+                            .addComponent(rf_operationLbl))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(rf_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(rf_cancelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {rf_cancelBtn, rf_submitBtn});
+
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rf_resourceObjectNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rf_resourceObjectNameLbl))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rf_fileNameLbl)
+                    .addComponent(rf_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rf_browseBtn))
+                .addGap(17, 17, 17)
+                .addComponent(rf_operationLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rf_addRadioBtn)
+                    .addComponent(rf_deleteRadioBtn)
+                    .addComponent(rf_exportRadioBtn))
+                .addGap(27, 27, 27)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rf_submitBtn)
+                    .addComponent(rf_cancelBtn))
+                .addGap(0, 38, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout reconFieldDialogLayout = new javax.swing.GroupLayout(reconFieldDialog.getContentPane());
+        reconFieldDialog.getContentPane().setLayout(reconFieldDialogLayout);
+        reconFieldDialogLayout.setHorizontalGroup(
+            reconFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        reconFieldDialogLayout.setVerticalGroup(
+            reconFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Utility Options", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
@@ -374,6 +522,11 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         processTaskBtn.setText("Process Tasks");
 
         reconFieldBtn.setText("Reconciliation Fields");
+        reconFieldBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reconFieldBtnActionPerformed(evt);
+            }
+        });
 
         rfToPffMappingBtn.setText("Recon Field Mappings");
 
@@ -777,6 +930,211 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_processFormField_submitBtnActionPerformed
 
+    private void rf_browseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rf_browseBtnActionPerformed
+        // TODO add your handling code here:
+        createFileChooserUI(rf_fileNameFld);
+        
+    }//GEN-LAST:event_rf_browseBtnActionPerformed
+
+    private void rf_cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rf_cancelBtnActionPerformed
+        // TODO add your handling code here:
+        reconFieldDialog.dispose();
+    }//GEN-LAST:event_rf_cancelBtnActionPerformed
+
+    private void rf_submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rf_submitBtnActionPerformed
+        // TODO add your handling code here:
+        tcObjectOperationsIntf resourceObjectOps = null;
+        tcExportOperationsIntf exportOps = null;
+        tcImportOperationsIntf importOps = null;
+        
+        try
+        {
+            String resourceObjectName = rf_resourceObjectNameFld.getText();
+            String fileName = rf_fileNameFld.getText();
+            resourceObjectOps = oimClientResAttr.getOIMClient().getService(tcObjectOperationsIntf.class);
+            exportOps = oimClientResAttr.getOIMClient().getService(tcExportOperationsIntf.class);
+            importOps = oimClientResAttr.getOIMClient().getService(tcImportOperationsIntf.class);
+
+            System.out.println("Resource Object Name: " + resourceObjectName);
+            System.out.println("File Name: " + fileName);
+            
+            if(rf_addRadioBtn.isSelected())
+            {
+                try 
+                {
+                    ReconFieldUtility.addReconFieldsDSFF(dbConnection.getDbProvider(), exportOps,  importOps, fileName, resourceObjectName);
+                    errorDialogMessage(reconFieldDialog, "Add successful.");
+                    reconFieldDialog.dispose();
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (ResourceObjectNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Resource object name does not exist.");
+                } catch (MissingRequiredFieldException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "File missing required fields in header.");
+                } catch (BadFileFormatException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Fix file format.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "File does not exist.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (ParserConfigurationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (SAXException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (TransformerConfigurationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (TransformerException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (SQLException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (NamingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (DDMException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (TransformationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (tcBulkException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Add failed.");
+                }
+            }
+
+            else if(rf_deleteRadioBtn.isSelected())
+            {
+                try {
+                    ReconFieldUtility.removeReconFieldDSFF(dbConnection.getDbProvider(), exportOps, importOps, fileName, resourceObjectName);             
+                    errorDialogMessage(reconFieldDialog, "Delete successful.");
+                    reconFieldDialog.dispose();
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (ResourceObjectNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Resource object name not found.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (ParserConfigurationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (SAXException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (TransformerConfigurationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (TransformerException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (SQLException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (NamingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (DDMException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (TransformationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (tcBulkException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Delete failed.");
+                }
+            }
+
+            else if(rf_exportRadioBtn.isSelected())
+            {
+                try {
+                    ReconFieldUtility.exportReconFieldsofResourceObjectFileFormatAdd(dbConnection.getDbProvider(), fileName, resourceObjectName);
+                    errorDialogMessage(reconFieldDialog, "Export successful.");
+                    reconFieldDialog.dispose();
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Export failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Export failed.");
+                } catch (ResourceObjectNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Resource object not found.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "File name not found.");
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, "Export failed.");
+                }
+            }
+        }
+        
+        finally
+        {
+            if(resourceObjectOps != null)
+            {
+                resourceObjectOps.close();
+            }
+            
+            if(exportOps != null)
+            {
+                exportOps.close();
+            }
+                        
+            if(importOps != null)
+            {
+                importOps.close();
+            }
+        }
+    }//GEN-LAST:event_rf_submitBtnActionPerformed
+
+    private void reconFieldBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reconFieldBtnActionPerformed
+        // TODO add your handling code here:
+       clearReconFieldUtilityFields();
+         
+       reconFieldDialog.setTitle("Reconciliation Field Utility Option");
+       reconFieldDialog.pack();
+       reconFieldDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
+       reconFieldDialog.setResizable(true);
+       reconFieldDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL); //Modal dialog blocks input from top-level windows
+       reconFieldDialog.setVisible(true); //Display lookup dialog
+    }//GEN-LAST:event_reconFieldBtnActionPerformed
+
     private void createFileChooserUI(javax.swing.JTextField fileNameField)
     {
         int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
@@ -811,10 +1169,18 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         processFormField_buttonOpGroup.clearSelection(); 
     }
     
+    private void clearReconFieldUtilityFields()
+    {
+        rf_resourceObjectNameFld.setText("");
+        rf_fileNameFld.setText("");
+        rf_buttonOpGroup.clearSelection(); 
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -860,7 +1226,20 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JButton processFormField_submitBtn;
     private javax.swing.JButton processTaskBtn;
     private javax.swing.JButton reconFieldBtn;
+    private javax.swing.JDialog reconFieldDialog;
     private javax.swing.JButton rfToPffMappingBtn;
+    private javax.swing.JRadioButton rf_addRadioBtn;
+    private javax.swing.JButton rf_browseBtn;
+    private javax.swing.ButtonGroup rf_buttonOpGroup;
+    private javax.swing.JButton rf_cancelBtn;
+    private javax.swing.JRadioButton rf_deleteRadioBtn;
+    private javax.swing.JRadioButton rf_exportRadioBtn;
+    private javax.swing.JTextField rf_fileNameFld;
+    private javax.swing.JLabel rf_fileNameLbl;
+    private javax.swing.JLabel rf_operationLbl;
+    private javax.swing.JTextField rf_resourceObjectNameFld;
+    private javax.swing.JLabel rf_resourceObjectNameLbl;
+    private javax.swing.JButton rf_submitBtn;
     // End of variables declaration//GEN-END:variables
 }
 

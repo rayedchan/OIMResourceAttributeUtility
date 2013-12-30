@@ -8,6 +8,11 @@ import Thor.API.Exceptions.tcProcessNotFoundException;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.Operations.tcObjectOperationsIntf;
 import Thor.API.tcResultSet;
+import com.thortech.xl.dataaccess.tcDataProvider;
+import com.thortech.xl.dataaccess.tcDataSet;
+import com.thortech.xl.dataaccess.tcDataSetException;
+import com.thortech.xl.dataobj.PreparedStatementUtil;
+import com.thortech.xl.orb.dataaccess.tcDataAccessException;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -471,22 +476,22 @@ public class MappingReconFieldToFormFieldUtility
                         }
                         
                         //Check if the recon field is a multivalued attribute
-                        if(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, objectKey, reconFieldName) == true)
+                        /*if(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, objectKey, reconFieldName) == true)
                         {
                             System.out.println("[Warning]: Recon Field'" + reconFieldName + "' is a mulitvalued attribute. Mapping will not be added:\n" + strLine);
                             isMappingFromFileValid = false;
                             break;
-                        }
+                        }*/
 
                         //Check if the recon field is a child attribute
-                        if(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, objectKey , reconFieldName) == true)
+                        /*if(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, objectKey , reconFieldName) == true)
                         {
                             System.out.println("[Warning]: Recon Field'" + reconFieldName + "' is a child attribute. Mapping will not be added:\n" + strLine);
                             isMappingFromFileValid = false;
                             break; 
-                        }
+                        }*/
                         
-                        reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
+                        //reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
                         fieldMapping.setReconFieldKey(reconFieldKey);
                         fieldMapping.setReconFieldName(reconFieldName);
                     }
@@ -670,23 +675,23 @@ public class MappingReconFieldToFormFieldUtility
                  }
                                 
                  //Check if the recon field is a multivalued attribute
-                 if(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, objectKey, reconFieldName) == true)
+                 /*if(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, objectKey, reconFieldName) == true)
                  {
                      System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be removed.");
                      continue;
-                 }
+                 }*/
 
                  //Check if the recon field is a child attribute
-                 if(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, objectKey , reconFieldName) == true)
+                 /*if(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, objectKey , reconFieldName) == true)
                  {
                      System.out.println("[Warning]: Reconciliation Field '" + reconFieldName + "' does not exist. Mapping will not be removed.");
                      continue;
-                 }
+                 }*/
                         
-                 String reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
+                 //String reconFieldKey = getReconFieldKey(oimDBConnection, objectKey, reconFieldName);
                               
                  //Validate if the mapping exist in OIM
-                 if(isReconFieldMapped(oimDBConnection, processKey, reconFieldKey) == false)
+                 /*if(isReconFieldMapped(oimDBConnection, processKey, reconFieldKey) == false)
                  {   
                      System.out.println("[Warning]: Mapping for reconciliation field does not exists. Mapping will not be added:\n" + strLine);
                      continue; 
@@ -696,7 +701,7 @@ public class MappingReconFieldToFormFieldUtility
                  if(!mappingsToRemove.containsValue(reconFieldName) && !mappingsToRemove.containsKey(reconFieldKey))
                  { 
                      mappingsToRemove.put(reconFieldKey, reconFieldName); 
-                 }
+                 }*/
                     
                  else
                  {
@@ -1164,59 +1169,33 @@ public class MappingReconFieldToFormFieldUtility
     /*
      * Determine if a reconciliation field has already been mapped.
      * Queries from PRF (process and reconcilaition field mapping table) table. 
-     * 
-     * @params
-     *      oimDBConnection - connection to the OIM Schema
-     *      reconFieldKey - reconciliation field name (ORF.ORF_FIELDNAME)
-     *      
-     * @return - true for if it exists, false otherwise
+     * @param   oimDBConnection     connection to the OIM Schema
+     * @param   reconFieldKey       reconciliation field name (ORF.ORF_FIELDNAME)
+     * @return  true for if it exists, false otherwise
      */
-    public static Boolean isReconFieldMapped(Connection oimDBConnection, String reconFieldKey)
-    {        
-        Statement st = null;
-        ResultSet rs = null;
+    public static Boolean isReconFieldMapped(tcDataProvider dbProvider, String reconFieldKey) throws tcDataSetException, tcDataAccessException
+    {          
+        tcDataSet prfDataSet = null;
+        PreparedStatementUtil ps = null;
             
         try 
         {
-            String query = "SELECT COUNT(*) AS numRows  FROM PRF "
-                    + "WHERE ORF_KEY = '" + reconFieldKey + "'";
-            //System.out.println(query);
+            String query = "SELECT COUNT(*) AS numRows  FROM PRF WHERE ORF_KEY = ?";
+            ps = new PreparedStatementUtil();
+            ps.setStatement(dbProvider, query);
+            ps.setString(1, reconFieldKey);
+            ps.execute();
+            prfDataSet = ps.getDataSet();
+            int numRecords = prfDataSet.getInt("numRows"); 
             
-            st = oimDBConnection.createStatement(); //Create a statement
-            rs = st.executeQuery(query);
-            rs.next();
-            
-            if(Integer.parseInt(rs.getString("numRows")) == 1)
+            if(numRecords == 1)
             {
                return true;  
             }    
- 
         } 
         
-        catch (SQLException ex) {
-            Logger.getLogger(MappingReconFieldToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         finally
-        {
-            if(rs != null)
-            {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            if(st != null)
-            {
-                try {
-                    st.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
+        { 
         }
         
         return false;
@@ -1352,61 +1331,31 @@ public class MappingReconFieldToFormFieldUtility
     
      /*
      * Get the reconciliation field key.
-     * 
-     * @params
-     *      oimDBConnection - connection to the OIM Schema
-     *      objectKey - resource object key (OBJ.OBJ_KEY)
-     *      reconFieldName - reconciliation field name (ORF_FIELD_NAME)
-     *      
-     * @return - recon field key; otherwise null
+     * @param   dbProvider      connection to the OIM Schema
+     * @param   objectKey       resource object key (OBJ.OBJ_KEY)
+     * @param   reconFieldName  reconciliation field name (ORF_FIELD_NAME)  
+     * @return  recon field key; otherwise null
      */
-    public static String getReconFieldKey(Connection oimDBConnection, Long objectKey, String reconFieldName)
-    {        
-        Statement st = null;
-        ResultSet rs = null;
+    public static String getReconFieldKey(tcDataProvider dbProvider, Long objectKey, String reconFieldName) throws tcDataSetException, tcDataAccessException
+    {            
+        tcDataSet rfDataSet = null;
+        PreparedStatementUtil ps = null;
             
         try 
         {
-            String query = "SELECT ORF_KEY FROM ORF WHERE OBJ_KEY = " + objectKey + " AND ORF_FIELDNAME = '" + reconFieldName + "'";
-            //System.out.println(query);
-            
-            st = oimDBConnection.createStatement(); //Create a statement
-            rs = st.executeQuery(query);
-
-            if(rs.next())
-            {
-                String reconKey = rs.getString("ORF_KEY");
-                return reconKey;
-            }
- 
+            String query = "SELECT ORF_KEY FROM ORF WHERE OBJ_KEY = ? AND ORF_FIELDNAME = ?"; 
+            ps = new PreparedStatementUtil();
+            ps.setStatement(dbProvider, query);
+            ps.setLong(1, objectKey);
+            ps.setString(2, reconFieldName);
+            ps.execute();
+            rfDataSet = ps.getDataSet();
+            String reconKey = rfDataSet.getString("ORF_KEY");
+            return reconKey;
         } 
         
-        catch (SQLException ex) {
-            Logger.getLogger(MappingReconFieldToFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         finally
-        {
-            if(rs != null)
-            {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            if(st != null)
-            {
-                try {
-                    st.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
+        { 
         }
-        
-        return null;
     }
 }

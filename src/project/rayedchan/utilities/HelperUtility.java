@@ -216,10 +216,8 @@ public class HelperUtility
     /*
      * Converts a Document into String representation
      * UTF-8 conversion
-     * @param
-     *      document - Document object to be parsed
-     * 
-     * @return - String representation of xml content
+     * @param   document    Document object to be parsed
+     * @return  String representation of xml content
      */
     public static String parseDocumentIntoStringXML(Document document) throws TransformerConfigurationException, TransformerException
     {

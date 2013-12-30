@@ -24,11 +24,14 @@ import Thor.API.Operations.tcObjectOperationsIntfExtended;
 import Thor.API.Operations.tcWorkflowDefinitionOperationsIntf;
 import Thor.API.tcResultSet;
 import com.thortech.xl.client.dataobj.tcORFClient;
+import com.thortech.xl.dataaccess.tcDataProvider;
+import com.thortech.xl.dataaccess.tcDataSetException;
 import com.thortech.xl.ddm.exception.DDMException;
 import com.thortech.xl.ddm.exception.TransformationException;
 //import com.thortech.xl.dataobj.util.ReconHorizontalTableConfigUtils;
 import com.thortech.xl.ejb.interfaces.tcORF;
 import com.thortech.xl.ejb.interfaces.tcORFDelegate;
+import com.thortech.xl.orb.dataaccess.tcDataAccessException;
 import com.thortech.xl.orb.dataaccess.tcDataSetData;
 import com.thortech.xl.vo.ddm.RootObject;
 import com.thortech.xl.vo.workflow.AdapterMapping;
@@ -93,8 +96,10 @@ import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconciliationField;
+import project.rayedchan.exception.ResourceObjectNameNotFoundException;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
+import project.rayedchan.services.tcOIMDatabaseConnection;
 import project.rayedchan.swing.gui.LoginJFrame;
 import project.rayedchan.utilities.HelperUtility;
 import project.rayedchan.utilities.LookupUtility;
@@ -147,10 +152,11 @@ public class TestDriver
         });
     }
     
-    public static void main2(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException
+    public static void main2(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
-        Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
+        tcOIMDatabaseConnection connection =  new tcOIMDatabaseConnection(oimClient);
+        //Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
         
         //OIM service objects
         tcLookupOperationsIntf lookupOps = oimClient.getService(tcLookupOperationsIntf.class);
@@ -158,52 +164,7 @@ public class TestDriver
         tcObjectOperationsIntf resourceObjectOps = oimClient.getService(tcObjectOperationsIntf.class);
         tcExportOperationsIntf exportOps = oimClient.getService(tcExportOperationsIntf.class);
         tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class); 
-       
-        /*
-         * Test Oracle Database connection
-         */
-        /*String query = "SELECT PKG.PKG_KEY, TOS.TOS_KEY, SDK.SDK_KEY, PKG.PKG_NAME, SDK.SDK_NAME, OBJ.OBJ_KEY, OBJ.OBJ_NAME FROM "
-         + "TOS RIGHT OUTER JOIN PKG ON PKG.PKG_KEY = TOS.PKG_KEY "
-         + "LEFT OUTER JOIN SDK ON SDK.SDK_KEY = TOS.SDK_KEY "
-         + "LEFT OUTER JOIN OBJ ON OBJ.OBJ_KEY = PKG.OBJ_KEY ORDER BY PKG.PKG_NAME";
-        Statement statement = oimDBConnection.createStatement(); //Create a statement
-        ResultSet resultSet = statement.executeQuery(query);
-        HelperUtility.printResultSetRecords(resultSet);*/
-            
-
-        /*
-         * ProcessFormUtility method calls 
-         */
-        
-        HashMap<String,String> updateFormFieldMap = new HashMap();
-        updateFormFieldMap.put("Structure Utility.Additional Columns.Field Label", "test5");
-        Long formFieldKey = 277L;
-        
-        
-        long processFormKey = 82L;
-        int processFormVersion = 3;
-        String fieldName = "test";
-        String fieldType = "TextField";
-        String variantType = "String";
-        int length = 100;
-        int order = 19;
-        String defaultValue = null;
-        String profileEnabled = "0";
-        boolean secure = true;
-        
-        
-        //ProcessFormFieldUtility.printProcessFormColumnNames(formDefOps);
-        //ProcessFormFieldUtility.printAllProcessFormInfo(formDefOps);
-        //ProcessFormFieldUtility.printProcessFormFieldColumnNames(formDefOps);
-        //ProcessFormFieldUtility.printProcessFormFields(formDefOps, 47L, 1);
-        //ProcessFormFieldUtility.printProcessFormFieldsFileFormatAdd(formDefOps, "UD_LDAP_USR");
-        //ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldAdd");
-        //ProcessFormFieldUtility.removeFieldsFromProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldRemove");
-        //formDefOps.updateFormField(formFieldKey, updateFormFieldMap);
-        ProcessFormField processFormFieldObj = new ProcessFormField (processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure);
-        ProcessFormFieldUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
-        //ProcessFormFieldUtility.removeFormField(formDefOps, 162L);
-
+         
         /*
          * ReconFieldMapToFormFieldUtility
          */
@@ -241,8 +202,21 @@ public class TestDriver
         /*
          * ReconFieldUtility
          */   
-        //String resourceObjectName = "LDAP User";
-        //System.out.println(ReconFieldUtility.doesResourceObjectExist(oimDBConnection, resourceObjectName));
+        String resourceObjectName = "ldap user";
+        String reconField = "test5";
+        Long resourceObjKey = 45L;
+        
+        //System.out.println(ReconFieldUtility.isReconFieldChildAttribute(connection.getDbProvider(), resourceObjKey, reconField));
+
+        //ReconFieldUtility.printReconFieldsofResourceObject(connection.getDbProvider(),80L);
+        
+        //System.out.println(MappingReconFieldToFormFieldUtility.getReconFieldKey(connection.getDbProvider(), resourceObjKey, reconField));
+        
+        //System.out.println(MappingReconFieldToFormFieldUtility.isReconFieldMapped(connection.getDbProvider(), "344"));
+        
+        
+        
+        
         //String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName);
         //System.out.println(resourceObjectXML);
         //System.out.println(System.getProperty("file.encoding"));

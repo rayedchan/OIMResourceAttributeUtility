@@ -940,6 +940,7 @@ public class ProcessFormFieldUtility
     
     /*
      * Determines if a form field label exists.
+     * Case insenstive.
      * @param   formDefOps          tcFormDefinitionOperationsIntf service object
      * @param   processFormKey      the form key (SDK_KEY)
      * @param   processFormVersion  SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
@@ -956,7 +957,7 @@ public class ProcessFormFieldUtility
             fieldResultSet.goToRow(i);
             String fieldLabel = fieldResultSet.getStringValue("Structure Utility.Additional Columns.Field Label");
             
-            if(fieldLabel.equals(fieldLabelCheck))
+            if(fieldLabel.equalsIgnoreCase(fieldLabelCheck))
             {
                 return true;
             }
