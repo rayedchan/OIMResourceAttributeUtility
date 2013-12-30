@@ -15,6 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,26 +25,37 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import project.rayedchan.custom.objects.ProcessFormField;
+import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.MissingRequiredFieldException;
+import project.rayedchan.exception.ProcessFormNotFoundException;
+import project.rayedchan.exception.ProcessFormVersionLockedException;
 
 /**
  * @author rayedchan
- * A utility to add and delete a form field. Changes are made to the current 
+ * A utility to add and delete a form field. Changes must be made to a current 
  * process form version which has never been active. A flat file can be used 
  * as a data source. 
  * 
  * Note: Once a process form version has been made active, no changes can ever
  * be made to that form version.
  * 
- * TODO: Auto-increment order field 
+ * This utility relies on the user have an inactive form version. Also, when 
+ * changes are pushed out to OIM, the user has to manually make the version active.
+ * This utility does check if there is a reconciliation mapping of a process form field.
+ * If you delete a process form field that has a reconciliation mapping, you will
+ * get an error when you try to make the form active in OIM.
  */
 public class ProcessFormFieldUtility
 {
     //List of possible field attribute names to be specified in file for adding fields
-    public static String FIELDLABEL = "field_label"; //required
-    public static String VARIANTTYPE = "variant_type";
-    public static String FIELDTYPE = "field_type";
-    public static String LENGTH = "length";
-    public static String ORDER = "order";
+    public static String FIELDLABEL = "field_label";  //required
+    public static String VARIANTTYPE = "variant_type"; 
+    public static String FIELDTYPE = "field_type"; 
+    public static String LENGTH = "length"; 
+    public static String ORDER = "order"; 
+    public static String DEFAULTVALUE = "default_value";
+    public static String APP_PROFILE = "application_profile";
+    public static String ENCRYPTED = "encrypted";
     
     //Possible Variant Type of a field
     public static String VT_BYTE = "Byte";
@@ -67,17 +80,17 @@ public class ProcessFormFieldUtility
     public static String FT_ITRESOURCELOOKUPFIELD = "ITResourceLookupField";
     public static String FT_LOOKUPFIELD = "LookupField";
 
-    
     /*
-     *Add fields to the lastest process form version. Data source is a flat file. File must follow 
-     *a specific format. The column name of the field is determined by the name of the field label.
-     *If the column name of the field exist, then the column name will be appended a number starting at 1.
-     *Only form versions that has never been made active can have fields added, deleted, or updated.
+     * Add fields to the lastest process form version. Data source is a flat file. File must follow 
+     * a specific format. The column name of the field is determined by the name of the field label.
+     * If the column name of the field exist, then the column name will be appended a number 1. After
+     * that, no extra duplication of the column name will be accepted by the API.  
+     * Only form versions that has never been made active can have fields added, deleted, or updated.
      * 
      * Sanity Check: Check file format before adding fields to process form.
      * Do not add existing field label names. [My Check]
      * Make sure field attributes are the right type.
-     * Check if the latest form version is locked.
+     * Check if the latest form version is unlocked.
      * 
      * File Format
      * <Process Form Table Name>
@@ -91,20 +104,21 @@ public class ProcessFormFieldUtility
      * FIELDTYPE = "TextField"
      * LENGTH = "100"
      * ORDER = "50"
+     * DEFAULTVALUE = null;
+     * APP_PROFILE = "0";
+     * ENCRYPTED = false;
      * 
-     * 
-     * @params - 
-     *          formDefOps - tcFormDefinitionOperationsIntf service object
-     *          fileName - name of the file 
-     * 
-     * @return - boolean value to indicate success or failure
-     * 
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   fileName            name of the file
+     * @param   processFormName     Table name of a process form
+     * @return  boolean value to indicate success or failure
      */
-    public static boolean addFieldsToProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException
+    public static boolean addFieldsToProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName, String processFormName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, FileNotFoundException, IOException, ProcessFormNotFoundException, ProcessFormVersionLockedException, BadFileFormatException, MissingRequiredFieldException
     {    
         FileInputStream fstream = null;
         DataInputStream in = null;
         BufferedReader br = null;
+        int lineNumber = 0;
             
         try 
         {    
@@ -113,15 +127,14 @@ public class ProcessFormFieldUtility
             br = new BufferedReader(new InputStreamReader(in));
             
             String strLine; //var to store a line of a file
-            ArrayList<String> pf_fieldAttributeNameArray = new ArrayList<String>(); //store the name of the field attributes 
+            ArrayList<String> pf_fieldAttributeNameArray = new ArrayList<String>(); //store the name of the field attributes; All records must have values for these attributes 
             ArrayList<ProcessFormField> pf_fieldRecordArray = new ArrayList<ProcessFormField>(); //store all process form fields to be added
             
-            //First line of the file should be the name of the process form
-            String processFormName = br.readLine();
+            //Validate name of the process form
             if(doesProcessFormExist(formDefOps, processFormName) == false)
             {
                 System.out.println("[Error]: Process form name "+ processFormName + " does not exist.");
-                return false;
+                throw new ProcessFormNotFoundException(String.format("Process form name %s does not exist.", processFormName));
             }
             
             tcResultSet formResultSet = getProcessFormData(formDefOps, processFormName); //get all data of a process form
@@ -132,16 +145,19 @@ public class ProcessFormFieldUtility
             if(isFormVersionLocked(formDefOps, processFormKey, processFormLatestVersion))
             {
                 System.out.println("[Error]: Process form version "+ processFormLatestVersion + " is locked.");
-                return false;
+                throw new ProcessFormVersionLockedException("Process form version is locked. Create a new version.");
             }
             
-            //Second line contains the attributes of a process form field
+            System.out.printf("Form being modified: Version = %s, Process Key = %s\n", processFormLatestVersion,processFormKey);
+            
+            //First line contains the attributes of a process form field
+            //Each process form field record in file must have a value for these attributes 
             String fieldAttributes = br.readLine();
             StringTokenizer attributeNameToken = new StringTokenizer(fieldAttributes, "\t"); 
+            lineNumber++;
             
             while(attributeNameToken.hasMoreTokens())
             {
-                //System.out.println();
                 String fieldAttributeName = attributeNameToken.nextToken();
                 
                 //Check if the name of the attribute is valid
@@ -169,42 +185,56 @@ public class ProcessFormFieldUtility
                 {
                     pf_fieldAttributeNameArray.add(ORDER);
                 }
+                              
+                else if(fieldAttributeName.equalsIgnoreCase(DEFAULTVALUE))
+                {
+                    pf_fieldAttributeNameArray.add(DEFAULTVALUE);
+                }
+                
+                else if(fieldAttributeName.equalsIgnoreCase(APP_PROFILE))
+                {
+                    pf_fieldAttributeNameArray.add(APP_PROFILE);
+                }
+                                
+                else if(fieldAttributeName.equalsIgnoreCase(ENCRYPTED))
+                {
+                    pf_fieldAttributeNameArray.add(ENCRYPTED);
+                }
                 
                 else
                 {
-                    System.out.println("Field attribute name " + fieldAttributeName + "is invalid."
-                    + "Here are all the possible attribute names:\n "
-                    + FIELDLABEL + "\n" +
-                    VARIANTTYPE + "\n" +
-                    FIELDTYPE + "\n" +
-                    LENGTH + "\n" +
-                    ORDER );
-                    return false;
+                    System.out.printf("Field attribute name %s is invalid.\n "
+                            + "Here are all the possible attribute names: %s, %s, %s, %s, %s, %s, %s, %s", 
+                            fieldAttributeName, FIELDLABEL, VARIANTTYPE, FIELDTYPE,
+                            LENGTH, ORDER, DEFAULTVALUE, APP_PROFILE, ENCRYPTED);
+                    throw new BadFileFormatException(String.format("Field attribute name %s is invalid.\n "
+                            + "Here are all the possible attribute names: %s, %s, %s, %s, %s, %s, %s, %s", 
+                            fieldAttributeName, FIELDLABEL, VARIANTTYPE, FIELDTYPE,
+                            LENGTH, ORDER, DEFAULTVALUE, APP_PROFILE, ENCRYPTED));
                 }
-   
             }
             
             //Validate that the "field_label" attribute name is specified the file
             if(!pf_fieldAttributeNameArray.contains(FIELDLABEL))
             {
                 System.out.println("'"+ FIELDLABEL + "' is a required attribute to be specified in file");
-                return false;
+                throw new MissingRequiredFieldException("'"+ FIELDLABEL + "' is a required attribute to be specified in file");
             }
             
             HashMap<String, String> formFieldDuplicationValidator = new HashMap<String, String>(); // used to make sure duplications are not being 
             
-            //Read each process form field from file
+            //Read each process form field from file and stage into array
             while ((strLine = br.readLine()) != null)  
             {
-                //System.out.println(strLine);
-                StringTokenizer fieldAttributeValueToken = new StringTokenizer(strLine, "\t");
+                lineNumber++;
+                String[] fieldAttributeValueToken = strLine.split("\t");
                 int numFieldAttributeNames = pf_fieldAttributeNameArray.size();
-                int numTokens = fieldAttributeValueToken.countTokens();
+                int numTokens = fieldAttributeValueToken.length;
                 ProcessFormField processFormFieldObj = new ProcessFormField(processFormKey, processFormLatestVersion);
                 
                 if(numFieldAttributeNames != numTokens)
                 {
-                    System.out.println("[Warning]: Size of row is invalid. Field will not be added:\n" + strLine);
+                    System.out.println("[Warning] Line =" + lineNumber +  " : Size of row is invalid. Field will not be added:\n" + strLine);
                     continue;
                 }
                 
@@ -216,12 +246,12 @@ public class ProcessFormFieldUtility
                     
                     if(fieldAttributeName.equalsIgnoreCase(FIELDLABEL))
                     {
-                        String fieldName = fieldAttributeValueToken.nextToken();
+                        String fieldName = fieldAttributeValueToken[i];
                          
                         //Check if the field label exist
                         if(doesFormFieldLabelExists(formDefOps, processFormKey, processFormLatestVersion, fieldName))
                         {
-                            System.out.println("[Warning]: Field label '" + fieldName + "' exists. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning] Line =" + lineNumber +  " : Field label '" + fieldName + "' exists. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break;
                         }
@@ -229,7 +259,7 @@ public class ProcessFormFieldUtility
                         //Validate if form field label has already been added to staging
                         if(formFieldDuplicationValidator.containsKey(fieldName))
                         {
-                            System.out.println("[Warning]: Field label '" + fieldName + "' exists in staging. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Field label '" + fieldName + "' exists in staging. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break; 
                         }
@@ -240,12 +270,12 @@ public class ProcessFormFieldUtility
 
                     else if(fieldAttributeName.equalsIgnoreCase(VARIANTTYPE))
                     {
-                        String variantType = fieldAttributeValueToken.nextToken();
+                        String variantType = fieldAttributeValueToken[i];
                         
                          //check if the variant type is valid
                         if(!isFieldVariantTypeValid(variantType))
                         {
-                            System.out.println("[Warning]: Variant type '" + variantType + "' is not valid. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Variant type '" + variantType + "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break; 
                         }
@@ -255,12 +285,12 @@ public class ProcessFormFieldUtility
 
                     else if(fieldAttributeName.equalsIgnoreCase(FIELDTYPE))
                     {
-                        String fieldType = fieldAttributeValueToken.nextToken();
+                        String fieldType = fieldAttributeValueToken[i];
                         
                         //check if the field type is valid
                         if(!isFieldTypeValid(fieldType))
                         {
-                            System.out.println("[Warning]: Field type '" + fieldType + "' is not valid. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Field type '" + fieldType + "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break; 
                         }
@@ -270,12 +300,12 @@ public class ProcessFormFieldUtility
 
                     else if(fieldAttributeName.equalsIgnoreCase(LENGTH))
                     {
-                        String length = fieldAttributeValueToken.nextToken();
+                        String length = fieldAttributeValueToken[i];
                         
                         //Check if length is an int type
                         if(!HelperUtility.isInteger(length))
                         {
-                            System.out.println("[Warning]: Length '" + length + "' is not valid. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Length '" + length + "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break; 
                         }
@@ -286,12 +316,12 @@ public class ProcessFormFieldUtility
 
                     else if(fieldAttributeName.equalsIgnoreCase(ORDER))
                     {
-                        String order = fieldAttributeValueToken.nextToken();
+                        String order = fieldAttributeValueToken[i];
                         
                          //Check if order is an integer
                         if(!HelperUtility.isInteger(order))
                         {
-                            System.out.println("[Warning]: Order '" + order+ "' is not valid. Field will not be added:\n" + strLine);
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Order '" + order+ "' is not valid. Field will not be added:\n" + strLine);
                             isFieldRecordFromFileValid = false;
                             break; 
                         }
@@ -299,15 +329,69 @@ public class ProcessFormFieldUtility
                         int numOrder = Integer.parseInt(order);
                         processFormFieldObj.setOrder(numOrder);
                     }
+                    
+                    else if(fieldAttributeName.equalsIgnoreCase(DEFAULTVALUE))
+                    {
+                        String defaultValue = fieldAttributeValueToken[i];
+                        processFormFieldObj.setDefaultValue(defaultValue);
+                    }
+                                       
+                    else if(fieldAttributeName.equalsIgnoreCase(APP_PROFILE))
+                    {
+                        String appProfileEnabledStr = fieldAttributeValueToken[i];
+                        
+                        if(appProfileEnabledStr.equalsIgnoreCase("1"))
+                        {                   
+                            processFormFieldObj.setProfileEnabled(appProfileEnabledStr);
+                        }
+                        
+                        else if(appProfileEnabledStr.equalsIgnoreCase("0") || appProfileEnabledStr.equalsIgnoreCase(""))
+                        {                    
+                            processFormFieldObj.setProfileEnabled(appProfileEnabledStr);
+                        }
+                        
+                        else
+                        {
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Application Profile '" + appProfileEnabledStr + "' is not valid (0 = false, 1 = true). Field will not be added:\n" + strLine);
+                            isFieldRecordFromFileValid = false;
+                            break; 
+                        }
+                    }
+                             
+                    else if(fieldAttributeName.equalsIgnoreCase(ENCRYPTED))
+                    {
+                        String encryptEnabledStr = fieldAttributeValueToken[i];
+                        boolean encryptEnabled;
+                        
+                        if(encryptEnabledStr.equalsIgnoreCase("1"))
+                        {
+                            encryptEnabled = true;
+                        }
+                        
+                        else if(encryptEnabledStr.equalsIgnoreCase("0") || encryptEnabledStr.equalsIgnoreCase(""))
+                        {
+                            encryptEnabled = false;
+                        }
+                        
+                        else
+                        {
+                            System.out.println("[Warning] Line =" + lineNumber +  ": Encrypted '" + encryptEnabledStr + "' is not valid (0 = false, 1 = true). Field will not be added:\n" + strLine);
+                            isFieldRecordFromFileValid = false;
+                            break; 
+                        }
+                        
+                        processFormFieldObj.setSecure(encryptEnabled);
+                    }
                 }
                 
                 //add form field object if field record in file is valid
                 if(isFieldRecordFromFileValid)
                 {
+                    processFormFieldObj.setLineNumber(lineNumber);
                     pf_fieldRecordArray.add( processFormFieldObj); 
                 }
                 
-            }
+            }//End For Loop
             
             System.out.println(pf_fieldRecordArray.toString());
             
@@ -321,37 +405,162 @@ public class ProcessFormFieldUtility
                 
                 catch (tcInvalidAttributeException ex) 
                 {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Line Number in flie: %s. Attribute is failed to be added.", obj.getLineNumber()), ex);
                 } 
                 
                 catch (tcAddFieldFailedException ex)
                 {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Line Number in flie: %s. Attribute is failed to be added.", obj.getLineNumber()), ex);
                 }
                 
                 catch (tcAPIException ex)
                 {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Line Number in flie: %s. Attribute is failed to be added.", obj.getLineNumber()), ex);
                 }
                 
                 catch (tcFormNotFoundException ex) 
                 {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Line Number in flie: %s. Attribute is failed to be added.", obj.getLineNumber()), ex);
                 } 
             }
             
             return true;
         } 
-        
-        catch (FileNotFoundException ex) 
+                
+        finally
         {
-            Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        catch (IOException ex) 
-        { 
-            Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            if(br != null)
+            {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(in != null)
+            {
+                try {
+                    in.close(); //Close the input stream
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(fstream != null)
+            {
+                try {
+                    fstream.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }           
+    }
+    
+    /*
+     * Uses a flat file as a datasource to remove fields from the latest version of a process form.
+     * File must be in a specific format. Form version must not be active.
+     * 
+     * Check to make sure field label exists. 
+     * Check for duplication in file are not process.
+     * 
+     * File Format
+     * <Name of Process Form>
+     * <Field Label1>
+     * <Field Label2>
+     *
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   fileName            name of the file
+     * @param   processFormName     Table name of a process form
+     * @return  boolean value to indicate success or failure
+     */
+    public static boolean removeFieldsFromProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName, String processFormName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, ProcessFormNotFoundException, ProcessFormVersionLockedException, FileNotFoundException, IOException
+    {    
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        int lineNumber = 0;
+            
+        try 
+        {    
+            fstream = new FileInputStream(fileName); //Open File
+            in = new DataInputStream(fstream); //Get the object of DataInputStream
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            String strLine; //var to store a line of a file
+            HashMap<Long, Object> fieldKeys = new HashMap<Long, Object>();
+
+            //Validate the name of the process form
+            if(doesProcessFormExist(formDefOps, processFormName) == false)
+            {
+                System.out.println("[Error]: Process form name "+ processFormName + " does not exist.");
+                throw new ProcessFormNotFoundException(String.format("Process form name %s does not exist.", processFormName));
+            }
+            
+            tcResultSet formResultSet = getProcessFormData(formDefOps, processFormName); //get all data of a process form
+            long processFormKey = Long.parseLong(formResultSet.getStringValue("Structure Utility.Key"));
+            int processFormLatestVersion = Integer.parseInt(formResultSet.getStringValue("Structure Utility.Latest Version"));
+
+            //determine if the form version is locked
+            if(isFormVersionLocked(formDefOps, processFormKey, processFormLatestVersion))
+            {
+                System.out.println("[Error]: Process form version "+ processFormLatestVersion + " is locked.");
+                throw new ProcessFormVersionLockedException("Process form version is locked. Create a new version.");
+            }
+            
+            //Read each process form field from file
+            while ((strLine = br.readLine()) != null)  
+            {   
+                lineNumber++;
+                String fieldLabel = strLine;
+                         
+                //Check if the field label exist
+                if(!doesFormFieldLabelExists(formDefOps, processFormKey, processFormLatestVersion, fieldLabel))
+                {
+                    System.out.println("[Warning] Line =" + lineNumber +  ": Field label '" + fieldLabel + "' does not exists.");
+                    continue;
+                }
+                
+                //get form field key
+                Long fieldKey = getFieldKeyByFieldLabel(formDefOps, processFormKey, processFormLatestVersion, fieldLabel);
+                
+                if(fieldKey != null)
+                {
+                    //check if the field has been added to map
+                    if(fieldKeys.containsKey(fieldKey))
+                    {
+                        System.out.println("[Warning] Line =" + lineNumber +  ": Duplication of field label '" + fieldLabel + "' does not exists.");
+                        continue;
+                    }
+                    //add form key to hash map
+                    fieldKeys.put(fieldKey, lineNumber);
+                }
+            }
+
+            System.out.println(fieldKeys.toString());
+            
+            //Remove fields from the process form 
+            Iterator it = fieldKeys.entrySet().iterator();
+    
+            while (it.hasNext()) 
+            {   
+                Map.Entry pairs = (Map.Entry)it.next();
+                Long fieldKey = (Long) pairs.getKey();
+                try {
+                    removeFormField(formDefOps, fieldKey);
+                } catch (tcFormFieldNotFoundException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Field %s failed to be deleted. Line number in file is %s", pairs.getKey(), pairs.getValue()), ex);
+                } catch (tcDeleteNotAllowedException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Field %s failed to be deleted. Line number in file is %s", pairs.getKey(), pairs.getValue()), ex);
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, String.format("Field %s failed to be deleted. Line number in file is %s", pairs.getKey(), pairs.getValue()), ex);
+                }
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+
+            return true;
+        } 
         
         finally
         {
@@ -381,182 +590,33 @@ public class ProcessFormFieldUtility
                     Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }      
-        
-        return false;
-            
-    }
-    
-    /*
-     * Uses a flat file as a datasource to remove fields from the latest version of a process form.
-     * File must be in a specific format.
-     * 
-     * Sanity - 
-     * Check to make sure field label exists. 
-     * Check for duplication in file are not process.
-     * 
-     * File Format
-     * <Name of Process Form>
-     * <Field Label1>
-     * <Field Label2>
-     * 
-     */
-    public static boolean removeFieldsFromProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException
-    {    
-        FileInputStream fstream = null;
-        DataInputStream in = null;
-        BufferedReader br = null;
-            
-        try 
-        {    
-            fstream = new FileInputStream(fileName); //Open File
-            in = new DataInputStream(fstream); //Get the object of DataInputStream
-            br = new BufferedReader(new InputStreamReader(in));
-            
-            String strLine; //var to store a line of a file
-            HashMap<Long, Object> fieldKeys = new HashMap<Long, Object>();
-
-            //First line of the file should be the name of the process form
-            String processFormName = br.readLine();
-            if(doesProcessFormExist(formDefOps, processFormName) == false)
-            {
-                System.out.println("[Error]: Process form name "+ processFormName + " does not exist.");
-                return false;
-            }
-            
-            tcResultSet formResultSet = getProcessFormData(formDefOps, processFormName); //get all data of a process form
-            long processFormKey = Long.parseLong(formResultSet.getStringValue("Structure Utility.Key"));
-            int processFormLatestVersion = Integer.parseInt(formResultSet.getStringValue("Structure Utility.Latest Version"));
-
-            //determine if the form version is locked
-            if(isFormVersionLocked(formDefOps, processFormKey, processFormLatestVersion))
-            {
-                System.out.println("[Error]: Process form version "+ processFormLatestVersion + " is locked.");
-                return false;
-            }
-            
-            //Read each process form field from file
-            while ((strLine = br.readLine()) != null)  
-            {   
-                String fieldLabel = strLine;
-                         
-                //Check if the field label exist
-                if(!doesFormFieldLabelExists(formDefOps, processFormKey, processFormLatestVersion, fieldLabel))
-                {
-                    System.out.println("[Warning]: Field label '" + fieldLabel + "' does not exists.");
-                    continue;
-                }
-                
-                //get form field key
-                Long fieldKey = getFieldKeyByFieldLabel(formDefOps, processFormKey, processFormLatestVersion, fieldLabel);
-                
-                if(fieldKey != null)
-                {
-                    //check if the field has been added to map
-                    if(fieldKeys.containsKey(fieldKey))
-                    {
-                        System.out.println("[Warning]: Duplication of field label '" + fieldLabel + "' does not exists.");
-                        continue;
-                    }
-                    //add form key to hash map
-                    fieldKeys.put(fieldKey, "");
-                }
-            }
-
-            System.out.println(fieldKeys.toString());
-            
-            //Remove fields from the process form 
-            Iterator it = fieldKeys.entrySet().iterator();
-    
-            while (it.hasNext()) 
-            {   
-                Map.Entry pairs = (Map.Entry)it.next();
-                Long fieldKey = (Long) pairs.getKey();
-                try {
-                    removeFormField(formDefOps, fieldKey);
-                } catch (tcFormFieldNotFoundException ex) {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (tcDeleteNotAllowedException ex) {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (tcAPIException ex) {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                it.remove(); // avoids a ConcurrentModificationException
-            }
-
-            return true;
-        } 
-        
-        catch (FileNotFoundException ex) 
-        {
-            Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        catch (IOException ex) 
-        { 
-            Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-         finally
-        {
-            if(br != null)
-            {
-                try {
-                    br.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            if(in != null)
-            {
-                try {
-                    in.close(); //Close the input stream
-                } catch (IOException ex) {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            if(fstream != null)
-            {
-                try {
-                    fstream.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }      
-        
-        return false;
-            
+        }          
     }
     
     /*
      * Print all the column names assiocated with a process form.
-     * @params - 
-     *          formDefOps - tcFormDefinitionOperationsIntf service object
-
-     * Table References -
-     *      SDK - information on process form
+     * Table References: 
+     *    SDK - information on process form
+     *      Structure Utility.Key  [SDK_KEY]
+     *      Structure Utility.Child Tables.Parent Key [SDK_KEY]
+     *      Structure Utility.Table Name [SDK_NAME]
+     *      Structure Utility.Description
+     *      Structure Utility.Request Table
+     *      Structure Utility.Form Description
+     *      Structure Utility.Schema [SDK_SCHEMA]
+     *      Structure Utility.Note
+     *      Form Information.key [WIN_KEY]
+     *      Structure Utility.Form Type [SDK_TYPE]
+     *      Data Object Manager.key
+     *      Structure Utility.Row Version
+     *      Structure Utility.Latest Version
+     *      Structure Utility.Structure Utility Version Label.Latest Version Label
+     *      Structure Utility.Active Version
+     *      Structure Utility.Structure Utility Version Label.Active Version Label
+     *      SDK_CURRENT_VERSION
+     *      CURRENT_SDL_LABEL
      * 
-     * Structure Utility.Key  [SDK_KEY]
-     * Structure Utility.Child Tables.Parent Key [SDK_KEY]
-     * Structure Utility.Table Name [SDK_NAME]
-     * Structure Utility.Description
-     * Structure Utility.Request Table
-     * Structure Utility.Form Description
-     * Structure Utility.Schema [SDK_SCHEMA]
-     * Structure Utility.Note
-     * Form Information.key [WIN_KEY]
-     * Structure Utility.Form Type [SDK_TYPE]
-     * Data Object Manager.key
-     * Structure Utility.Row Version
-     * Structure Utility.Latest Version
-     * Structure Utility.Structure Utility Version Label.Latest Version Label
-     * Structure Utility.Active Version
-     * Structure Utility.Structure Utility Version Label.Active Version Label
-     * SDK_CURRENT_VERSION
-     * CURRENT_SDL_LABEL
+     * @param  formDefOps  tcFormDefinitionOperationsIntf service object
      */
     public static void printProcessFormColumnNames(tcFormDefinitionOperationsIntf formDefOps) throws tcAPIException
     {
@@ -573,8 +633,7 @@ public class ProcessFormFieldUtility
     
     /*
      * Print all the important data of each process form.
-     * @params - 
-     *          formDefOps - tcFormDefinitionOperationsIntf service object
+     * @param   formDefOps  tcFormDefinitionOperationsIntf service object
      */
     public static void printAllProcessFormInfo(tcFormDefinitionOperationsIntf formDefOps) throws tcAPIException, tcColumnNotFoundException
     {
@@ -591,37 +650,34 @@ public class ProcessFormFieldUtility
             String processFormTableName = processFormResultSet.getStringValue("Structure Utility.Table Name");
             String processFormActiveVersion = processFormResultSet.getStringValue("Structure Utility.Active Version");
             String processFormLatestVersion = processFormResultSet.getStringValue("Structure Utility.Latest Version");
-            
             System.out.printf("%-30s%-30s%-30s%-30s\n",processFormKey, processFormTableName, processFormActiveVersion,processFormLatestVersion);
         }
     }
     
     /*
      * Print all the columm names of a process form field.
-     * @params - 
-     *          formDefOps - tcFormDefinitionOperationsIntf service object
-     * 
-     * Table References
+     * Table References:
      *      SDC -information on process form fields
+     *          Structure Utility.Additional Columns.Key
+     *          Structure Utility.Key
+     *          Structure Utility.Additional Columns.Name
+     *          Structure Utility.Additional Columns.Variant Type
+     *          Structure Utility.Additional Columns.Length
+     *          Structure Utility.Additional Columns.Field Label
+     *          Structure Utility.Additional Columns.Field Type
+     *          Structure Utility.Additional Columns.Default Value
+     *          Structure Utility.Additional Columns.Order
+     *          Structure Utility.Additional Columns.Profile Enabled
+     *          Structure Utility.Additional Columns.Encrypted
+     *          Structure Utility.Additional Columns.Row Version
+     *          Structure Utility.Additional Columns.Version
+     *          EDITABLE
+     *          OPTIONAL
+     *          DISCRIMINABLE
+     *          VISIBLE
+     *          LOOKUPCODE
      * 
-     * Structure Utility.Additional Columns.Key
-     * Structure Utility.Key
-     * Structure Utility.Additional Columns.Name
-     * Structure Utility.Additional Columns.Variant Type
-     * Structure Utility.Additional Columns.Length
-     * Structure Utility.Additional Columns.Field Label
-     * Structure Utility.Additional Columns.Field Type
-     * Structure Utility.Additional Columns.Default Value
-     * Structure Utility.Additional Columns.Order
-     * Structure Utility.Additional Columns.Profile Enabled
-     * Structure Utility.Additional Columns.Encrypted
-     * Structure Utility.Additional Columns.Row Version
-     * Structure Utility.Additional Columns.Version
-     * EDITABLE
-     * OPTIONAL
-     * DISCRIMINABLE
-     * VISIBLE
-     * LOOKUPCODE
+     * @param   formDefOps  tcFormDefinitionOperationsIntf service object
      */
     public static void printProcessFormFieldColumnNames(tcFormDefinitionOperationsIntf formDefOps) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException
     {
@@ -656,40 +712,62 @@ public class ProcessFormFieldUtility
     }
     
     /*
-     * Print all the fields of a process form in proper file format for this utility.
-     * @params 
-     *       formDefOps - tcFormDefinitionOperationsIntf service object
-     *       processFormName - Name of the process form table
+     * Export all the fields of current process form in proper file format for this utility.
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormName     Name of the process form table
      */
-    public static void printProcessFormFieldsFileFormatAdd(tcFormDefinitionOperationsIntf formDefOps, String processFormName) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException
+    public static void exportProcessFormFieldsFileFormatAdd(tcFormDefinitionOperationsIntf formDefOps, String fileName ,String processFormName) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, FileNotFoundException, UnsupportedEncodingException, ProcessFormNotFoundException
     {
-        tcResultSet formResultSet = getProcessFormData(formDefOps, processFormName);
-        tcResultSet processFieldResultSet = formDefOps.getFormFields(Long.parseLong(formResultSet.getStringValue("Structure Utility.Key")), Integer.parseInt(formResultSet.getStringValue("Structure Utility.Latest Version"))); 
-        int numRows = processFieldResultSet.getTotalRowCount();
+        PrintWriter writer = null;
         
-        System.out.println(processFormName);
-        System.out.printf("%s\t%s\t%s\t%s\t%s\n", "Field_Label", "Variant_Type", "Field_Type" ,"Length", "Order");
-        for(int i = 0; i < numRows; i++)
+        try
         {
-            processFieldResultSet.goToRow(i);
-            String processFormFieldLabel = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Field Label");
-            String processFormFieldVariantType = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Variant Type");
-            String processFormFieldType = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Field Type");
-            String processFormFieldLength = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Length");
-            String processFormFieldOrder = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Order");
+            writer = new PrintWriter(fileName, "UTF-8");
+                  
+            //Validate the name of the process form
+            if(doesProcessFormExist(formDefOps, processFormName) == false)
+            {
+                throw new ProcessFormNotFoundException(String.format("Process form name %s does not exist.", processFormName));
+            }
             
-            
-            System.out.printf("%s\t%s\t%s\t%s\t%s\n",processFormFieldLabel, processFormFieldVariantType, processFormFieldType ,processFormFieldLength, processFormFieldOrder);
+            tcResultSet formResultSet = getProcessFormData(formDefOps, processFormName);
+            tcResultSet processFieldResultSet = formDefOps.getFormFields(Long.parseLong(formResultSet.getStringValue("Structure Utility.Key")), Integer.parseInt(formResultSet.getStringValue("Structure Utility.Latest Version"))); 
+            int numRows = processFieldResultSet.getTotalRowCount();
+
+            writer.printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", FIELDLABEL, VARIANTTYPE, FIELDTYPE, LENGTH, ORDER, DEFAULTVALUE, APP_PROFILE, ENCRYPTED);
+            for(int i = 0; i < numRows; i++)
+            {
+                processFieldResultSet.goToRow(i);
+                String processFormFieldLabel = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Field Label");
+                String processFormFieldVariantType = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Variant Type");
+                String processFormFieldType = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Field Type");
+                String processFormFieldLength = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Length");
+                String processFormFieldOrder = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Order");
+                String processFormFieldDefaultValue = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Default Value");
+                String processFormFieldAppProfile = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Profile Enabled");
+                String processFormFieldEncrypted = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Encrypted");
+
+                writer.printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",processFormFieldLabel, 
+                        processFormFieldVariantType, processFormFieldType ,processFormFieldLength, 
+                        processFormFieldOrder, processFormFieldDefaultValue, processFormFieldAppProfile,
+                        processFormFieldEncrypted);
+            }
+        }
+              
+        finally
+        {
+            if(writer != null)
+            {
+                writer.close();
+            }
         }
     }
     
-    
     /*
      * Print all the fields of a process form.
-     * @params 
-     *       formDefOps - tcFormDefinitionOperationsIntf service object
-     *       processFormKey - SDK_KEY
-     *       processFormVersion - SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey      SDK_KEY
+     * @param   processFormVersion  SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
      */
     public static void printProcessFormFields(tcFormDefinitionOperationsIntf formDefOps, long processFormKey, int processFormVersion) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException
     {
@@ -707,21 +785,20 @@ public class ProcessFormFieldUtility
             String processFormFieldLength = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Length");
             String processFormFieldLabel = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Field Label");
             String processFormFieldOrder = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Order");
-            
             System.out.printf("%-10s%-12s%-30s%-15s%-10s%-25s%-7s\n", processFormKey_SDK_KEY ,processFormFieldKey, processFormFieldColumnName,processFormFieldVariantType, processFormFieldLength, processFormFieldLabel,processFormFieldOrder);
         }
     }
     
     /*
      * Add a field to a process form.
-     * @params 
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormFieldObject - process form field object
+     * @param   formDefOps              tcFormDefinitionOperationsIntf service object
+     * @param   processFormFieldObject  process form field object
      * 
      * NOTE: The API appends a number to column name if the column name already exist.
      * In Design Console you have the ability the to decide a field's column name. But
-     * through the API, you do not. The column name is determined by the field label for the API.  
-     *     
+     * through the API, you do not. The column name is determined by the field label for the API.
+     * When adding a duplicate field label, the column name is appended a one. (When trying to call
+     * the API a 3rd time for duplicate, an exception will be thrown)    
      */
     public static void addFieldToProcessForm(tcFormDefinitionOperationsIntf formDefOps, ProcessFormField processFormFieldObj) throws tcAPIException, tcFormNotFoundException, tcInvalidAttributeException, tcAddFieldFailedException
     {
@@ -735,15 +812,13 @@ public class ProcessFormFieldUtility
         String defaultValue = processFormFieldObj.getDefaultValue();
         String profileEnabled = processFormFieldObj.getProfileEnabled();
         boolean secure = processFormFieldObj.getSecure();
-       
         formDefOps.addFormField(processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure); 
     }
     
     /*
      * Determines if a process form exists.
-     * @params 
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormName - table name of the process form
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormName     table name of the process form
      */
     public static boolean doesProcessFormExist(tcFormDefinitionOperationsIntf formDefOps, String processFormName) throws tcAPIException, tcColumnNotFoundException
     {
@@ -761,9 +836,8 @@ public class ProcessFormFieldUtility
     
     /*
      * Get the process form name by process form key.
-     * @params 
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - process form key (SDK.SDK_KEY)
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey      process form key (SDK.SDK_KEY)
      */
     public static String getProcessFormNameByFormKey(tcFormDefinitionOperationsIntf formDefOps, Long processFormKey) throws tcAPIException, tcColumnNotFoundException
     {
@@ -771,7 +845,6 @@ public class ProcessFormFieldUtility
         map.put("Structure Utility.Key", processFormKey.toString());
         tcResultSet processFormResultSet = formDefOps.findForms(map);
         int numRows = processFormResultSet.getTotalRowCount();
-        
         
         for(int i = 0; i < numRows; i++)
         {
@@ -785,11 +858,9 @@ public class ProcessFormFieldUtility
     
     /*
      * Get all the data of a process form.
-     * @params 
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormName - table name of the process form
-     * 
-     * @return - tcResultSet pointing to the process form record
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormName     table name of the process form
+     * @return  tcResultSet pointing to the process form record
      */
     public static tcResultSet getProcessFormData(tcFormDefinitionOperationsIntf formDefOps, String processFormName) throws tcAPIException, tcColumnNotFoundException
     {
@@ -809,11 +880,9 @@ public class ProcessFormFieldUtility
     
     /*
      * Get the process form name by process form key.
-     * @params 
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - process form key (SDK.SDK_KEY)
-     * 
-     * @return - tcResultSet pointing to the process form record
+     * @param   formDefOps      tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey  process form key (SDK.SDK_KEY)
+     * @return  tcResultSet pointing to the process form record
      */
     public static tcResultSet getProcessFormData(tcFormDefinitionOperationsIntf formDefOps, Long processFormKey) throws tcAPIException, tcColumnNotFoundException
     {
@@ -833,11 +902,9 @@ public class ProcessFormFieldUtility
     
     /*
      * Get all the fields of a process form
-     * params 
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - SDK_KEY
-     *      processFormVersion - SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
-     * 
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey      SDK_KEY
+     * @param   processFormVersion  SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
      */
     public static tcResultSet getAllProcessFormFields(tcFormDefinitionOperationsIntf formDefOps, long processFormKey, int processFormVersion) throws tcAPIException, tcFormNotFoundException
     {
@@ -846,13 +913,11 @@ public class ProcessFormFieldUtility
     
     /*
      * Get the form field key by field label.
-     * @params
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - SDK_KEY
-     *      processFormVersion - SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
-     *      fieldLabelCheck - field label to be checked
-     * 
-     * @return - field key [Structure Utility.Additional Columns.Key] SDC_KEY
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey      SDK_KEY
+     * @param   processFormVersion  SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
+     * @param   fieldLabelCheck     field label to be checked
+     * @return  field key [Structure Utility.Additional Columns.Key] SDC_KEY
      */
     public static Long getFieldKeyByFieldLabel(tcFormDefinitionOperationsIntf formDefOps, long processFormKey, int processFormVersion, String fieldLabelCheck) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException
     {
@@ -875,14 +940,11 @@ public class ProcessFormFieldUtility
     
     /*
      * Determines if a form field label exists.
-     * TODO: Optimize with direct SQL Query
-     * @params
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - the form key (SDK_KEY)
-     *      processFormVersion - SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
-     *      fieldLabelCheck - field label to be checked
-     * 
-     * @return - boolean value to indicate if form label exists in the given process form
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey      the form key (SDK_KEY)
+     * @param   processFormVersion  SDK_LATEST_VERSION, SDK_ACTIVE_VERSION, or any sdk version; Do not use the version label.
+     * @param   fieldLabelCheck     field label to be checked
+     * @return  boolean value to indicate if form label exists in the given process form
      */
     public static boolean doesFormFieldLabelExists(tcFormDefinitionOperationsIntf formDefOps, long processFormKey, int processFormVersion, String fieldLabelCheck) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException
     {
@@ -905,10 +967,8 @@ public class ProcessFormFieldUtility
     
     /*
      * Determine if the variant type of a process form field is valid.
-     * @param 
-     *      variantType - name of variant type
-     * 
-     * @return - boolean value to indicate if a variant type is valid
+     * @param   variantType     name of variant type
+     * @return  boolean value to indicate if a variant type is valid
      */
     public static boolean isFieldVariantTypeValid(String variantType)
     {
@@ -921,10 +981,8 @@ public class ProcessFormFieldUtility
     
     /*
      * Determine if the field type of a process form field is valid.
-     * @param
-     *      fieldType - name of field type
-     * 
-     * @return - boolean value to indicate if a variant type is valid
+     * @param   fieldType   name of field type
+     * @return  boolean value to indicate if a variant type is valid
      */
     public static boolean isFieldTypeValid(String fieldType)
     {
@@ -940,24 +998,20 @@ public class ProcessFormFieldUtility
      * been active before and no create, delete, or update operations can be 
      * performed on the form. Assumes a correct form version is passed in.
      * 
-     * Table Reference - 
+     * Table Reference:
      *      SDL - contains records with process form versions
+     *          Structure Utility.Structure Utility Version Label.Key
+     *          Structure Utility.Structure Utility Version Label.Parent Label
+     *          SDL_CURRENT_VERSION
+     *          Structure Utility.Structure Utility Version Label.Version Label
+     *          SDL_LOCK
+     *          Structure Utility.Active Version
+     *          Structure Utility.Latest Version
      * 
-     * Structure Utility.Structure Utility Version Label.Key
-     * Structure Utility.Structure Utility Version Label.Parent Label
-     * SDL_CURRENT_VERSION
-     * Structure Utility.Structure Utility Version Label.Version Label
-     * SDL_LOCK
-     * Structure Utility.Active Version
-     * Structure Utility.Latest Version
-     * 
-     * @params -
-     *      formDefOps - tcFormDefinitionOperationsIntf service object
-     *      processFormKey - process form key (SDK.SDK_KEY)
-     *      processFormVersion - version to be checked against SDL_CURRENT_VERSION
-     * 
-     * @return - boolean value to indicate if the given form version is locked.
-     *      
+     * @param   formDefOps          tcFormDefinitionOperationsIntf service object
+     * @param   processFormKey      process form key (SDK.SDK_KEY)
+     * @param   processFormVersion  version to be checked against SDL_CURRENT_VERSION
+     * @return  boolean value to indicate if the given form version is locked.   
      */
     public static boolean isFormVersionLocked(tcFormDefinitionOperationsIntf formDefOps, long processFormKey, int processFormVersion) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException
     {
@@ -985,7 +1039,6 @@ public class ProcessFormFieldUtility
                     return true;
                 }
             }
-
         }
         
         System.out.println("form version does not exist");
@@ -994,9 +1047,8 @@ public class ProcessFormFieldUtility
     
     /*
      * Removes a field from a process form.
-     * @param -
-     *          formDefOps - tcFormDefinitionOperationsIntf service object
-     *          formFieldKey - key of the form field (SDC.SDC_KEY)
+     * @param   formDefOps      tcFormDefinitionOperationsIntf service object
+     * @param   formFieldKey    key of the form field (SDC.SDC_KEY)
      *      
      * Note: Form Fields with a mapping to a reconciliation field can only be deleted when 
      * the mapping is removed.

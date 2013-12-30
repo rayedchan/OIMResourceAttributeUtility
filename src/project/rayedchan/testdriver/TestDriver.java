@@ -147,64 +147,7 @@ public class TestDriver
         });
     }
     
-    //Handles the creation of the JFrame and all it's components
-    private static void createGuiFrame()
-    {
-        JFrame guiFrame = new JFrame();
-        
-        //make sure the program exits when the frame closes
-        guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        guiFrame.setTitle("Dialog Box Example");
-        guiFrame.setSize(500,300);
-        
-        //This will center the JFrame in the middle of the screen
-        guiFrame.setLocationRelativeTo(null);
-        guiFrame.setVisible(true);
-        
-        //Using a JPanel as the message for the JOptionPane
-        JPanel userPanel = new JPanel();
-        userPanel.setLayout(new GridLayout(2,2));
-
-        //Labels for the textfield components        
-        JLabel usernameLbl = new JLabel("User ID:");
-        JLabel passwordLbl = new JLabel("Password:");
-
-        //Input components
-        JTextField usernameFld = new JTextField();
-        JPasswordField passwordFld = new JPasswordField();
-
-        //Add the components to the JPanel        
-        userPanel.add(usernameLbl);
-        userPanel.add(usernameFld);
-        userPanel.add(passwordLbl);
-        userPanel.add(passwordFld);
-
-        //As the JOptionPane accepts an object as the message
-        //it allows us to use any component we like - in this case 
-        //a JPanel containing the dialog components we want
-        String title = "Custom OIM Resource Console";
-        int input = JOptionPane.showConfirmDialog(guiFrame, userPanel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            
-        //User attempts to login
-        if(input == JOptionPane.OK_OPTION)
-        {
-            //Get values from input field
-            String username = usernameFld.getText();
-            char[] password = passwordFld.getPassword(); 
-            
-            System.out.println(username);
-            System.out.println(password);
-            
-            //Fill password array with zeroes
-            Arrays.fill(password, '0');
-        }
-    }
-    
-    
-    
-    
-    
-    public static void others(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException
+    public static void main2(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         Connection oimDBConnection = new OIMDatabaseConnection().getOracleDBConnction(); //Get connection to OIM Schema
@@ -215,194 +158,6 @@ public class TestDriver
         tcObjectOperationsIntf resourceObjectOps = oimClient.getService(tcObjectOperationsIntf.class);
         tcExportOperationsIntf exportOps = oimClient.getService(tcExportOperationsIntf.class);
         tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class); 
-        tcWorkflowDefinitionOperationsIntf wfDefOps = oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
-
-        /*
-         * ProcessTaskUtility
-         */      
-        //HelperUtility.printTcResultSetRecords(wfDefOps.getAvailableAdapters()); //ADP - Adapters
-        //ProcessTaskUtility.printAvailiableAdapters(wfDefOps);
-        //HelperUtility.printTcResultSetRecords(wfDefOps.getAdapterMappings("T", 31L)); //Info on the adapters, variable mappings, structure
-        //HelperUtility.printTcResultSetRecords(ProcessTaskUtility.getAdapterVariableMappings(wfDefOps, "T", 31L));  
-            
-        WorkflowDefinition wfDefObj = wfDefOps.getWorkflowDefinition(45L); //Get the workflow of a resource object
-        
-        /*TaskDefinition newTaskDef = new TaskDefinition();
-        newTaskDef.setName("Test Updated");
-        newTaskDef.setDescription("Test Updated");
-        newTaskDef.setConditionalTask(true);
-        newTaskDef.setCancelWhilePending(true);
-        newTaskDef.setRequiredComplete(true);
-        newTaskDef.setAllowMultiple(true);
-        newTaskDef.setTaskEffect("Field Change");
-        
-        ResponseDefinition newResponseDef = new ResponseDefinition();
-        newResponseDef.setStatus("R");
-        newResponseDef.setResponse("UNKNOWN");
-        newResponseDef.setResponseDescription("An unknown response was received");
-        HashMap<String, ResponseDefinition> responses = new HashMap<String, ResponseDefinition>();
-        responses.put("UNKNOWN", newResponseDef);
-        newTaskDef.setResponses(responses);
-        //System.out.println(wfDefObj.getTaskList());
-        //System.out.println(wfDefObj.getTasks());
-        
-        HashMap<String, StatusMapping> statusMapping = new HashMap<String,StatusMapping>();
-        StatusMapping s1 = new StatusMapping();
-        StatusMapping s2 = new StatusMapping();
-        StatusMapping s3 = new StatusMapping();
-        StatusMapping s4 = new StatusMapping();
-        StatusMapping s5 = new StatusMapping();
-        StatusMapping s6 = new StatusMapping();
-        StatusMapping s7 = new StatusMapping();
-        StatusMapping s8 = new StatusMapping();
-        StatusMapping s9 = new StatusMapping();
-        StatusMapping s10 = new StatusMapping();
-        StatusMapping s11 = new StatusMapping();
-        StatusMapping s12 = new StatusMapping();
-        
-        s1.setObjectStatus("None");
-        s1.setTaskStatus("XLR");
-        s1.setTaskStatusCategory("Rejected");
-        
-        s2.setObjectStatus("None");
-        s2.setTaskStatus("W");
-        s2.setTaskStatusCategory("Waiting");
-        
-        s3.setObjectStatus("None");
-        s3.setTaskStatus("UT");
-        s3.setTaskStatusCategory("Completed");
-        
-        s4.setObjectStatus("None");
-        s4.setTaskStatus("P");
-        s4.setTaskStatusCategory("Pending");
-        
-        s5.setObjectStatus("None");
-        s5.setTaskStatus("UCR");
-        s5.setTaskStatusCategory("Rejected");
-        
-        s6.setObjectStatus("None");
-        s6.setTaskStatus("S");
-        s6.setTaskStatusCategory("Suspended");
-        
-        s7.setObjectStatus("None");
-        s7.setTaskStatus("R");
-        s7.setTaskStatusCategory("Rejected");
-        
-        s8.setObjectStatus("None");
-        s8.setTaskStatus("C");
-        s8.setTaskStatusCategory("Completed");
-        
-        s9.setObjectStatus("None");
-        s9.setTaskStatus("PX");
-        s9.setTaskStatusCategory("Pending");
-        
-        s10.setObjectStatus("None");
-        s10.setTaskStatus("MC");
-        s10.setTaskStatusCategory("Completed");
-        
-        s11.setObjectStatus("None");
-        s11.setTaskStatus("X");
-        s11.setTaskStatusCategory("Cancelled");
-        
-        s12.setObjectStatus("None");
-        s12.setTaskStatus("UC");
-        s12.setTaskStatusCategory("Completed");
-        
-        statusMapping.put("XLR", s1);
-        statusMapping.put("W", s2);
-        statusMapping.put("UT", s3);
-        statusMapping.put("P", s4);
-        statusMapping.put("UCR", s5);
-        statusMapping.put("S", s6);
-        statusMapping.put("R", s7);
-        statusMapping.put("C", s8);
-        statusMapping.put("PX", s9);
-        statusMapping.put("MC", s10);
-        statusMapping.put("X", s11);
-        statusMapping.put("UC", s12);
-
-        newTaskDef.setStatusMappings(statusMapping);
-        
-        HashMap tasksAssign = new HashMap();
-        TaskAssignment newTaskAssignment =  new TaskAssignment();
-        newTaskAssignment.setRuleName("Default");
-        newTaskAssignment.setTargetType("Group");
-        newTaskAssignment.setGroupName("SYSTEM ADMINISTRATORS");
-        newTaskAssignment.setPriority("1");
-        tasksAssign.put(1, newTaskAssignment);
-        newTaskDef.setTaskAssignments(tasksAssign);
-        
-        ArrayList taskList = wfDefObj.getTaskList();
-        HashMap tasks = wfDefObj.getTasks();
-        tasks.put("Test Updated", newTaskDef);
-        taskList.add("Test Updated");
-        wfDefObj.setTasks(tasks);
-        wfDefObj.setTaskList(taskList);
-        wfDefOps.updateWorkflow(wfDefObj);*/
-        
-        
-        //System.out.println(wfDefObj.getTaskList()); //Gets all the process tasks 
-        TaskDefinition  taskDef = wfDefObj.getTask("test1");
-        //System.out.println(taskDef.getName());
-        //printStringList(taskDef.getResponseList());
-        //System.out.println(taskDef.getResponses());
-        //ResponseDefinition responseDef = taskDef.getResponseDefinition("UNKNOWN");
-        //System.out.println(responseDef.getResponseDescription());
-        
-        
-        //System.out.println(taskDef.getStatusMappings());
-        /*Iterator it = taskDef.getStatusMappings().entrySet().iterator();
-        while(it.hasNext())
-        {
-             Map.Entry pairs = (Map.Entry) it.next();
-             StatusMapping statusMap =  (StatusMapping) pairs.getValue();
-             System.out.println(statusMap.getObjectStatusKey());
-             System.out.println(statusMap.getTaskStatusKey());
-             System.out.println(statusMap.getTaskStatus());
-             System.out.println(statusMap.getTaskStatusCategory());
-             System.out.println(statusMap.getObjectStatus());
-             System.out.println();
-        }*/
-        
-        //System.out.print(taskDef.getTaskAssignments());
-        /*Iterator it = taskDef.getTaskAssignments().entrySet().iterator();
-        while(it.hasNext())
-        {
-             Map.Entry pairs = (Map.Entry) it.next();
-             TaskAssignment taskAssignment =  (TaskAssignment) pairs.getValue();
-             System.out.println(taskAssignment.getRuleName());
-             System.out.println(taskAssignment.getTargetType());
-             System.out.println(taskAssignment.getGroupName());
-              System.out.println(taskAssignment.getPriority());
-              System.out.println();
-             
-
-        }*/
-        
-        taskDef.setDescription("hello");
-        //System.out.println(taskDef.getName());
-        HashMap tasks = wfDefObj.getTasks();
-        System.out.println(tasks);
-        tasks.put("test1", taskDef);
-        wfDefObj.setTasks(tasks);
-        wfDefOps.updateWorkflow(wfDefObj);
-        
-        
-        //System.out.println(wfDefObj.getTask("Telephone Test"));
-        
- 
-        //System.out.println(taskDef.getTaskAdapter());
-        //System.out.println(taskDef.getTaskAdapterKey());
-        //System.out.println(taskDef.getTaskAdapterMappings());
-        
-        /*
-        HashSet<AdapterMapping> mappings = taskDef.getTaskAdapterMappings();    
-        for(AdapterMapping attrMap : mappings)
-        {
-           System.out.println(attrMap.getAdapterVariableName());
-        }
-        */
-
        
         /*
          * Test Oracle Database connection
@@ -415,49 +170,28 @@ public class TestDriver
         ResultSet resultSet = statement.executeQuery(query);
         HelperUtility.printResultSetRecords(resultSet);*/
             
-        /*
-         * Lookup Utility method calls
-         */
-        /*String lookupName =  "Lookup.Test";
-        String newCodeKeyToAdd = "codeKeyTest1";
-        String newDecodeToAdd = "decodeTest";
-        String language = "en";
-        String country = "US";
-        String lookupField = "LKU_GROUP"; //Lookup Group Field
-        String lookupUpdateFieldValue = "testLookupDescription";
-        String codeKeyToRemove = "test1";
-        String codeKeyToUpdate = "newCode2";
-        String newCodeKey = "code";
-        String newDecode = "decode";
-        String fileNameAdd = "/home/oracle/Desktop/testAdd";
-        String fileNameDelete = "/home/oracle/Desktop/testDelete";*/
-        //LookupUtility.addLookup(lookupOps, lookupName);
-        //LookupUtility.printLookupEntryColumns(lookupOps, lookupName);
-        //LookupUtility.printLookupEntries(lookupOps, lookupName);
-        //LookupUtility.addEntryToLookup(lookupOps, lookupName, newCodeKeyToAdd, newDecodeToAdd, language, country);
-        //LookupUtility.updateLookup(lookupOps, lookupName, lookupField, lookupUpdateFieldValue);
-        //LookupUtility.removeEntryFromLookup(lookupOps,lookupName, codeKeyToRemove); //remove the entry with the given code key           
-        //LookupUtility.printLookupFileFormat(lookupOps,lookupName);
-        //LookupUtility.updateEntryFromLookup(lookupOps,lookupName, codeKeyToUpdate, newCodeKey, newDecode);
-        //LookupUtility.addEntriesToLookupDSFF(lookupOps,fileNameAdd);
-        //LookupUtility.deleteEntriesFromLookupDSFF(lookupOps, fileNameDelete);
 
         /*
          * ProcessFormUtility method calls 
          */
-        /*HashMap<String,String> updateFormFieldMap = new HashMap();
+        
+        HashMap<String,String> updateFormFieldMap = new HashMap();
         updateFormFieldMap.put("Structure Utility.Additional Columns.Field Label", "test5");
         Long formFieldKey = 277L;
-        long processFormKey = 47L;
-        int processFormVersion = 2;
-        String fieldName = "test1";
+        
+        
+        long processFormKey = 82L;
+        int processFormVersion = 3;
+        String fieldName = "test";
         String fieldType = "TextField";
         String variantType = "String";
         int length = 100;
         int order = 19;
         String defaultValue = null;
-        String profileEnabled = null;
-        boolean secure = false;*/
+        String profileEnabled = "0";
+        boolean secure = true;
+        
+        
         //ProcessFormFieldUtility.printProcessFormColumnNames(formDefOps);
         //ProcessFormFieldUtility.printAllProcessFormInfo(formDefOps);
         //ProcessFormFieldUtility.printProcessFormFieldColumnNames(formDefOps);
@@ -466,8 +200,8 @@ public class TestDriver
         //ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldAdd");
         //ProcessFormFieldUtility.removeFieldsFromProcessFormDSFF(formDefOps, "/home/oracle/Desktop/testPFFieldRemove");
         //formDefOps.updateFormField(formFieldKey, updateFormFieldMap);
-        //ProcessFormField processFormFieldObj = new ProcessFormField (processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure);
-        //ProcessFormFieldUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
+        ProcessFormField processFormFieldObj = new ProcessFormField (processFormKey, processFormVersion,  fieldName, fieldType, variantType, length, order, defaultValue, profileEnabled, secure);
+        ProcessFormFieldUtility.addFieldToProcessForm(formDefOps, processFormFieldObj);
         //ProcessFormFieldUtility.removeFormField(formDefOps, 162L);
 
         /*

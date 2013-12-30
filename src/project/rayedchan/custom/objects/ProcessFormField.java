@@ -8,14 +8,15 @@ public class ProcessFormField
 {
     private long processFormKey;
     private int processFormVersion;
-    private String fieldName;
+    private String fieldName; //Label Name and Column Name suffix
     private String fieldType = "TextField";
     private String variantType = "String";
-    private int length = 100;
+    private int length = 100; //Specify zero if field does not have length attribute
     private int order = 50;
     private String defaultValue = null;
-    private String profileEnabled = null;
-    private boolean secure = false;
+    private String profileEnabled = null; //Application Profile; "0" = false, "1" = true
+    private boolean secure = false; //Encrypted
+    private int lineNumber; //Line number in flat file
     
     /*
      * Constructors
@@ -93,6 +94,11 @@ public class ProcessFormField
         return this.secure;
     }
     
+    public int getLineNumber()
+    {
+        return this.lineNumber;
+    }
+    
     /*
      * Setter Methods
      */
@@ -144,6 +150,11 @@ public class ProcessFormField
     public void setSecure(boolean secure)
     {
         this.secure = secure;
+    }
+    
+    public void setLineNumber(int lineNumber)
+    {
+        this.lineNumber = lineNumber;
     }
     
     /*

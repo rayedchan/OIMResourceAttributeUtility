@@ -1,12 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package project.rayedchan.swing.gui;
 
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
+import Thor.API.Exceptions.tcFormNotFoundException;
 import Thor.API.Exceptions.tcInvalidLookupException;
+import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.Operations.tcLookupOperationsIntf;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -20,13 +18,17 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import project.rayedchan.exception.BadFileFormatException;
 import project.rayedchan.exception.LookupNameNotFoundException;
+import project.rayedchan.exception.MissingRequiredFieldException;
+import project.rayedchan.exception.ProcessFormNotFoundException;
+import project.rayedchan.exception.ProcessFormVersionLockedException;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.tcOIMDatabaseConnection;
 import project.rayedchan.utilities.LookupUtility;
+import project.rayedchan.utilities.ProcessFormFieldUtility;
 
 /**
- *
- * @author oracle
+ * @author rayedchan
+ * Welcome Page for connector attribute extension utilities mainly.
  */
 public class WelcomeJFrame extends javax.swing.JFrame {
 
@@ -69,8 +71,21 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         lookup_submitBtn = new javax.swing.JButton();
         lookup_cancelBtn = new javax.swing.JButton();
         processFormFieldDialog = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
+        processFormFieldForm_tableNameLbl = new javax.swing.JLabel();
+        processFormField_fileNameLbl = new javax.swing.JLabel();
+        processFormField_operationLbl = new javax.swing.JLabel();
+        processFormField_formTableNameFld = new javax.swing.JTextField();
+        processFormField_fileNameFld = new javax.swing.JTextField();
+        processFormField_addRadioBtn = new javax.swing.JRadioButton();
+        processFormField_deleteRadioBtn = new javax.swing.JRadioButton();
+        processFormField_exportRadioBtn = new javax.swing.JRadioButton();
+        processFormField_browseBtn = new javax.swing.JButton();
+        processFormField_submitBtn = new javax.swing.JButton();
+        processFormField_cancelBtn = new javax.swing.JButton();
         fileChooser = new javax.swing.JFileChooser();
         lookup_buttonOpGroup = new javax.swing.ButtonGroup();
+        processFormField_buttonOpGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -213,15 +228,127 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
         lookupDialog.getAccessibleContext().setAccessibleParent(null);
 
+        processFormFieldDialog.setPreferredSize(new java.awt.Dimension(439, 251));
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Process Form Field Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
+        jPanel2.setPreferredSize(new java.awt.Dimension(439, 251));
+
+        processFormFieldForm_tableNameLbl.setText("Form Table Name:");
+
+        processFormField_fileNameLbl.setText("File Name:");
+
+        processFormField_operationLbl.setText("Operation:");
+
+        processFormField_fileNameFld.setEditable(false);
+
+        processFormField_buttonOpGroup.add(processFormField_addRadioBtn);
+        processFormField_addRadioBtn.setText("Add");
+
+        processFormField_buttonOpGroup.add(processFormField_deleteRadioBtn);
+        processFormField_deleteRadioBtn.setText("Delete");
+
+        processFormField_buttonOpGroup.add(processFormField_exportRadioBtn);
+        processFormField_exportRadioBtn.setText("Export");
+
+        processFormField_browseBtn.setText("Browse");
+        processFormField_browseBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                processFormField_browseBtnActionPerformed(evt);
+            }
+        });
+
+        processFormField_submitBtn.setText("Submit");
+        processFormField_submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                processFormField_submitBtnActionPerformed(evt);
+            }
+        });
+
+        processFormField_cancelBtn.setText("Cancel");
+        processFormField_cancelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                processFormField_cancelBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(processFormField_addRadioBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(processFormField_deleteRadioBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(processFormField_exportRadioBtn)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(processFormFieldForm_tableNameLbl)
+                                    .addComponent(processFormField_fileNameLbl))
+                                .addGap(4, 4, 4)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(processFormField_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(processFormField_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))
+                                    .addComponent(processFormField_formTableNameFld)))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(processFormField_operationLbl)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(processFormField_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(processFormField_cancelBtn)))
+                        .addContainerGap())))
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {processFormField_cancelBtn, processFormField_submitBtn});
+
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(processFormField_formTableNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(processFormFieldForm_tableNameLbl))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(processFormField_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(processFormField_browseBtn)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(processFormField_fileNameLbl)))
+                .addGap(18, 18, 18)
+                .addComponent(processFormField_operationLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(processFormField_addRadioBtn)
+                    .addComponent(processFormField_deleteRadioBtn)
+                    .addComponent(processFormField_exportRadioBtn))
+                .addGap(29, 29, 29)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(processFormField_submitBtn)
+                    .addComponent(processFormField_cancelBtn))
+                .addGap(0, 29, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout processFormFieldDialogLayout = new javax.swing.GroupLayout(processFormFieldDialog.getContentPane());
         processFormFieldDialog.getContentPane().setLayout(processFormFieldDialogLayout);
         processFormFieldDialogLayout.setHorizontalGroup(
             processFormFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         processFormFieldDialogLayout.setVerticalGroup(
             processFormFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         fileChooser.setFileFilter(new MyCustomFilter());
@@ -384,7 +511,8 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
     private void processFormFieldBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processFormFieldBtnActionPerformed
         // TODO add your handling code here:
-       processFormFieldDialog.setTitle("Process Form Field Option");
+       clearProcessFormFields();
+       processFormFieldDialog.setTitle("Process Form Field Utility Option");
        processFormFieldDialog.pack();
        processFormFieldDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
        processFormFieldDialog.setResizable(true);
@@ -394,17 +522,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
     private void lookup_browseFileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookup_browseFileBtnActionPerformed
         // TODO add your handling code here:
-        int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
-        if (returnVal == JFileChooser.APPROVE_OPTION) 
-        {
-            File file = fileChooser.getSelectedFile(); //Get details of selected file
-            lookup_fileNameFld.setText(file.getAbsolutePath()); //Populate file name field
-        }
-        
-        else 
-        {
-            System.out.println("File access cancelled by user.");
-        }
+        createFileChooserUI(lookup_fileNameFld);
     }//GEN-LAST:event_lookup_browseFileBtnActionPerformed
 
     private void lookup_cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookup_cancelBtnActionPerformed
@@ -414,7 +532,6 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
     private void lookup_submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookup_submitBtnActionPerformed
         // TODO add your handling code here:
-         
         tcLookupOperationsIntf lookupOps = null;
         try
         {
@@ -529,6 +646,152 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         
     }//GEN-LAST:event_lookup_submitBtnActionPerformed
 
+    private void processFormField_cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processFormField_cancelBtnActionPerformed
+        // TODO add your handling code here:
+        processFormFieldDialog.dispose();
+    }//GEN-LAST:event_processFormField_cancelBtnActionPerformed
+
+    private void processFormField_browseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processFormField_browseBtnActionPerformed
+        // TODO add your handling code here:
+        createFileChooserUI(processFormField_fileNameFld);
+    }//GEN-LAST:event_processFormField_browseBtnActionPerformed
+
+    private void processFormField_submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processFormField_submitBtnActionPerformed
+        // TODO add your handling code here:
+        tcFormDefinitionOperationsIntf formDefOps = null;
+        
+        try
+        {
+            String processFormName = processFormField_formTableNameFld.getText();
+            String fileName = processFormField_fileNameFld.getText();
+            formDefOps = oimClientResAttr.getOIMClient().getService(tcFormDefinitionOperationsIntf.class);
+
+            System.out.println("Process Form Table Name: " + processFormName);
+            System.out.println("File Name: " + fileName);
+            
+            if(processFormField_addRadioBtn.isSelected())
+            {
+                try {
+                    ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, fileName, processFormName);
+                    errorDialogMessage(processFormFieldDialog, "Add successful.");
+                    processFormFieldDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Add failed.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Add failed.");
+                } catch (tcFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form table name does not exist.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "File name not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Error reading file.");
+                } catch (ProcessFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form table name does not exist.");
+                } catch (ProcessFormVersionLockedException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form version must not be active. Create new version in design console.");
+                } catch (BadFileFormatException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Fix file format.");
+                } catch (MissingRequiredFieldException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Fix file to include required field.");
+                }
+            }
+
+            else if(processFormField_deleteRadioBtn.isSelected())
+            {
+                try {
+                    ProcessFormFieldUtility.removeFieldsFromProcessFormDSFF(formDefOps, fileName, processFormName);
+                    errorDialogMessage(processFormFieldDialog, "Delete successful.");
+                    processFormFieldDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Delete failed.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Delete failed.");
+                } catch (tcFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form table does not exist.");
+                } catch (ProcessFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form not found.");
+                } catch (ProcessFormVersionLockedException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form version must not be active. Create new version in design console.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Error reading file");
+                }
+            }
+
+            else if(processFormField_exportRadioBtn.isSelected())
+            {
+                try {
+                    ProcessFormFieldUtility.exportProcessFormFieldsFileFormatAdd(formDefOps, fileName,processFormName);
+                    errorDialogMessage(processFormFieldDialog, "Export successful.");
+                    processFormFieldDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Export failed.");
+                } catch (tcFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form not found.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Export failed.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "File not found.");
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Unsupported encoding. Contact developer.");
+                } catch (ProcessFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, "Process form not found.");
+                }
+            }
+
+            else
+            {
+                errorDialogMessage(processFormFieldDialog, "An operation must be selected.");
+            }
+        }
+        
+        finally
+        {
+            if(formDefOps != null)
+            {
+                formDefOps.close();
+            }
+        }
+    }//GEN-LAST:event_processFormField_submitBtnActionPerformed
+
+    private void createFileChooserUI(javax.swing.JTextField fileNameField)
+    {
+        int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
+        if (returnVal == JFileChooser.APPROVE_OPTION) 
+        {
+            File file = fileChooser.getSelectedFile(); //Get details of selected file
+            fileNameField.setText(file.getAbsolutePath()); //Populate file name field
+        }
+        
+        else 
+        {
+            System.out.println("File access cancelled by user.");
+        }
+    }
+    
     private void errorDialogMessage(Component component, String message)
     {
         JOptionPane.showMessageDialog(component, message);
@@ -541,9 +804,17 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         lookup_buttonOpGroup.clearSelection(); 
     }
     
+    private void clearProcessFormFields()
+    {
+        processFormField_formTableNameFld.setText("");
+        processFormField_fileNameFld.setText("");
+        processFormField_buttonOpGroup.clearSelection(); 
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -575,6 +846,18 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JButton lookup_submitBtn;
     private javax.swing.JButton processFormFieldBtn;
     private javax.swing.JDialog processFormFieldDialog;
+    private javax.swing.JLabel processFormFieldForm_tableNameLbl;
+    private javax.swing.JRadioButton processFormField_addRadioBtn;
+    private javax.swing.JButton processFormField_browseBtn;
+    private javax.swing.ButtonGroup processFormField_buttonOpGroup;
+    private javax.swing.JButton processFormField_cancelBtn;
+    private javax.swing.JRadioButton processFormField_deleteRadioBtn;
+    private javax.swing.JRadioButton processFormField_exportRadioBtn;
+    private javax.swing.JTextField processFormField_fileNameFld;
+    private javax.swing.JLabel processFormField_fileNameLbl;
+    private javax.swing.JTextField processFormField_formTableNameFld;
+    private javax.swing.JLabel processFormField_operationLbl;
+    private javax.swing.JButton processFormField_submitBtn;
     private javax.swing.JButton processTaskBtn;
     private javax.swing.JButton reconFieldBtn;
     private javax.swing.JButton rfToPffMappingBtn;
