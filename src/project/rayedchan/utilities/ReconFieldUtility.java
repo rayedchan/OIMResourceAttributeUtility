@@ -66,6 +66,10 @@ import project.rayedchan.exception.ResourceObjectNameNotFoundException;
  * directory to classpath in order to use.
  * 
  * Add xlDataObjects.jar to use prepared statement for tcDataProvider.
+ * 
+ * Note: Removing a reconciliation field that has a recon mapping through the xml will change
+ * the recon mappings to empty value (E.g. UD_FLAT_FIL_ROLE =  ). This utility prevents
+ * removal of recon fields that has a recon mapping defined.
  */
 public class ReconFieldUtility 
 {
