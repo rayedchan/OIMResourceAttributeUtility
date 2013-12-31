@@ -111,8 +111,9 @@ public class ReconFieldUtility
      * @param   importOps           tcImportOperationsIntf service object
      * @param   fileName            file that contains the reconciliation fields to add
      * @param   resourceObjectName  Resource Object to add fields to
+     * @param   delimiter           Use to separate values in file
      */
-    public static Boolean addReconFieldsDSFF(tcDataProvider dbProvider, tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String resourceObjectName) throws tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException, tcAPIException, ParserConfigurationException, SAXException, TransformerConfigurationException, TransformerException, SQLException, NamingException, DDMException, TransformationException, tcBulkException, XPathExpressionException
+    public static Boolean addReconFieldsDSFF(tcDataProvider dbProvider, tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String resourceObjectName, String delimiter) throws tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException, tcAPIException, ParserConfigurationException, SAXException, TransformerConfigurationException, TransformerException, SQLException, NamingException, DDMException, TransformationException, tcBulkException, XPathExpressionException
     {            
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -142,7 +143,7 @@ public class ReconFieldUtility
             //First line contains the attributes of a reconciliation field
             //Each record in flat file must have values for these attributes
             String rf_AttributeNames = br.readLine();
-            StringTokenizer attributeNameToken = new StringTokenizer(rf_AttributeNames, "\t"); 
+            StringTokenizer attributeNameToken = new StringTokenizer(rf_AttributeNames, delimiter); 
             lineNumber++;
             
             while(attributeNameToken.hasMoreTokens())
@@ -198,7 +199,7 @@ public class ReconFieldUtility
             while ((strLine = br.readLine()) != null)  
             {
                 lineNumber++;
-                String[] fieldAttributeValueToken = strLine.split("\t");
+                String[] fieldAttributeValueToken = strLine.split(delimiter);
                 int numFieldAttributeNames = reconFieldAttributeNameArray.size();
                 int numTokens = fieldAttributeValueToken.length;
                 ReconciliationField reconFieldObj = new ReconciliationField();
@@ -822,9 +823,10 @@ public class ReconFieldUtility
      * Table ORF - contains all the reconciliation fields  
      * @param    dbProvider     connection to the OIM Schema 
      * @param    fileName       File to write to
-     * @param    objectKey      resource object key (ORF.OBJ_KEY)    
+     * @param    objectKey      resource object key (ORF.OBJ_KEY)  
+     * @param    fileDelimiter  Use to separate values in file
      */
-    public static void exportReconFieldsofResourceObjectFileFormatAdd(tcDataProvider dbProvider, String fileName ,String resourceObjectName) throws tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, FileNotFoundException, UnsupportedEncodingException 
+    public static void exportReconFieldsofResourceObjectFileFormatAdd(tcDataProvider dbProvider, String fileName ,String resourceObjectName, String delimiter) throws tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, FileNotFoundException, UnsupportedEncodingException 
     {  
         PrintWriter writer = null;
         tcDataSet orfDataSet = null;
@@ -853,7 +855,7 @@ public class ReconFieldUtility
             ps.execute();
             orfDataSet = ps.getDataSet();
             int numRecords = orfDataSet.getTotalRowCount();
-            writer.printf("%s\t%s\t%s\n", "ReconFieldName", "FieldType", "isRequired");
+            writer.printf("%s%s%s%s%s\n", "ReconFieldName", delimiter, "FieldType", delimiter, "isRequired");
            
             for(int i = 0; i < numRecords; i++)
             {
@@ -861,7 +863,7 @@ public class ReconFieldUtility
                 String reconFieldName = orfDataSet.getString("ORF_FIELDNAME"); 
                 String reconFieldType = orfDataSet.getString("ORF_FIELDTYPE");
                 String isRequired = orfDataSet.getString("ORF_REQUIRED");
-                writer.printf("%s\t%s\t%s\n", reconFieldName, reconFieldType, isRequired);
+                writer.printf("%s%s%s%s%s\n", reconFieldName, delimiter, reconFieldType, delimiter, isRequired);
             }
         }
       

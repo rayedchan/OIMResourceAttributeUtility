@@ -130,6 +130,10 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         rf_browseBtn = new javax.swing.JButton();
         rf_submitBtn = new javax.swing.JButton();
         rf_cancelBtn = new javax.swing.JButton();
+        rf_delimiterLbl = new javax.swing.JLabel();
+        rf_tabRadioBtn = new javax.swing.JRadioButton();
+        rf_commaRadioBtn = new javax.swing.JRadioButton();
+        rf_semicolonRadioBtn = new javax.swing.JRadioButton();
         rf_buttonOpGroup = new javax.swing.ButtonGroup();
         processReconFieldMappingDialog = new javax.swing.JDialog();
         jPanel4 = new javax.swing.JPanel();
@@ -147,6 +151,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         prfMap_buttonOpGroup = new javax.swing.ButtonGroup();
         lookup_delimiterBtnGroup = new javax.swing.ButtonGroup();
         processFormField_delimiterBtnGroup = new javax.swing.ButtonGroup();
+        rf_delimiterBtnGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -507,40 +512,65 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             }
         });
 
+        rf_delimiterLbl.setText("Delimiter:");
+
+        rf_delimiterBtnGroup.add(rf_tabRadioBtn);
+        rf_tabRadioBtn.setText("Tab");
+
+        rf_delimiterBtnGroup.add(rf_commaRadioBtn);
+        rf_commaRadioBtn.setText("Comma");
+
+        rf_delimiterBtnGroup.add(rf_semicolonRadioBtn);
+        rf_semicolonRadioBtn.setText("Semicolon");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(12, 12, 12)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rf_resourceObjectNameLbl)
-                            .addComponent(rf_fileNameLbl))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(12, 12, 12)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(rf_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(rf_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE))
-                            .addComponent(rf_resourceObjectNameFld)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
                                 .addComponent(rf_addRadioBtn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(rf_deleteRadioBtn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(rf_exportRadioBtn))
-                            .addComponent(rf_operationLbl))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(rf_tabRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(rf_commaRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(rf_semicolonRadioBtn)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(rf_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(rf_cancelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(rf_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(rf_cancelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(rf_resourceObjectNameLbl)
+                                    .addComponent(rf_fileNameLbl))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(rf_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(rf_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(rf_resourceObjectNameFld)))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(rf_delimiterLbl)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(rf_operationLbl)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {rf_cancelBtn, rf_submitBtn});
@@ -556,18 +586,25 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     .addComponent(rf_fileNameLbl)
                     .addComponent(rf_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(rf_browseBtn))
-                .addGap(17, 17, 17)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rf_delimiterLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rf_tabRadioBtn)
+                    .addComponent(rf_commaRadioBtn)
+                    .addComponent(rf_semicolonRadioBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(rf_operationLbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rf_addRadioBtn)
                     .addComponent(rf_deleteRadioBtn)
                     .addComponent(rf_exportRadioBtn))
-                .addGap(27, 27, 27)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rf_submitBtn)
                     .addComponent(rf_cancelBtn))
-                .addGap(0, 38, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout reconFieldDialogLayout = new javax.swing.GroupLayout(reconFieldDialog.getContentPane());
@@ -578,7 +615,9 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         );
         reconFieldDialogLayout.setVerticalGroup(
             reconFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(reconFieldDialogLayout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reconciliation Field Mapping Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
@@ -1209,18 +1248,41 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         {
             String resourceObjectName = rf_resourceObjectNameFld.getText();
             String fileName = rf_fileNameFld.getText();
+            String fileDelimiter = null;
             resourceObjectOps = oimClientResAttr.getOIMClient().getService(tcObjectOperationsIntf.class);
             exportOps = oimClientResAttr.getOIMClient().getService(tcExportOperationsIntf.class);
             importOps = oimClientResAttr.getOIMClient().getService(tcImportOperationsIntf.class);
+            
+            //Convert file delimiter option
+            if(rf_tabRadioBtn.isSelected())
+            {
+                fileDelimiter = "\t";
+            }
+            
+            else if(rf_commaRadioBtn.isSelected())
+            {
+                fileDelimiter = ",";
+            }
+            
+            else if(rf_semicolonRadioBtn.isSelected())
+            {
+                fileDelimiter = ";";
+            }
 
             System.out.println("Resource Object Name: " + resourceObjectName);
             System.out.println("File Name: " + fileName);
             
             if(rf_addRadioBtn.isSelected())
-            {
+            {                               
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(reconFieldDialog, "A file delimiter must be selected.");
+                    return;
+                }
+                                
                 try 
                 {
-                    ReconFieldUtility.addReconFieldsDSFF(dbConnection.getDbProvider(), exportOps,  importOps, fileName, resourceObjectName);
+                    ReconFieldUtility.addReconFieldsDSFF(dbConnection.getDbProvider(), exportOps,  importOps, fileName, resourceObjectName, fileDelimiter);
                     errorDialogMessage(reconFieldDialog, "Add successful.");
                     reconFieldDialog.dispose();
                 } catch (tcDataSetException ex) {
@@ -1338,9 +1400,15 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             }
 
             else if(rf_exportRadioBtn.isSelected())
-            {
+            {            
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(reconFieldDialog, "A file delimiter must be selected.");
+                    return;
+                }
+                                
                 try {
-                    ReconFieldUtility.exportReconFieldsofResourceObjectFileFormatAdd(dbConnection.getDbProvider(), fileName, resourceObjectName);
+                    ReconFieldUtility.exportReconFieldsofResourceObjectFileFormatAdd(dbConnection.getDbProvider(), fileName, resourceObjectName, fileDelimiter);
                     errorDialogMessage(reconFieldDialog, "Export successful.");
                     reconFieldDialog.dispose();
                 } catch (tcDataSetException ex) {
@@ -1384,7 +1452,6 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private void reconFieldBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reconFieldBtnActionPerformed
         // TODO add your handling code here:
        clearReconFieldUtilityFields();
-         
        reconFieldDialog.setTitle("Reconciliation Field Utility Option");
        reconFieldDialog.pack();
        reconFieldDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
@@ -1613,7 +1680,8 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     {
         rf_resourceObjectNameFld.setText("");
         rf_fileNameFld.setText("");
-        rf_buttonOpGroup.clearSelection(); 
+        rf_buttonOpGroup.clearSelection();
+        rf_delimiterBtnGroup.clearSelection();
     }
     
     private void clearReconFieldMappingFields()
@@ -1703,14 +1771,19 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JButton rf_browseBtn;
     private javax.swing.ButtonGroup rf_buttonOpGroup;
     private javax.swing.JButton rf_cancelBtn;
+    private javax.swing.JRadioButton rf_commaRadioBtn;
     private javax.swing.JRadioButton rf_deleteRadioBtn;
+    private javax.swing.ButtonGroup rf_delimiterBtnGroup;
+    private javax.swing.JLabel rf_delimiterLbl;
     private javax.swing.JRadioButton rf_exportRadioBtn;
     private javax.swing.JTextField rf_fileNameFld;
     private javax.swing.JLabel rf_fileNameLbl;
     private javax.swing.JLabel rf_operationLbl;
     private javax.swing.JTextField rf_resourceObjectNameFld;
     private javax.swing.JLabel rf_resourceObjectNameLbl;
+    private javax.swing.JRadioButton rf_semicolonRadioBtn;
     private javax.swing.JButton rf_submitBtn;
+    private javax.swing.JRadioButton rf_tabRadioBtn;
     // End of variables declaration//GEN-END:variables
 }
 
