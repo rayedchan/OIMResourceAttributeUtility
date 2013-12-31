@@ -717,8 +717,8 @@ public class ReconFieldUtility
      * (E.g. field on parent level and field on child level).
      * Reconciliation fields are case sensitive.
      * @param   dbProvider          connection to the OIM Schema 
-     * @param   resourceObjectKey   resource object
-     * @param   reconFieldName      recon field name to check
+     * @param   resourceObjectKey   resource object (OBJ.OBJ_KEY)
+     * @param   reconFieldName      recon field name to check (ORF_FIELD_NAME) 
      * @return  true if the recon field name exists; false otherwise
      */
     public static Boolean doesReconFieldNameExist(tcDataProvider dbProvider, Long resourceObjectKey ,String reconFieldName) throws tcDataSetException, tcDataAccessException

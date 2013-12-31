@@ -96,6 +96,9 @@ import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconciliationField;
+import project.rayedchan.exception.NoResourceObjForProcessDefException;
+import project.rayedchan.exception.ProcessDefintionNotFoundException;
+import project.rayedchan.exception.ProcessFormNotFoundException;
 import project.rayedchan.exception.ResourceObjectNameNotFoundException;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.OIMDatabaseConnection;
@@ -152,7 +155,7 @@ public class TestDriver
         });
     }
     
-    public static void main2(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException
+    public static void main2(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         tcOIMDatabaseConnection connection =  new tcOIMDatabaseConnection(oimClient);
@@ -168,13 +171,25 @@ public class TestDriver
         /*
          * ReconFieldMapToFormFieldUtility
          */
-        /*long formKey = 47L;
-        long objKey = 45L; //OBJ.obj_key from OIM schema            
-        long processKey = 45L; //PKG_KEY
+        long formKey = 47L; //SDK
+        long objKey = 81L; //OBJ.obj_key from OIM schema            
+        long processKey = 81L; //PKG_KEY
         String reconFieldKey = "181";
         String processFormFieldName = "UD_LDAP_USR_TEST2"; //need to test case sensitivity 
         Boolean isKeyField  = false;
-        Boolean isCaseInsenstive = false;*/
+        Boolean isCaseInsenstive = false;
+        String processDefName = "Ldap User";
+        
+        //HelperUtility.printTcResultSetRecords(formDefOps.getDataFlow(81L));
+        //System.out.println(MappingReconFieldToFormFieldUtility.getObjKeyByProcKey(connection.getDbProvider(), processKey));
+        //System.out.println(MappingReconFieldToFormFieldUtility.getProcessKeyByProcessDefinitionName(connection.getDbProvider(), processDefName));
+        //MappingReconFieldToFormFieldUtility.printReconFieldAndFormFieldMappingsAddDSFF(connection.getDbProvider(), formDefOps, processDefName);
+        //System.out.println(MappingReconFieldToFormFieldUtility.getFormKeyByObjAndProcKey(connection.getDbProvider(), 41L, 41L));
+        //formDefOps.addReconDataFlow(processKey, objKey, "347", "ud_flat_fil_test", false, false);
+        
+        
+        System.out.println(MappingReconFieldToFormFieldUtility.isReconFieldMapped(connection.getDbProvider(), processKey, "339"));
+        
         //ReconFieldAndFormFieldMap fieldMappings = new ReconFieldAndFormFieldMap(null,processFormFieldName,reconFieldKey,isKeyField,isCaseInsenstive); 
         //HelperUtility.getAllProcessDefinitions(oimDBConnection);
         //tcResultSet result = formDefOps.getReconDataFlowForProcess(processKey);
@@ -197,100 +212,6 @@ public class TestDriver
         //System.out.println(MappingReconFieldToFormFieldUtility.doesPRFMappingExist(oimDBConnection, processKey, "User ID", "UD_LDAP_USR_USERID"));
         //System.out.println(Boolean.parseBoolean("false"));
         //MappingReconFieldToFormFieldUtility.removeReconFieldAndFormFieldMapDSFF(oimDBConnection, formDefOps, "/home/oracle/Desktop/testRemoveMapPRF");
-     
-        
-        /*
-         * ReconFieldUtility
-         */   
-        String resourceObjectName = "ldap user";
-        String reconField = "test5";
-        Long resourceObjKey = 45L;
-        
-        //System.out.println(ReconFieldUtility.isReconFieldChildAttribute(connection.getDbProvider(), resourceObjKey, reconField));
-
-        //ReconFieldUtility.printReconFieldsofResourceObject(connection.getDbProvider(),80L);
-        
-        //System.out.println(MappingReconFieldToFormFieldUtility.getReconFieldKey(connection.getDbProvider(), resourceObjKey, reconField));
-        
-        //System.out.println(MappingReconFieldToFormFieldUtility.isReconFieldMapped(connection.getDbProvider(), "344"));
-        
-        
-        
-        
-        //String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName);
-        //System.out.println(resourceObjectXML);
-        //System.out.println(System.getProperty("file.encoding"));
-        //ReconFieldUtility.printAllResourceObjects(oimDBConnection);
-        //ReconFieldUtility.printReconFieldsofResourceObject(oimDBConnection, 45L);
-        //ArrayList<ReconciliationField> reconFieldArray = new ArrayList<ReconciliationField>();
-        //ReconFieldUtility.printReconFieldsofResourceObjectFileFormatAdd(oimDBConnection, 45L);
-        //System.out.println(ReconFieldUtility.getResourceObjectName(oimDBConnection, 45L));
-        //System.out.println(ReconFieldUtility.getResourceObjectKey(oimDBConnection, "DBAT_TEST_GTC"));
-        //System.out.println(ReconFieldUtility.doesReconFieldNameExist(oimDBConnection, 45L, "User ID"));
-        //System.out.println(ReconFieldUtility.isReconFieldMulitvalued(oimDBConnection, 45L, "Group Name"));
-        //System.out.println(ReconFieldUtility.isReconFieldChildAttribute(oimDBConnection, 45L, "test6"));
- 
-        //ReconciliationField reconField = new ReconciliationField("test15", "String", false);
-        //Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML);
-        //ReconFieldUtility.addReconField(document, reconField);
-        //ReconFieldUtility.removeReconField(document, "test7");
-        //String newObjectResourceXML = HelperUtility.parseDocumentIntoStringXML(document);
-        //ReconFieldUtility.addReconFieldsDSFF(oimDBConnection, exportOps, importOps, "/home/oracle/Desktop/testReconFieldAdd");
-        //ReconFieldUtility.removeReconFieldDSFF(oimDBConnection, exportOps, importOps, "/home/oracle/Desktop/testReconFieldRemove");
-            
-        //System.out.println(newObjectResourceXML);
-        //System.out.println(ReconFieldUtility.getResourceObjectUpdateTimestamp(document));
-        //ReconFieldUtility.importResourceObject(importOps, newObjectResourceXML, "TestReconFieldRemove");
-        //XPathExpression expr = xpath.compile("//ReconField"); //Get all tags with "ReconField" tag name regardless of depth
-        //NodeList reconFieldNodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
-        /*NodeList reconFieldNodes = (NodeList) xpath.evaluate("xl-ddm-data/Resource/ReconField", document, XPathConstants.NODESET); //do not get the mulitvalued reconField
-          int numReconFieldNodes = reconFieldNodes.getLength();
-
-          for(int i = 0; i < numReconFieldNodes; i++)
-          {
-              String reconFieldName = null;
-              String reconFieldType = null;
-              String isRequired = null;
-              Boolean isMultiValued = false;
-              Node reconFieldNode = reconFieldNodes.item(i);
-              NodeList rfAttributeNodes = reconFieldNode.getChildNodes();
-              Element rfElement = (Element) reconFieldNode;
-              reconFieldName = rfElement.getAttribute("name");
-              int numAttributes = rfAttributeNodes.getLength();
-                
-              //System.out.println(reconFieldName);
-               
-              //iterate all the reconciliation field attributes
-              for(int j = 0; j < numAttributes; j++)
-              {
-                  Element attrElement = (Element) rfAttributeNodes.item(j);
-                  String attributeName = attrElement.getTagName();
-                        
-                  if(attributeName.equalsIgnoreCase(ORF_FIELDTYPE_TAG))
-                  {
-                      reconFieldType = attrElement.getTextContent();
-                      if(reconFieldType.equalsIgnoreCase("Multi-Valued"))
-                      {
-                          isMultiValued = true;
-                          break;
-                      }
-                  }
-                    
-                  else if(attributeName.equalsIgnoreCase(ORF_REQUIRED_TAG))
-                  {
-                      isRequired = attrElement.getTextContent();
-                  }
-                   
-              }
-                
-              if(isMultiValued == false)
-              {
-                  ReconciliationField reconField = new ReconciliationField(reconFieldName, reconFieldType, isRequired);
-                  reconFieldArray.add(reconField);
-              }                
-          }*/
-            
-          //System.out.println(reconFieldArray);
     }
     
     

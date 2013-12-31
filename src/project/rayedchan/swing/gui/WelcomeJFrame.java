@@ -5,6 +5,7 @@ import Thor.API.Exceptions.tcBulkException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.Exceptions.tcFormNotFoundException;
 import Thor.API.Exceptions.tcInvalidLookupException;
+import Thor.API.Exceptions.tcProcessNotFoundException;
 import Thor.API.Operations.tcExportOperationsIntf;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.Operations.tcImportOperationsIntf;
@@ -35,12 +36,16 @@ import org.xml.sax.SAXException;
 import project.rayedchan.exception.BadFileFormatException;
 import project.rayedchan.exception.LookupNameNotFoundException;
 import project.rayedchan.exception.MissingRequiredFieldException;
+import project.rayedchan.exception.NoResourceObjForProcessDefException;
+import project.rayedchan.exception.ProcessDefintionNotFoundException;
 import project.rayedchan.exception.ProcessFormNotFoundException;
 import project.rayedchan.exception.ProcessFormVersionLockedException;
 import project.rayedchan.exception.ResourceObjectNameNotFoundException;
+import project.rayedchan.exception.ResourceObjectNotFoundException;
 import project.rayedchan.services.OIMClientResourceAttr;
 import project.rayedchan.services.tcOIMDatabaseConnection;
 import project.rayedchan.utilities.LookupUtility;
+import project.rayedchan.utilities.MappingReconFieldToFormFieldUtility;
 import project.rayedchan.utilities.ProcessFormFieldUtility;
 import project.rayedchan.utilities.ReconFieldUtility;
 
@@ -118,6 +123,20 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         rf_submitBtn = new javax.swing.JButton();
         rf_cancelBtn = new javax.swing.JButton();
         rf_buttonOpGroup = new javax.swing.ButtonGroup();
+        processReconFieldMappingDialog = new javax.swing.JDialog();
+        jPanel4 = new javax.swing.JPanel();
+        prfMap_procDefNameLbl = new javax.swing.JLabel();
+        prfMap_fileNameLbl = new javax.swing.JLabel();
+        prfMap_operationLbl = new javax.swing.JLabel();
+        prfMap_addRadioBtn = new javax.swing.JRadioButton();
+        prfMap_deleteRadioBtn = new javax.swing.JRadioButton();
+        prfMap_exportRadioBtn = new javax.swing.JRadioButton();
+        prfMap_procDefNameFld = new javax.swing.JTextField();
+        prfMap_fileNameFld = new javax.swing.JTextField();
+        prfMap_browseBtn = new javax.swing.JButton();
+        prfMap_submitBtn = new javax.swing.JButton();
+        prfMap_cancelBtn = new javax.swing.JButton();
+        prfMap_buttonOpGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -369,7 +388,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(processFormField_submitBtn)
                     .addComponent(processFormField_cancelBtn))
-                .addGap(0, 29, Short.MAX_VALUE))
+                .addGap(0, 12, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout processFormFieldDialogLayout = new javax.swing.GroupLayout(processFormFieldDialog.getContentPane());
@@ -380,7 +399,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         );
         processFormFieldDialogLayout.setVerticalGroup(
             processFormFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
         );
 
         fileChooser.setFileFilter(new MyCustomFilter());
@@ -501,6 +520,120 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        processReconFieldMappingDialog.setPreferredSize(new java.awt.Dimension(439, 251));
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reconciliation Field Mapping Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
+
+        prfMap_procDefNameLbl.setText("Process Definition Name:");
+
+        prfMap_fileNameLbl.setText("File Name:");
+
+        prfMap_operationLbl.setText("Operation:");
+
+        prfMap_buttonOpGroup.add(prfMap_addRadioBtn);
+        prfMap_addRadioBtn.setText("Add");
+
+        prfMap_buttonOpGroup.add(prfMap_deleteRadioBtn);
+        prfMap_deleteRadioBtn.setText("Delete");
+
+        prfMap_buttonOpGroup.add(prfMap_exportRadioBtn);
+        prfMap_exportRadioBtn.setText("Export");
+
+        prfMap_browseBtn.setText("Browse");
+        prfMap_browseBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prfMap_browseBtnActionPerformed(evt);
+            }
+        });
+
+        prfMap_submitBtn.setText("Submit");
+        prfMap_submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prfMap_submitBtnActionPerformed(evt);
+            }
+        });
+
+        prfMap_cancelBtn.setText("Cancel");
+        prfMap_cancelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prfMap_cancelBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(prfMap_procDefNameLbl)
+                            .addComponent(prfMap_fileNameLbl))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(prfMap_procDefNameFld)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(prfMap_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(prfMap_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE))))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(prfMap_addRadioBtn)
+                                .addGap(18, 18, 18)
+                                .addComponent(prfMap_deleteRadioBtn)
+                                .addGap(18, 18, 18)
+                                .addComponent(prfMap_exportRadioBtn))
+                            .addComponent(prfMap_operationLbl))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(prfMap_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(prfMap_cancelBtn)))
+                .addContainerGap())
+        );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {prfMap_cancelBtn, prfMap_submitBtn});
+
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(prfMap_procDefNameLbl)
+                    .addComponent(prfMap_procDefNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(prfMap_fileNameLbl)
+                    .addComponent(prfMap_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(prfMap_browseBtn))
+                .addGap(18, 18, 18)
+                .addComponent(prfMap_operationLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(prfMap_addRadioBtn)
+                    .addComponent(prfMap_deleteRadioBtn)
+                    .addComponent(prfMap_exportRadioBtn))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(prfMap_submitBtn)
+                    .addComponent(prfMap_cancelBtn)))
+        );
+
+        javax.swing.GroupLayout processReconFieldMappingDialogLayout = new javax.swing.GroupLayout(processReconFieldMappingDialog.getContentPane());
+        processReconFieldMappingDialog.getContentPane().setLayout(processReconFieldMappingDialogLayout);
+        processReconFieldMappingDialogLayout.setHorizontalGroup(
+            processReconFieldMappingDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        processReconFieldMappingDialogLayout.setVerticalGroup(
+            processReconFieldMappingDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Utility Options", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
@@ -529,6 +662,11 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         });
 
         rfToPffMappingBtn.setText("Recon Field Mappings");
+        rfToPffMappingBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rfToPffMappingBtnActionPerformed(evt);
+            }
+        });
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -1135,6 +1273,162 @@ public class WelcomeJFrame extends javax.swing.JFrame {
        reconFieldDialog.setVisible(true); //Display lookup dialog
     }//GEN-LAST:event_reconFieldBtnActionPerformed
 
+    private void rfToPffMappingBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rfToPffMappingBtnActionPerformed
+        // TODO add your handling code here:
+       clearReconFieldMappingFields();
+         
+       processReconFieldMappingDialog.setTitle("Reconciliation Field Mapping Utility Option");
+       processReconFieldMappingDialog.pack();
+       processReconFieldMappingDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
+       processReconFieldMappingDialog.setResizable(true);
+       processReconFieldMappingDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL); //Modal dialog blocks input from top-level windows
+       processReconFieldMappingDialog.setVisible(true); //Display lookup dialog
+    }//GEN-LAST:event_rfToPffMappingBtnActionPerformed
+
+    private void prfMap_cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prfMap_cancelBtnActionPerformed
+        // TODO add your handling code here:
+        processReconFieldMappingDialog.dispose();
+    }//GEN-LAST:event_prfMap_cancelBtnActionPerformed
+
+    private void prfMap_submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prfMap_submitBtnActionPerformed
+        // TODO add your handling code here:
+        tcFormDefinitionOperationsIntf formDefOps = null;
+
+        try
+        {
+            String procDefName = prfMap_procDefNameFld.getText();
+            String fileName = prfMap_fileNameFld.getText();
+            formDefOps = oimClientResAttr.getOIMClient().getService(tcFormDefinitionOperationsIntf.class);
+
+            System.out.println("Process Defintion Name: " + procDefName);
+            System.out.println("File Name: " + fileName);
+
+            if(prfMap_addRadioBtn.isSelected())
+            {
+                try {
+                    MappingReconFieldToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(dbConnection.getDbProvider(), formDefOps, fileName, procDefName);
+                    errorDialogMessage(processReconFieldMappingDialog, "Add successful.");
+                    processReconFieldMappingDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Add failed.");
+                } catch (tcFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Form not found.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Add failed.");
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Add failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Add failed.");
+                } catch (ProcessDefintionNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Process definition not found.");
+                } catch (NoResourceObjForProcessDefException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "No resource object for process definition..");
+                } catch (ResourceObjectNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Resource object not found.");
+                } catch (ProcessFormNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Process form not found.");
+                } catch (MissingRequiredFieldException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Missing required field in header.");
+                } catch (BadFileFormatException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Bad file format.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Error reading file.");
+                }
+            }
+
+            else if(prfMap_deleteRadioBtn.isSelected())
+            {
+                try {
+                    MappingReconFieldToFormFieldUtility.removeReconFieldAndFormFieldMapDSFF(dbConnection.getDbProvider(), formDefOps, fileName, procDefName);
+                    errorDialogMessage(processReconFieldMappingDialog, "Delete successful.");
+                    processReconFieldMappingDialog.dispose();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Error reading file.");
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Delete failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Delete failed.");
+                } catch (ProcessDefintionNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Process defintion not found.");
+                } catch (NoResourceObjForProcessDefException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "No resource object associated with process definition.");
+                } catch (ResourceObjectNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Resource object not found.");
+                }
+            }
+
+            else if(prfMap_exportRadioBtn.isSelected())
+            {
+                try {
+                    MappingReconFieldToFormFieldUtility.exportReconFieldAndFormFieldMappingsAddDSFF(dbConnection.getDbProvider(), formDefOps, fileName, procDefName);
+                    errorDialogMessage(processReconFieldMappingDialog, "Export successful.");
+                    processReconFieldMappingDialog.dispose();
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Export failed.");
+                } catch (tcProcessNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Process defintion not found.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Export failed.");
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Export failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Export failed.");
+                } catch (ProcessDefintionNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Process defintion not found.");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "File does not exist.");
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, "Unsupported encoding. Contact developer.");
+                }
+            }
+        }
+
+        finally
+        {
+            if(formDefOps != null)
+            {
+                formDefOps.close();
+            }
+        }
+    }//GEN-LAST:event_prfMap_submitBtnActionPerformed
+
+    private void prfMap_browseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prfMap_browseBtnActionPerformed
+        // TODO add your handling code here:
+        createFileChooserUI(prfMap_fileNameFld);
+    }//GEN-LAST:event_prfMap_browseBtnActionPerformed
+
     private void createFileChooserUI(javax.swing.JTextField fileNameField)
     {
         int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
@@ -1176,11 +1470,19 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         rf_buttonOpGroup.clearSelection(); 
     }
     
+    private void clearReconFieldMappingFields()
+    {
+        prfMap_procDefNameFld.setText("");
+        prfMap_fileNameFld.setText("");
+        prfMap_buttonOpGroup.clearSelection(); 
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1210,6 +1512,18 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JTextField lookup_lookupNameFld;
     private javax.swing.JLabel lookup_lookupNameLbl;
     private javax.swing.JButton lookup_submitBtn;
+    private javax.swing.JRadioButton prfMap_addRadioBtn;
+    private javax.swing.JButton prfMap_browseBtn;
+    private javax.swing.ButtonGroup prfMap_buttonOpGroup;
+    private javax.swing.JButton prfMap_cancelBtn;
+    private javax.swing.JRadioButton prfMap_deleteRadioBtn;
+    private javax.swing.JRadioButton prfMap_exportRadioBtn;
+    private javax.swing.JTextField prfMap_fileNameFld;
+    private javax.swing.JLabel prfMap_fileNameLbl;
+    private javax.swing.JLabel prfMap_operationLbl;
+    private javax.swing.JTextField prfMap_procDefNameFld;
+    private javax.swing.JLabel prfMap_procDefNameLbl;
+    private javax.swing.JButton prfMap_submitBtn;
     private javax.swing.JButton processFormFieldBtn;
     private javax.swing.JDialog processFormFieldDialog;
     private javax.swing.JLabel processFormFieldForm_tableNameLbl;
@@ -1224,6 +1538,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JTextField processFormField_formTableNameFld;
     private javax.swing.JLabel processFormField_operationLbl;
     private javax.swing.JButton processFormField_submitBtn;
+    private javax.swing.JDialog processReconFieldMappingDialog;
     private javax.swing.JButton processTaskBtn;
     private javax.swing.JButton reconFieldBtn;
     private javax.swing.JDialog reconFieldDialog;

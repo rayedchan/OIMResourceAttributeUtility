@@ -203,7 +203,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
+              <Component id="jPanel2" alignment="0" pref="234" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -303,7 +303,7 @@
                           <Component id="processFormField_submitBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="processFormField_cancelBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="0" pref="29" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="12" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -578,6 +578,187 @@
     </Container>
     <Component class="javax.swing.ButtonGroup" name="rf_buttonOpGroup">
     </Component>
+    <Container class="javax.swing.JDialog" name="processReconFieldMappingDialog">
+      <Properties>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[439, 251]"/>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jPanel4" alignment="0" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Container class="javax.swing.JPanel" name="jPanel4">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Reconciliation Field Mapping Utility">
+                  <Font PropertyName="font" name="Dialog" size="12" style="1"/>
+                </TitledBorder>
+              </Border>
+            </Property>
+          </Properties>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="prfMap_procDefNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="prfMap_fileNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="prfMap_procDefNameFld" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="prfMap_fileNameFld" min="-2" pref="159" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="prfMap_browseBtn" pref="65" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                      <Component id="prfMap_addRadioBtn" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="prfMap_deleteRadioBtn" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="prfMap_exportRadioBtn" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="prfMap_operationLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="prfMap_submitBtn" linkSize="8" min="-2" pref="103" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="prfMap_cancelBtn" linkSize="8" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="prfMap_procDefNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_procDefNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="prfMap_fileNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_fileNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_browseBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="prfMap_operationLbl" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="prfMap_addRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_deleteRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_exportRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="prfMap_submitBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_cancelBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="prfMap_procDefNameLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Process Definition Name:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="prfMap_fileNameLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="File Name:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="prfMap_operationLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Operation:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="prfMap_addRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="prfMap_buttonOpGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Add"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="prfMap_deleteRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="prfMap_buttonOpGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Delete"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="prfMap_exportRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="prfMap_buttonOpGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Export"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="prfMap_procDefNameFld">
+            </Component>
+            <Component class="javax.swing.JTextField" name="prfMap_fileNameFld">
+            </Component>
+            <Component class="javax.swing.JButton" name="prfMap_browseBtn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Browse"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prfMap_browseBtnActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="prfMap_submitBtn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Submit"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prfMap_submitBtnActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="prfMap_cancelBtn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Cancel"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prfMap_cancelBtnActionPerformed"/>
+              </Events>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.ButtonGroup" name="prfMap_buttonOpGroup">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
@@ -742,6 +923,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Recon Field Mappings"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rfToPffMappingBtnActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
           <AuxValues>

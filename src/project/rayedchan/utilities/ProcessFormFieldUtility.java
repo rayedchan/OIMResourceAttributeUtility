@@ -818,7 +818,7 @@ public class ProcessFormFieldUtility
     /*
      * Determines if a process form exists.
      * @param   formDefOps          tcFormDefinitionOperationsIntf service object
-     * @param   processFormName     table name of the process form
+     * @param   processFormName     table name of the process form (SDK.SDK_NAME)
      */
     public static boolean doesProcessFormExist(tcFormDefinitionOperationsIntf formDefOps, String processFormName) throws tcAPIException, tcColumnNotFoundException
     {
