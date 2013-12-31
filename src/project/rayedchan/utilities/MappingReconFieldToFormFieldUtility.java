@@ -272,8 +272,9 @@ public class MappingReconFieldToFormFieldUtility
      * @param   formDefOps      tcFormDefinitionOperationsIntf service object
      * @param   fileName        Name of file to write to
      * @param   processDefName  Process definition name (PKG.PKG_NAME)
+     * @param   delimiter       Use to separate values from file
      */
-    public static void exportReconFieldAndFormFieldMappingsAddDSFF(tcDataProvider dbProvider, tcFormDefinitionOperationsIntf formDefOps, String fileName, String processDefName) throws tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, FileNotFoundException, UnsupportedEncodingException
+    public static void exportReconFieldAndFormFieldMappingsAddDSFF(tcDataProvider dbProvider, tcFormDefinitionOperationsIntf formDefOps, String fileName, String processDefName, String delimiter) throws tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, FileNotFoundException, UnsupportedEncodingException
     {
         PrintWriter writer = null;
         try
@@ -284,7 +285,7 @@ public class MappingReconFieldToFormFieldUtility
             tcResultSet mappingResultSet = formDefOps.getReconDataFlowForProcess(processKey);
             int numRows = mappingResultSet.getTotalRowCount();
 
-            writer.printf("%s\t%s\t%s\t%s\n",RECONFIELDNAME, FORMFIELDCOLUMNNAME, ISKEYFIELD, IS_CASE_INSENSITIVE);
+            writer.printf("%s%s%s%s%s%s%s\n",RECONFIELDNAME, delimiter, FORMFIELDCOLUMNNAME, delimiter, ISKEYFIELD, delimiter, IS_CASE_INSENSITIVE);
             for(int i = 0; i < numRows; i++)
             {
                 mappingResultSet.goToRow(i);
@@ -296,7 +297,7 @@ public class MappingReconFieldToFormFieldUtility
 
                 if(childTableName == null || childTableName.isEmpty())
                 {
-                    writer.printf("%s\t%s\t%s\t%s\n", reconField, formField, isKeyField, isCaseInsensitive);
+                    writer.printf("%s%s%s%s%s%s%s\n", reconField, delimiter, formField, delimiter, isKeyField, delimiter, isCaseInsensitive);
                 }
             } 
         }
@@ -366,13 +367,14 @@ public class MappingReconFieldToFormFieldUtility
      * <reconFieldName1>    <formFieldColumnName1>
      * <reconFieldName2>    <formFieldColumnName2>
      * 
-     * @param   dbProvider     connection to the OIM Schema
-     * @param   formDefOps     tcFormDefinitionOperationsIntf service
-     * @param   fileName       path of file    
-     * @param   processDefName    Process definition name
+     * @param   dbProvider      connection to the OIM Schema
+     * @param   formDefOps      tcFormDefinitionOperationsIntf service
+     * @param   fileName        path of file    
+     * @param   processDefName  Process definition name
+     * @param   delimiter       Used to separate values in file
      * @return  true for success; false otherwise 
      */
-    public static Boolean addReconFieldAndFormFieldMapDSFF(tcDataProvider dbProvider, tcFormDefinitionOperationsIntf formDefOps, String fileName, String processDefName) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ResourceObjectNotFoundException, ProcessFormNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException
+    public static Boolean addReconFieldAndFormFieldMapDSFF(tcDataProvider dbProvider, tcFormDefinitionOperationsIntf formDefOps, String fileName, String processDefName, String delimiter) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ResourceObjectNotFoundException, ProcessFormNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException
     {        
         HashMap<String,String> mappings = new HashMap<String,String>(); //store all the mappings of a recon field and a form field in staging
         FileInputStream fstream = null;
@@ -402,7 +404,7 @@ public class MappingReconFieldToFormFieldUtility
             //First line determines the ordering of the mappings attributes in the file
             ArrayList<String> mappingAttributeNameArray = new ArrayList<String>(); //store the name of each mapping attribute name 
             String mappingAttributeNames = br.readLine();
-            StringTokenizer mappingAttributeNameTokens = new StringTokenizer(mappingAttributeNames, "\t");
+            StringTokenizer mappingAttributeNameTokens = new StringTokenizer(mappingAttributeNames, delimiter);
             lineNumber++;
             
             while(mappingAttributeNameTokens.hasMoreTokens())
@@ -459,7 +461,7 @@ public class MappingReconFieldToFormFieldUtility
             while ((strLine = br.readLine()) != null)  
             {
                 lineNumber++;
-                String[] mappingToken = strLine.split("\t");
+                String[] mappingToken = strLine.split(delimiter);
                 int mappingAttrNameFileCount = mappingAttributeNameArray.size();
                 int numTokens = mappingToken.length;
                 ReconFieldAndFormFieldMap fieldMapping = new ReconFieldAndFormFieldMap();

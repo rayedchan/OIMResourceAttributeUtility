@@ -735,7 +735,10 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+              </Group>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -754,63 +757,87 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="prfMap_procDefNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="prfMap_fileNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="prfMap_procDefNameFld" max="32767" attributes="0"/>
-                                  <Group type="102" attributes="0">
-                                      <Component id="prfMap_fileNameFld" min="-2" pref="159" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="prfMap_browseBtn" pref="65" max="32767" attributes="0"/>
-                                  </Group>
-                              </Group>
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                              <Component id="prfMap_tabRadioBtn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="prfMap_commaRadioBtn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="prfMap_semicolonRadioBtn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
-                                      <Component id="prfMap_addRadioBtn" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="prfMap_deleteRadioBtn" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="prfMap_exportRadioBtn" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="prfMap_procDefNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="prfMap_fileNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <Component id="prfMap_fileNameFld" min="-2" pref="159" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="prfMap_browseBtn" max="32767" attributes="0"/>
+                                          </Group>
+                                          <Component id="prfMap_procDefNameFld" max="32767" attributes="0"/>
+                                      </Group>
                                   </Group>
-                                  <Component id="prfMap_operationLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                              <Component id="prfMap_addRadioBtn" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                                              <Component id="prfMap_deleteRadioBtn" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                                              <Component id="prfMap_exportRadioBtn" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="prfMap_operationLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="prfMap_delimiterLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="prfMap_submitBtn" linkSize="8" min="-2" pref="103" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="prfMap_cancelBtn" linkSize="8" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="prfMap_submitBtn" linkSize="8" min="-2" pref="103" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="prfMap_cancelBtn" linkSize="8" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="prfMap_procDefNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="prfMap_procDefNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="prfMap_fileNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="prfMap_fileNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="prfMap_browseBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="prfMap_fileNameLbl" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="prfMap_fileNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="prfMap_browseBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                      <Component id="prfMap_delimiterLbl" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="prfMap_tabRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_commaRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="prfMap_semicolonRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="prfMap_operationLbl" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -823,6 +850,7 @@
                           <Component id="prfMap_submitBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="prfMap_cancelBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace min="0" pref="18" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -895,6 +923,35 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prfMap_cancelBtnActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JLabel" name="prfMap_delimiterLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delimiter:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="prfMap_tabRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="prfMap_delimiterBtnGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Tab"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="prfMap_commaRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="prfMap_delimiterBtnGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Comma"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="prfMap_semicolonRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="prfMap_delimiterBtnGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Semicolon"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>
@@ -906,6 +963,8 @@
     <Component class="javax.swing.ButtonGroup" name="processFormField_delimiterBtnGroup">
     </Component>
     <Component class="javax.swing.ButtonGroup" name="rf_delimiterBtnGroup">
+    </Component>
+    <Component class="javax.swing.ButtonGroup" name="prfMap_delimiterBtnGroup">
     </Component>
   </NonVisualComponents>
   <Properties>
