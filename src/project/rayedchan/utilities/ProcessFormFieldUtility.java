@@ -111,9 +111,10 @@ public class ProcessFormFieldUtility
      * @param   formDefOps          tcFormDefinitionOperationsIntf service object
      * @param   fileName            name of the file
      * @param   processFormName     Table name of a process form
+     * @param   delimiter           Use to separate values in file
      * @return  boolean value to indicate success or failure
      */
-    public static boolean addFieldsToProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName, String processFormName) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, FileNotFoundException, IOException, ProcessFormNotFoundException, ProcessFormVersionLockedException, BadFileFormatException, MissingRequiredFieldException
+    public static boolean addFieldsToProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName, String processFormName, String delimiter) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, FileNotFoundException, IOException, ProcessFormNotFoundException, ProcessFormVersionLockedException, BadFileFormatException, MissingRequiredFieldException
     {    
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -153,7 +154,7 @@ public class ProcessFormFieldUtility
             //First line contains the attributes of a process form field
             //Each process form field record in file must have a value for these attributes 
             String fieldAttributes = br.readLine();
-            StringTokenizer attributeNameToken = new StringTokenizer(fieldAttributes, "\t"); 
+            StringTokenizer attributeNameToken = new StringTokenizer(fieldAttributes, delimiter); 
             lineNumber++;
             
             while(attributeNameToken.hasMoreTokens())
@@ -227,7 +228,7 @@ public class ProcessFormFieldUtility
             while ((strLine = br.readLine()) != null)  
             {
                 lineNumber++;
-                String[] fieldAttributeValueToken = strLine.split("\t");
+                String[] fieldAttributeValueToken = strLine.split(delimiter);
                 int numFieldAttributeNames = pf_fieldAttributeNameArray.size();
                 int numTokens = fieldAttributeValueToken.length;
                 ProcessFormField processFormFieldObj = new ProcessFormField(processFormKey, processFormLatestVersion);
@@ -715,8 +716,9 @@ public class ProcessFormFieldUtility
      * Export all the fields of current process form in proper file format for this utility.
      * @param   formDefOps          tcFormDefinitionOperationsIntf service object
      * @param   processFormName     Name of the process form table
+     * @param   delimiter           Use to separate values in file
      */
-    public static void exportProcessFormFieldsFileFormatAdd(tcFormDefinitionOperationsIntf formDefOps, String fileName ,String processFormName) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, FileNotFoundException, UnsupportedEncodingException, ProcessFormNotFoundException
+    public static void exportProcessFormFieldsFileFormatAdd(tcFormDefinitionOperationsIntf formDefOps, String fileName ,String processFormName, String delimiter) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, FileNotFoundException, UnsupportedEncodingException, ProcessFormNotFoundException
     {
         PrintWriter writer = null;
         
@@ -734,7 +736,7 @@ public class ProcessFormFieldUtility
             tcResultSet processFieldResultSet = formDefOps.getFormFields(Long.parseLong(formResultSet.getStringValue("Structure Utility.Key")), Integer.parseInt(formResultSet.getStringValue("Structure Utility.Latest Version"))); 
             int numRows = processFieldResultSet.getTotalRowCount();
 
-            writer.printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", FIELDLABEL, VARIANTTYPE, FIELDTYPE, LENGTH, ORDER, DEFAULTVALUE, APP_PROFILE, ENCRYPTED);
+            writer.printf("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n", FIELDLABEL, delimiter ,VARIANTTYPE, delimiter , FIELDTYPE, delimiter, LENGTH, delimiter, ORDER, delimiter, DEFAULTVALUE, delimiter, APP_PROFILE, delimiter, ENCRYPTED);
             for(int i = 0; i < numRows; i++)
             {
                 processFieldResultSet.goToRow(i);
@@ -747,9 +749,9 @@ public class ProcessFormFieldUtility
                 String processFormFieldAppProfile = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Profile Enabled");
                 String processFormFieldEncrypted = processFieldResultSet.getStringValue("Structure Utility.Additional Columns.Encrypted");
 
-                writer.printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",processFormFieldLabel, 
-                        processFormFieldVariantType, processFormFieldType ,processFormFieldLength, 
-                        processFormFieldOrder, processFormFieldDefaultValue, processFormFieldAppProfile,
+                writer.printf("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",processFormFieldLabel, delimiter, 
+                        processFormFieldVariantType, delimiter, processFormFieldType, delimiter, processFormFieldLength, delimiter, 
+                        processFormFieldOrder, delimiter, processFormFieldDefaultValue, delimiter, processFormFieldAppProfile, delimiter,
                         processFormFieldEncrypted);
             }
         }

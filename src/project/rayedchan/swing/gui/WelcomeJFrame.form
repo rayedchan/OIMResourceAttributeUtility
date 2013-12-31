@@ -243,7 +243,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jPanel2" alignment="0" pref="234" max="32767" attributes="0"/>
+              <Component id="jPanel2" alignment="0" pref="284" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -265,21 +265,32 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
-                              <Component id="processFormField_addRadioBtn" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="processFormField_deleteRadioBtn" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="processFormField_exportRadioBtn" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="processFormField_tabRadioBtn" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="processFormField_commaRadioBtn" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="processFormField_semicolonRadionBtn" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="processFormField_addRadioBtn" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="processFormField_deleteRadioBtn" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                      <Component id="processFormField_exportRadioBtn" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="processFormFieldForm_tableNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="processFormField_fileNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -295,10 +306,10 @@
                                       </Group>
                                   </Group>
                                   <Group type="102" attributes="0">
-                                      <Component id="processFormField_operationLbl" min="-2" max="-2" attributes="0"/>
+                                      <Component id="processFormField_delimiterLbl" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
                                       <Component id="processFormField_submitBtn" linkSize="6" min="-2" pref="100" max="-2" attributes="0"/>
                                       <EmptySpace max="32767" attributes="0"/>
                                       <Component id="processFormField_cancelBtn" linkSize="6" min="-2" max="-2" attributes="0"/>
@@ -308,17 +319,22 @@
                           </Group>
                       </Group>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="processFormField_operationLbl" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="processFormField_formTableNameFld" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                          <Component id="processFormFieldForm_tableNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="processFormField_formTableNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="processFormFieldForm_tableNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="processFormField_fileNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -326,11 +342,19 @@
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                               <Component id="processFormField_fileNameLbl" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="processFormField_delimiterLbl" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="processFormField_tabRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="processFormField_commaRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="processFormField_semicolonRadionBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="processFormField_operationLbl" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -338,12 +362,12 @@
                           <Component id="processFormField_deleteRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="processFormField_exportRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="processFormField_submitBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="processFormField_cancelBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="processFormField_submitBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="0" pref="12" max="32767" attributes="0"/>
+                      <EmptySpace pref="16" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -418,6 +442,35 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="processFormField_cancelBtnActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="processFormField_delimiterLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delimiter:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="processFormField_tabRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="processFormField_delimiterBtnGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Tab"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="processFormField_commaRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="processFormField_delimiterBtnGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Comma"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="processFormField_semicolonRadionBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="processFormField_delimiterBtnGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Semicolon"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>
@@ -791,6 +844,8 @@
     </Component>
     <Component class="javax.swing.ButtonGroup" name="lookup_delimiterBtnGroup">
     </Component>
+    <Component class="javax.swing.ButtonGroup" name="processFormField_delimiterBtnGroup">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
@@ -798,6 +853,9 @@
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
   </SyntheticProperties>
+  <Events>
+    <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>

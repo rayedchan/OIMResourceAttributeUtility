@@ -11,7 +11,7 @@ import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.Operations.tcImportOperationsIntf;
 import Thor.API.Operations.tcLookupOperationsIntf;
 import Thor.API.Operations.tcObjectOperationsIntf;
-import com.thortech.xl.dataaccess.tcDataProvider;
+import com.thortech.xl.dataaccess.tcClientDataAccessException;
 import com.thortech.xl.dataaccess.tcDataSetException;
 import com.thortech.xl.ddm.exception.DDMException;
 import com.thortech.xl.ddm.exception.TransformationException;
@@ -110,6 +110,10 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         processFormField_browseBtn = new javax.swing.JButton();
         processFormField_submitBtn = new javax.swing.JButton();
         processFormField_cancelBtn = new javax.swing.JButton();
+        processFormField_delimiterLbl = new javax.swing.JLabel();
+        processFormField_tabRadioBtn = new javax.swing.JRadioButton();
+        processFormField_commaRadioBtn = new javax.swing.JRadioButton();
+        processFormField_semicolonRadionBtn = new javax.swing.JRadioButton();
         fileChooser = new javax.swing.JFileChooser();
         lookup_buttonOpGroup = new javax.swing.ButtonGroup();
         processFormField_buttonOpGroup = new javax.swing.ButtonGroup();
@@ -142,6 +146,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         prfMap_cancelBtn = new javax.swing.JButton();
         prfMap_buttonOpGroup = new javax.swing.ButtonGroup();
         lookup_delimiterBtnGroup = new javax.swing.ButtonGroup();
+        processFormField_delimiterBtnGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -350,24 +355,43 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             }
         });
 
+        processFormField_delimiterLbl.setText("Delimiter:");
+
+        processFormField_delimiterBtnGroup.add(processFormField_tabRadioBtn);
+        processFormField_tabRadioBtn.setText("Tab");
+
+        processFormField_delimiterBtnGroup.add(processFormField_commaRadioBtn);
+        processFormField_commaRadioBtn.setText("Comma");
+
+        processFormField_delimiterBtnGroup.add(processFormField_semicolonRadionBtn);
+        processFormField_semicolonRadionBtn.setText("Semicolon");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(12, 12, 12)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(12, 12, 12)
-                        .addComponent(processFormField_addRadioBtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(processFormField_deleteRadioBtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(processFormField_exportRadioBtn)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(processFormField_tabRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(processFormField_commaRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(processFormField_semicolonRadionBtn))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(processFormField_addRadioBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(processFormField_deleteRadioBtn)
+                                .addGap(12, 12, 12)
+                                .addComponent(processFormField_exportRadioBtn)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(processFormFieldForm_tableNameLbl)
                                     .addComponent(processFormField_fileNameLbl))
@@ -379,13 +403,17 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                                         .addComponent(processFormField_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))
                                     .addComponent(processFormField_formTableNameFld)))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(processFormField_operationLbl)
+                                .addComponent(processFormField_delimiterLbl)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(processFormField_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(processFormField_cancelBtn)))
                         .addContainerGap())))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(processFormField_operationLbl)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {processFormField_cancelBtn, processFormField_submitBtn});
@@ -393,30 +421,37 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(processFormField_formTableNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(processFormFieldForm_tableNameLbl))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(processFormField_formTableNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(processFormFieldForm_tableNameLbl))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(processFormField_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(processFormField_browseBtn)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(53, 53, 53)
+                        .addGap(26, 26, 26)
                         .addComponent(processFormField_fileNameLbl)))
                 .addGap(18, 18, 18)
+                .addComponent(processFormField_delimiterLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(processFormField_tabRadioBtn)
+                    .addComponent(processFormField_commaRadioBtn)
+                    .addComponent(processFormField_semicolonRadionBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(processFormField_operationLbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(processFormField_addRadioBtn)
                     .addComponent(processFormField_deleteRadioBtn)
                     .addComponent(processFormField_exportRadioBtn))
-                .addGap(29, 29, 29)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(processFormField_submitBtn)
-                    .addComponent(processFormField_cancelBtn))
-                .addGap(0, 12, Short.MAX_VALUE))
+                    .addComponent(processFormField_cancelBtn)
+                    .addComponent(processFormField_submitBtn))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout processFormFieldDialogLayout = new javax.swing.GroupLayout(processFormFieldDialog.getContentPane());
@@ -427,7 +462,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         );
         processFormFieldDialogLayout.setVerticalGroup(
             processFormFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
         );
 
         fileChooser.setFileFilter(new MyCustomFilter());
@@ -659,6 +694,11 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Utility Options", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
 
@@ -815,7 +855,6 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private void lookupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lookupBtnActionPerformed
         // TODO add your handling code here:
        clearLookupUtilityFields();
-         
        lookupDialog.setTitle("Lookup Utility Option");
        lookupDialog.pack();
        lookupDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
@@ -949,6 +988,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     errorDialogMessage(lookupDialog, "A file delimiter must be selected.");
                     return;
                 }
+                
                 try {
                     LookupUtility.exportLookupFileFormat(lookupOps, lookupName, fileName, fileDelimiter);                  
                     errorDialogMessage(lookupDialog, "Export successful.");
@@ -1007,15 +1047,37 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         {
             String processFormName = processFormField_formTableNameFld.getText();
             String fileName = processFormField_fileNameFld.getText();
+            String fileDelimiter = null;
             formDefOps = oimClientResAttr.getOIMClient().getService(tcFormDefinitionOperationsIntf.class);
 
             System.out.println("Process Form Table Name: " + processFormName);
             System.out.println("File Name: " + fileName);
             
-            if(processFormField_addRadioBtn.isSelected())
+            //Convert file delimiter option
+            if(processFormField_tabRadioBtn.isSelected())
             {
+                fileDelimiter = "\t";
+            }
+            else if(processFormField_commaRadioBtn.isSelected())
+            {
+                 fileDelimiter = ",";
+            }
+            
+            else if(processFormField_semicolonRadionBtn.isSelected())
+            {
+                fileDelimiter = ";";
+            }
+            
+            if(processFormField_addRadioBtn.isSelected())
+            {         
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(processFormFieldDialog, "A file delimiter must be selected.");
+                    return;
+                }
+                                
                 try {
-                    ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, fileName, processFormName);
+                    ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, fileName, processFormName, fileDelimiter);
                     errorDialogMessage(processFormFieldDialog, "Add successful.");
                     processFormFieldDialog.dispose();
                 } catch (tcAPIException ex) {
@@ -1079,9 +1141,15 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             }
 
             else if(processFormField_exportRadioBtn.isSelected())
-            {
+            {         
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(processFormFieldDialog, "A file delimiter must be selected.");
+                    return;
+                }
+                                
                 try {
-                    ProcessFormFieldUtility.exportProcessFormFieldsFileFormatAdd(formDefOps, fileName,processFormName);
+                    ProcessFormFieldUtility.exportProcessFormFieldsFileFormatAdd(formDefOps, fileName,processFormName, fileDelimiter);
                     errorDialogMessage(processFormFieldDialog, "Export successful.");
                     processFormFieldDialog.dispose();
                 } catch (tcAPIException ex) {
@@ -1481,6 +1549,30 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         createFileChooserUI(prfMap_fileNameFld);
     }//GEN-LAST:event_prfMap_browseBtnActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+
+        if(dbConnection != null)
+        {
+            try {
+                dbConnection.closeResource();
+                System.out.println("Closed Database resources.");
+            } catch (tcDataAccessException ex) {
+                Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (tcClientDataAccessException ex) {
+                Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        if(oimClientResAttr != null)
+        {
+            oimClientResAttr.getOIMClient().logout();
+            System.out.println("Logged out user from OIM client.");
+        }
+                
+        System.out.println("Exiting application");
+    }//GEN-LAST:event_formWindowClosing
+
     private void createFileChooserUI(javax.swing.JTextField fileNameField)
     {
         int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
@@ -1514,6 +1606,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         processFormField_formTableNameFld.setText("");
         processFormField_fileNameFld.setText("");
         processFormField_buttonOpGroup.clearSelection(); 
+        processFormField_delimiterBtnGroup.clearSelection();
     }
     
     private void clearReconFieldUtilityFields()
@@ -1589,13 +1682,18 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JButton processFormField_browseBtn;
     private javax.swing.ButtonGroup processFormField_buttonOpGroup;
     private javax.swing.JButton processFormField_cancelBtn;
+    private javax.swing.JRadioButton processFormField_commaRadioBtn;
     private javax.swing.JRadioButton processFormField_deleteRadioBtn;
+    private javax.swing.ButtonGroup processFormField_delimiterBtnGroup;
+    private javax.swing.JLabel processFormField_delimiterLbl;
     private javax.swing.JRadioButton processFormField_exportRadioBtn;
     private javax.swing.JTextField processFormField_fileNameFld;
     private javax.swing.JLabel processFormField_fileNameLbl;
     private javax.swing.JTextField processFormField_formTableNameFld;
     private javax.swing.JLabel processFormField_operationLbl;
+    private javax.swing.JRadioButton processFormField_semicolonRadionBtn;
     private javax.swing.JButton processFormField_submitBtn;
+    private javax.swing.JRadioButton processFormField_tabRadioBtn;
     private javax.swing.JDialog processReconFieldMappingDialog;
     private javax.swing.JButton processTaskBtn;
     private javax.swing.JButton reconFieldBtn;

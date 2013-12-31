@@ -112,13 +112,8 @@ import project.rayedchan.utilities.ProcessTaskUtility;
 import project.rayedchan.utilities.ReconFieldUtility;
 
 /**
- *
  * @author rayedchan
- * //TODO: close resources
- * TODO: ProcessFormUtility 
- *      make active form function
- *      validation method on deleting form field
- *
+ * Starts the GUI for this application.
  */
 public class TestDriver 
 {
@@ -148,8 +143,10 @@ public class TestDriver
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+        java.awt.EventQueue.invokeLater(new Runnable() 
+        {
+            public void run() 
+            {
                 new LoginJFrame().setVisible(true);
             }
         });
