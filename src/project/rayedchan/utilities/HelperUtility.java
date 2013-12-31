@@ -3,16 +3,17 @@ package project.rayedchan.utilities;
 import Thor.API.Exceptions.tcAPIException;
 import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.tcResultSet;
+import com.thortech.xl.dataaccess.tcDataProvider;
+import com.thortech.xl.dataaccess.tcDataSet;
+import com.thortech.xl.dataaccess.tcDataSetException;
+import com.thortech.xl.dataobj.PreparedStatementUtil;
+import com.thortech.xl.orb.dataaccess.tcDataAccessException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,8 +37,7 @@ public class HelperUtility
 {
     /*
      * Prints the column names of a tcResultSet.
-     * @param 
-     *      tcResultSetObj - tcResultSet Object
+     * @param   tcResultSetObj  tcResultSet Object
      */
     public static void printTcResultSetColumnNames(tcResultSet tcResultSetObj)
     {
@@ -51,8 +51,7 @@ public class HelperUtility
     
     /*
      * Prints the records of a tcResultSet.
-     * @param -
-     *      tcResultSetObj - tcResultSetObject
+     * @param   tcResultSetObj  tcResultSetObject
      */
     public static void printTcResultSetRecords(tcResultSet tcResultSetObj) throws tcAPIException, tcColumnNotFoundException
     {
@@ -72,8 +71,7 @@ public class HelperUtility
     
     /*
      * Print the records of the ResultSet. 
-     * @param -
-     *      resultSet - the result set of a query
+     * @param   resultSet   the result set of a query
      */
     public static void printResultSetRecords(ResultSet resultSet) throws SQLException
     {
@@ -92,9 +90,7 @@ public class HelperUtility
             }
             
             System.out.println();
-           
         }
-  
     }
     
     /*
@@ -103,14 +99,12 @@ public class HelperUtility
      * SDK = Structure Utility (Process Form)
      * OBJ = Resource Object Definition
      * PKG = Service Processes
-     * 
-     * @param 
-     *      conn - connection to the OIM Schema 
+     * @param   dbProvider   connection to the OIM Schema 
      */
-    public static void getAllProcessDefinitions(Connection conn)
-    {
-        Statement st = null;
-        ResultSet rs = null;
+    public static void getAllProcessDefinitions(tcDataProvider dbProvider) throws tcDataSetException, tcDataAccessException
+    {   
+        tcDataSet pkgDataSet = null;
+        PreparedStatementUtil ps = null;
         
         try 
         {
@@ -118,58 +112,37 @@ public class HelperUtility
              + "TOS RIGHT OUTER JOIN PKG ON PKG.PKG_KEY = TOS.PKG_KEY "
              + "LEFT OUTER JOIN SDK ON SDK.SDK_KEY = TOS.SDK_KEY "
              + "LEFT OUTER JOIN OBJ ON OBJ.OBJ_KEY = PKG.OBJ_KEY ORDER BY PKG.PKG_NAME";
-            st = conn.createStatement(); //Create a statement
-            rs = st.executeQuery(query);
+            
+            ps = new PreparedStatementUtil();
+            ps.setStatement(dbProvider, query);
+            ps.execute();
+            pkgDataSet = ps.getDataSet();
+            int numRecords = pkgDataSet.getTotalRowCount();
             
             System.out.printf("%-25s%-25s%-25s%-25s%-25s%-25s%-25s\n", "Package Key", "Package Name","Process Key", "Object Key", "Object Name", "Form Key", "Form Name");
-            while(rs.next())
+            for(int i = 0; i < numRecords; i++)
             {
-                String packageKey = rs.getString("PKG_KEY");
-                String packageName = rs.getString("PKG_NAME");
-                String processKey = rs.getString("TOS_KEY");
-                String objectKey = rs.getString("OBJ_KEY");
-                String objectName = rs.getString("OBJ_NAME");
-                String formName = rs.getString("SDK_NAME");
-                String formKey = rs.getString("SDK_KEY");
-                
+                pkgDataSet.goToRow(i);
+                String packageKey = pkgDataSet.getString("PKG_KEY");
+                String packageName = pkgDataSet.getString("PKG_NAME");
+                String processKey = pkgDataSet.getString("TOS_KEY");
+                String objectKey = pkgDataSet.getString("OBJ_KEY");
+                String objectName = pkgDataSet.getString("OBJ_NAME");
+                String formName = pkgDataSet.getString("SDK_NAME");
+                String formKey = pkgDataSet.getString("SDK_KEY");
                 System.out.printf("%-25s%-25s%-25s%-25s%-25s%-25s%-25s\n",packageKey, packageName, processKey, objectKey, objectName, formKey, formName);
             }
         } 
         
-        catch (SQLException ex) {
-            Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         finally
-        {
-            if(rs != null)
-            {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
-            if(st != null)
-            {
-                try {
-                    st.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(HelperUtility.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
+        {   
         }
-        
     }
     
     /*
      * Determine if a string can be parse into an integer.
-     * @param 
-     *       strValue - validate if string value can be parsed 
-     * 
-     * @return - boolean value to indicate if string is an integer
+     * @param   strValue    validate if string value can be parsed 
+     * @return  boolean value to indicate if string is an integer
      */
     public static boolean isInteger(String strValue)
     {
@@ -187,10 +160,8 @@ public class HelperUtility
     
      /*
      * Determine if a string can be parse into an boolean.
-     * @param 
-     *       strValue - validate if string value can be parsed 
-     * 
-     * @return - boolean value to indicate if string is a boolean
+     * @param   strValue    validate if string value can be parsed 
+     * @return  boolean value to indicate if string is a boolean
      */
     public static boolean isBoolean(String strValue)
     {
@@ -200,10 +171,8 @@ public class HelperUtility
      
     /*
      * Parses a String Object, which stores xml content, into a Document Object.
-     * @param
-     *      xmlContent - xml content
-     * 
-     * @return - document representation of the given xml  
+     * @param   xmlContent   xml content
+     * @return  document representation of the given xml  
      */
     public static Document parseStringXMLIntoDocument(String xmlContent) throws ParserConfigurationException, SAXException, IOException
     {    
@@ -231,10 +200,8 @@ public class HelperUtility
      /*
      * Converts a Document into String representation
      * UTF-16 conversion
-     * @param
-     *      document - Document object to be parsed
-     * 
-     * @return - String representation of xml content
+     * @param   document Document object to be parsed
+     * @return  String representation of xml content
      */
     public static String parseDocumentIntoStringXMLVersion2(Document document) throws TransformerConfigurationException, TransformerException
     {  
@@ -243,5 +210,4 @@ public class HelperUtility
         String newResourceObjectXML = lsSerializer.writeToString(document);
         return newResourceObjectXML;
     }
-     
 }
