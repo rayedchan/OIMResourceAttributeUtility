@@ -93,6 +93,10 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         lookup_exportRadioBtn = new javax.swing.JRadioButton();
         lookup_submitBtn = new javax.swing.JButton();
         lookup_cancelBtn = new javax.swing.JButton();
+        lookup_delimiterLbl = new javax.swing.JLabel();
+        lookup_tabRadioBtn = new javax.swing.JRadioButton();
+        lookup_commaRadioBtn = new javax.swing.JRadioButton();
+        lookup_semicolonRadioBtn = new javax.swing.JRadioButton();
         processFormFieldDialog = new javax.swing.JDialog();
         jPanel2 = new javax.swing.JPanel();
         processFormFieldForm_tableNameLbl = new javax.swing.JLabel();
@@ -137,6 +141,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         prfMap_submitBtn = new javax.swing.JButton();
         prfMap_cancelBtn = new javax.swing.JButton();
         prfMap_buttonOpGroup = new javax.swing.ButtonGroup();
+        lookup_delimiterBtnGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -198,42 +203,58 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             }
         });
 
+        lookup_delimiterLbl.setText("File Delimiter:");
+
+        lookup_delimiterBtnGroup.add(lookup_tabRadioBtn);
+        lookup_tabRadioBtn.setText("Tab");
+
+        lookup_delimiterBtnGroup.add(lookup_commaRadioBtn);
+        lookup_commaRadioBtn.setText("Comma");
+
+        lookup_delimiterBtnGroup.add(lookup_semicolonRadioBtn);
+        lookup_semicolonRadioBtn.setText("Semicolon");
+
         javax.swing.GroupLayout lookup_PanelLayout = new javax.swing.GroupLayout(lookup_Panel);
         lookup_Panel.setLayout(lookup_PanelLayout);
         lookup_PanelLayout.setHorizontalGroup(
             lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(lookup_PanelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(24, 24, 24)
                 .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(lookup_PanelLayout.createSequentialGroup()
-                        .addGap(12, 12, 12)
+                        .addComponent(lookup_tabRadioBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lookup_commaRadioBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lookup_semicolonRadioBtn))
+                    .addGroup(lookup_PanelLayout.createSequentialGroup()
                         .addComponent(lookup_addRadioBtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lookup_deleteRadioBtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lookup_exportRadioBtn)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lookup_exportRadioBtn)))
+                .addGap(155, 155, 155))
+            .addGroup(lookup_PanelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(lookup_PanelLayout.createSequentialGroup()
                         .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lookup_delimiterLbl)
+                            .addComponent(lookup_lookupNameLbl)
+                            .addComponent(lookup_fileNameLbl)
+                            .addComponent(lookup_OperationLbl))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lookup_lookupNameFld)
                             .addGroup(lookup_PanelLayout.createSequentialGroup()
-                                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lookup_lookupNameLbl)
-                                    .addComponent(lookup_fileNameLbl))
+                                .addComponent(lookup_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lookup_lookupNameFld)
-                                    .addGroup(lookup_PanelLayout.createSequentialGroup()
-                                        .addComponent(lookup_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lookup_browseFileBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE))))
-                            .addGroup(lookup_PanelLayout.createSequentialGroup()
-                                .addComponent(lookup_OperationLbl)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(lookup_PanelLayout.createSequentialGroup()
-                                .addComponent(lookup_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lookup_cancelBtn)))
-                        .addContainerGap())))
+                                .addComponent(lookup_browseFileBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(lookup_PanelLayout.createSequentialGroup()
+                        .addComponent(lookup_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lookup_cancelBtn)))
+                .addContainerGap())
         );
 
         lookup_PanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {lookup_cancelBtn, lookup_submitBtn});
@@ -250,18 +271,25 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     .addComponent(lookup_fileNameLbl)
                     .addComponent(lookup_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lookup_browseFileBtn))
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lookup_delimiterLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lookup_tabRadioBtn)
+                    .addComponent(lookup_commaRadioBtn)
+                    .addComponent(lookup_semicolonRadioBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addComponent(lookup_OperationLbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lookup_addRadioBtn)
                     .addComponent(lookup_deleteRadioBtn)
                     .addComponent(lookup_exportRadioBtn))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(lookup_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lookup_submitBtn)
                     .addComponent(lookup_cancelBtn))
-                .addGap(26, 26, 26))
+                .addContainerGap())
         );
 
         lookup_PanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lookup_cancelBtn, lookup_submitBtn});
@@ -274,12 +302,12 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         );
         lookupDialogLayout.setVerticalGroup(
             lookupDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lookup_Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(lookupDialogLayout.createSequentialGroup()
+                .addComponent(lookup_Panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         lookupDialog.getAccessibleContext().setAccessibleParent(null);
-
-        processFormFieldDialog.setPreferredSize(new java.awt.Dimension(439, 251));
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Process Form Field Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
         jPanel2.setPreferredSize(new java.awt.Dimension(439, 251));
@@ -404,8 +432,6 @@ public class WelcomeJFrame extends javax.swing.JFrame {
 
         fileChooser.setFileFilter(new MyCustomFilter());
 
-        reconFieldDialog.setPreferredSize(new java.awt.Dimension(439, 251));
-
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reconciliation Field Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
 
         rf_resourceObjectNameLbl.setText("Resource Object Name:");
@@ -519,8 +545,6 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             reconFieldDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
-        processReconFieldMappingDialog.setPreferredSize(new java.awt.Dimension(439, 251));
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Reconciliation Field Mapping Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
 
@@ -827,18 +851,41 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         try
         {
             String lookupName = lookup_lookupNameFld.getText();
-            String fileName = lookup_fileNameFld.getText();
+            String fileName = lookup_fileNameFld.getText(); 
+            String fileDelimiter = null;
             lookupOps = oimClientResAttr.getOIMClient().getService(tcLookupOperationsIntf.class);
 
             System.out.println("Lookup Name: " + lookupName);
             System.out.println("File Name: " + fileName);
-
+            
+            //Convert file delimiter option
+            if(lookup_tabRadioBtn.isSelected())
+            {
+                fileDelimiter = "\t";
+            }
+            else if(lookup_commaRadioBtn.isSelected())
+            {
+                 fileDelimiter = ",";
+            }
+            
+            else if(lookup_semicolonRadioBtn.isSelected())
+            {
+                fileDelimiter = ";";
+            }
+            
             //Add entries to lookup
             if(lookup_addRadioBtn.isSelected())
             {
+                
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(lookupDialog, "A file delimiter must be selected.");
+                    return;
+                }
+                
                 try 
                 {
-                    LookupUtility.addEntriesToLookupDSFF(lookupOps, lookupName, fileName);
+                    LookupUtility.addEntriesToLookupDSFF(lookupOps, lookupName, fileName, fileDelimiter);
                     errorDialogMessage(lookupDialog, "Add successful.");
                     lookupDialog.dispose();
                 } catch (BadFileFormatException ex) {
@@ -896,9 +943,14 @@ public class WelcomeJFrame extends javax.swing.JFrame {
             }
 
             else if(lookup_exportRadioBtn.isSelected())
-            {
+            {               
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(lookupDialog, "A file delimiter must be selected.");
+                    return;
+                }
                 try {
-                    LookupUtility.exportLookupFileFormat(lookupOps, lookupName, fileName);                  
+                    LookupUtility.exportLookupFileFormat(lookupOps, lookupName, fileName, fileDelimiter);                  
                     errorDialogMessage(lookupDialog, "Export successful.");
                     lookupDialog.dispose();
                 } catch (tcAPIException ex) {
@@ -1454,6 +1506,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         lookup_lookupNameFld.setText("");
         lookup_fileNameFld.setText("");
         lookup_buttonOpGroup.clearSelection(); 
+        lookup_delimiterBtnGroup.clearSelection();
     }
     
     private void clearProcessFormFields()
@@ -1505,13 +1558,18 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JButton lookup_browseFileBtn;
     private javax.swing.ButtonGroup lookup_buttonOpGroup;
     private javax.swing.JButton lookup_cancelBtn;
+    private javax.swing.JRadioButton lookup_commaRadioBtn;
     private javax.swing.JRadioButton lookup_deleteRadioBtn;
+    private javax.swing.ButtonGroup lookup_delimiterBtnGroup;
+    private javax.swing.JLabel lookup_delimiterLbl;
     private javax.swing.JRadioButton lookup_exportRadioBtn;
     private javax.swing.JTextField lookup_fileNameFld;
     private javax.swing.JLabel lookup_fileNameLbl;
     private javax.swing.JTextField lookup_lookupNameFld;
     private javax.swing.JLabel lookup_lookupNameLbl;
+    private javax.swing.JRadioButton lookup_semicolonRadioBtn;
     private javax.swing.JButton lookup_submitBtn;
+    private javax.swing.JRadioButton lookup_tabRadioBtn;
     private javax.swing.JRadioButton prfMap_addRadioBtn;
     private javax.swing.JButton prfMap_browseBtn;
     private javax.swing.ButtonGroup prfMap_buttonOpGroup;

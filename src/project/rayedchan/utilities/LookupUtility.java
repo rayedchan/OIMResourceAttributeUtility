@@ -54,9 +54,10 @@ public class LookupUtility
      * @param   lookupOps    tcLookupOperationsIntf service object
      * @param   lookupName   Name of existing lookup
      * @param   fileName     Path of file on local machine that contains the data
+     * @param   delimiter    Delimiter that separates each field in file
      * @return boolean value to indicate success or failure
      */
-    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String lookupName, String fileName) throws tcAPIException, tcColumnNotFoundException, tcInvalidLookupException, LookupNameNotFoundException, FileNotFoundException, IOException, BadFileFormatException
+    public static boolean addEntriesToLookupDSFF(tcLookupOperationsIntf lookupOps, String lookupName, String fileName, String delimiter) throws tcAPIException, tcColumnNotFoundException, tcInvalidLookupException, LookupNameNotFoundException, FileNotFoundException, IOException, BadFileFormatException
     {
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -84,7 +85,7 @@ public class LookupUtility
                 lineNumber++;
                 
                 //System.out.println(strLine);
-                StringTokenizer st = new StringTokenizer(strLine, "\t"); 
+                StringTokenizer st = new StringTokenizer(strLine, delimiter); 
                 String key = null;
                 String value = null;
                 int counter = 0;
@@ -210,7 +211,7 @@ public class LookupUtility
      * 
      *@param   lookupOps    tcLookupOperationsIntf service object
      *@param   lookupName   Name of existing lookup
-     *@param   fileName     name of file that contains the data
+     *@param   fileName     name of file that contains the data 
      *@return  boolean value to indicate success or failure
      */
     public static boolean deleteEntriesFromLookupDSFF(tcLookupOperationsIntf lookupOps, String lookupName, String fileName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException, LookupNameNotFoundException, BadFileFormatException, FileNotFoundException, IOException 
@@ -378,8 +379,9 @@ public class LookupUtility
      * @param   lookupOps   tcLookupOperationsIntf service object
      * @param   lookupName  Name of the lookup definition
      * @param   fileName    Absolute path of file on local machine
+     * @param   delimiter   Delimiter that separates each field in file
      */
-    public static void exportLookupFileFormat(tcLookupOperationsIntf lookupOps, String lookupName, String fileName) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException, FileNotFoundException, UnsupportedEncodingException, LookupNameNotFoundException
+    public static void exportLookupFileFormat(tcLookupOperationsIntf lookupOps, String lookupName, String fileName, String delimiter) throws tcAPIException, tcInvalidLookupException, tcColumnNotFoundException, FileNotFoundException, UnsupportedEncodingException, LookupNameNotFoundException
     {
         PrintWriter writer = null;
         
@@ -400,7 +402,7 @@ public class LookupUtility
                 lookupResultSet.goToRow(i);
                 String code = lookupResultSet.getStringValue("Lookup Definition.Lookup Code Information.Code Key");
                 String decode = lookupResultSet.getStringValue("Lookup Definition.Lookup Code Information.Decode");
-                writer.printf("%s\t%s\n",code,decode);
+                writer.printf("%s%s%s\n",code, delimiter, decode);
             }
         }
         

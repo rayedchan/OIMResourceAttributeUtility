@@ -122,7 +122,7 @@ import project.rayedchan.utilities.ReconFieldUtility;
  */
 public class TestDriver 
 {
-    public static void main2(String[] args)
+    public static void main(String[] args)
     {
          /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -155,7 +155,7 @@ public class TestDriver
         });
     }
     
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException
+    public static void main2(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         tcOIMDatabaseConnection connection =  new tcOIMDatabaseConnection(oimClient);
