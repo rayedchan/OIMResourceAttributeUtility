@@ -172,14 +172,16 @@ public class TestDriver
         //HelperUtility.printTcResultSetRecords(wfDefOps.getAvailableAdapters());
         //HelperUtility.printTcResultSetRecords(ProcessTaskUtility.getAdapterVariableMappings(wfDefOps, "T", 65));
         	
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
- 
-	// root elements
-	Document document = docBuilder.newDocument();
+        //DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        //DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	//Document document = docBuilder.newDocument();
+        
+        String processObjectXML = ProcessTaskUtility.exportProcessObject(exportOps, "Flat File");
+        Document document =  HelperUtility.parseStringXMLIntoDocument(processObjectXML); //convert xml to a Document
         ProcessTaskUtility.createUpdateProcessTask(document);
-        String newObjectProcessXML = HelperUtility.parseDocumentIntoStringXML(document);
-        System.out.println(newObjectProcessXML);
+        String newProcessObjectXML = HelperUtility.parseDocumentIntoStringXML(document);
+        System.out.println(newProcessObjectXML);
+        ProcessTaskUtility.importResourceObject(importOps, newProcessObjectXML, "CustomProcessTaskUtilAdd");
         
     }
 }
