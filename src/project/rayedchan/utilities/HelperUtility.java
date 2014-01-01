@@ -210,4 +210,16 @@ public class HelperUtility
         String newResourceObjectXML = lsSerializer.writeToString(document);
         return newResourceObjectXML;
     }
+    
+    /*
+     * Prnts the elements of a string array.
+     * @param list  An array of String
+     */    
+    public static void printStringList(String[] list)
+    {
+        for(String element: list)
+        {
+            System.out.println(element);
+        }
+    }
 }
