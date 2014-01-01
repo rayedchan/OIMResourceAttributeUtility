@@ -222,4 +222,16 @@ public class HelperUtility
             System.out.println(element);
         }
     }
+    
+    /*
+     * Builds a document object used for xml data handling.
+     * @return document
+     */
+    public Document createDocument() throws ParserConfigurationException
+    {    
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	Document document = docBuilder.newDocument();
+        return document;
+    }
 }

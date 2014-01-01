@@ -55,6 +55,9 @@ import project.rayedchan.exception.ResourceObjectNameNotFoundException;
  * attribute. It is highly recommended to backup the xml for the resource object
  * before using this utility.
  * 
+ * TODO: Reverse the attributes of a tag (OIM default format). DOM automatically
+ * alphabetize attributes of a tag. 
+ * 
  * Note: When using this utility to add reconciliation fields, 
  * the "Create Reconciliation Profile" is initiated by the import utility.
  * The import utility merges with the existing data. If data is removed from the

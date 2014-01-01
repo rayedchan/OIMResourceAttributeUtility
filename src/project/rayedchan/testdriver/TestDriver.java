@@ -43,6 +43,7 @@ import com.thortech.xl.vo.workflow.TaskDefinition;
 import com.thortech.xl.vo.workflow.WorkflowDefinition;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -99,6 +100,8 @@ import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconciliationField;
 import project.rayedchan.exception.AdapterNameNotFoundException;
 import project.rayedchan.exception.EventHandlerNotFoundException;
+import project.rayedchan.exception.IncorrectAdapterException;
+import project.rayedchan.exception.IncorrectAdapterVariableNameException;
 import project.rayedchan.exception.NoResourceObjForProcessDefException;
 import project.rayedchan.exception.ProcessDefintionNotFoundException;
 import project.rayedchan.exception.ProcessFormNotFoundException;
@@ -155,7 +158,7 @@ public class TestDriver
         });
     }
     
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException, AdapterNameNotFoundException, EventHandlerNotFoundException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException, AdapterNameNotFoundException, EventHandlerNotFoundException, FileNotFoundException, IncorrectAdapterVariableNameException, IncorrectAdapterVariableNameException, IncorrectAdapterException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         tcOIMDatabaseConnection connection =  new tcOIMDatabaseConnection(oimClient);
@@ -172,288 +175,24 @@ public class TestDriver
              
         String adapterName = "adpFFUpdateUser";
         long adapterKey = 65L;
+        long tosKey = 81L;
+        String procTaskName = "CreatE USer";
+        String fileName = "/home/oracle/Desktop/create_processtask_flatfile.txt";
         
+        //System.out.println(ProcessTaskUtility.getTosKeyByProcDefKey(dbProvider, 500L));
         //System.out.println(ProcessTaskUtility.getAdapterKeyByAdapterName(dbProvider,adapterName));
-         //System.out.println(ProcessTaskUtility.getEventHandlerByAdapterKey(dbProvider,adapterKey));
+        //System.out.println(ProcessTaskUtility.getEventHandlerByAdapterKey(dbProvider,adapterKey));
         //System.out.println(ProcessTaskUtility.exportProcessObject(exportOps, "Flat File"));
         //HelperUtility.printTcResultSetRecords(wfDefOps.getAvailableAdapters());
-        HelperUtility.printTcResultSetRecords(ProcessTaskUtility.getAdapterVariableMappings(wfDefOps, "T", 65));
+        //HelperUtility.printTcResultSetRecords(ProcessTaskUtility.getAdapterVariableMappings(wfDefOps, "T", 65));
         	
- 
-        
-        //DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        //DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-	//Document document = docBuilder.newDocument();
-        
         /*String processObjectXML = ProcessTaskUtility.exportProcessObject(exportOps, "Flat File");
         Document document =  HelperUtility.parseStringXMLIntoDocument(processObjectXML); //convert xml to a Document
         ProcessTaskUtility.createUpdateProcessTask(document);
         String newProcessObjectXML = HelperUtility.parseDocumentIntoStringXML(document);
         System.out.println(newProcessObjectXML);
-        ProcessTaskUtility.importResourceObject(importOps, newProcessObjectXML, "CustomProcessTaskUtilAdd");*/
+        ProcessTaskUtility.importProcessObject(importOps, newProcessObjectXML, "CustomProcessTaskUtilAdd");*/
         
+        //ProcessTaskUtility.createUpdateProcessTaskDSFF(dbProvider, wfDefOps, exportOps, importOps, fileName, "Flat File", "adpFFUpdateUser", ";");
     }
 }
-
-
-/*
- * <ProcessTask repo-type="RDBMS" name="FirstName Updated">
- *      <MIL_APP_EFFECT>NONE</MIL_APP_EFFECT>
- *      <MIL_CONDITIONAL>1</MIL_CONDITIONAL>
- *      <MIL_DESCRIPTION>This task is triggered when FirstName attribute of parent form gets updated.</MIL_DESCRIPTION>
- *      <MIL_DISABLE_MANUAL_INSERT>0</MIL_DISABLE_MANUAL_INSERT>
- *      <MIL_SEQUENCE>0</MIL_SEQUENCE>
- *      <MIL_CONSTANT>0</MIL_CONSTANT>
- *      <MIL_CANCEL_WHILE_PENDING>1</MIL_CANCEL_WHILE_PENDING>
- *      <MIL_COMP_ON_REC>0</MIL_COMP_ON_REC>
- *      <MIL_UPDATE>1386887934000</MIL_UPDATE>
- *      <MIL_REQUIRED_COMPLETE>0</MIL_REQUIRED_COMPLETE>
- *      <MIL_CREATE_MULTIPLE>1</MIL_CREATE_MULTIPLE>
- *      <MIL_OFFLINED>0</MIL_OFFLINED>
- *      
- *      <EVT_KEY EventHandler="adpADPFFUPDATEUSER"/>
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="W"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="S"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="X"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="S"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="C"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="W"/>
- *              <UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="P"/>
- *              <UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="X"/>
- *              <UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="R"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskAdapterMapping repo-type="RDBMS" id="MAV619">
- *              <MAV_MAP_QUALIFIER>String</MAV_MAP_QUALIFIER>
- *              <MAV_UPDATE>1386887635000</MAV_UPDATE>
- *              <MAV_MAP_VALUE>FirstName</MAV_MAP_VALUE>
- *              <MAV_MAP_TO>Literal</MAV_MAP_TO>
- *              <MAV_MAP_OLD_VALUE>0</MAV_MAP_OLD_VALUE>
- *              <ADV_KEY EventHandler="adpADPFFUPDATEUSER" AdapterVariable="attrFieldName" Adapter="adpFFUpdateUser"/>
- *          </TaskAdapterMapping>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="P"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="W"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="UC"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskAdapterMapping repo-type="RDBMS" id="MAV618">
- *              <MAV_MAP_QUALIFIER>String</MAV_MAP_QUALIFIER>
- *              <MAV_UPDATE>1386887623000</MAV_UPDATE>
- *              <MAV_MAP_VALUE>UD_FLAT_FIL_SERVER</MAV_MAP_VALUE>
- *              <MAV_MAP_TO>Literal</MAV_MAP_TO>
- *              <MAV_MAP_OLD_VALUE>0</MAV_MAP_OLD_VALUE>
- *              <ADV_KEY EventHandler="adpADPFFUPDATEUSER" AdapterVariable="itResourceFieldName" Adapter="adpFFUpdateUser"/>
- *          </TaskAdapterMapping>
- * 
- *          <TaskAdapterMapping repo-type="RDBMS" id="MAV615">
- *              <MAV_FIELD_LENGTH>0</MAV_FIELD_LENGTH>
- *              <MAV_UPDATE>1386887592000</MAV_UPDATE>
- *              <MAV_MAP_TO>Response Code</MAV_MAP_TO>
- *              <MAV_MAP_OLD_VALUE>0</MAV_MAP_OLD_VALUE>
- *              <ADV_KEY EventHandler="adpADPFFUPDATEUSER" AdapterVariable="Adapter return value" Adapter="adpFFUpdateUser"/>
- *          </TaskAdapterMapping>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="C"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="MC"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="PX"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="PX"/>
- *              <UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="UC"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskResponse repo-type="RDBMS" name="ERROR">
- *              <RSC_DESC>Error Occurred</RSC_DESC>
- *              <RSC_UPDATE>1386887934000</RSC_UPDATE>
- *              <STA_KEY Status="R"/>
- *          </TaskResponse>
- * 
- *          <TaskResponse repo-type="RDBMS" name="SUCCESS">
- *              <RSC_DESC>Operation Completed</RSC_DESC>
- *              <RSC_UPDATE>1386887933000</RSC_UPDATE>
- *              <STA_KEY Status="C"/>
- *          </TaskResponse>
- *          
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="XLR"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskAdapterMapping repo-type="RDBMS" id="MAV616">
- *              <MAV_MAP_QUALIFIER>String</MAV_MAP_QUALIFIER>
- *              <MAV_UPDATE>1386887602000</MAV_UPDATE>
- *              <MAV_MAP_VALUE>User</MAV_MAP_VALUE>
- *              <MAV_MAP_TO>Literal</MAV_MAP_TO>
- *              <MAV_MAP_OLD_VALUE>0</MAV_MAP_OLD_VALUE>
- *              <ADV_KEY EventHandler="adpADPFFUPDATEUSER" AdapterVariable="objectType" Adapter="adpFFUpdateUser"/>
- *          </TaskAdapterMapping>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="S"/><UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="UT"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="UCR"/><OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="X"/><UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskAdapterMapping repo-type="RDBMS" id="MAV617">
- *              <MAV_FIELD_LENGTH>19</MAV_FIELD_LENGTH>
- *              <MAV_MAP_QUALIFIER>Process Instance</MAV_MAP_QUALIFIER>
- *              <MAV_UPDATE>1386887607000</MAV_UPDATE>
- *              <MAV_MAP_VALUE>orc_key</MAV_MAP_VALUE>
- *              <MAV_MAP_TO>Process Data</MAV_MAP_TO>
- *              <MAV_MAP_OLD_VALUE>0</MAV_MAP_OLD_VALUE>
- *              <ADV_KEY EventHandler="adpADPFFUPDATEUSER" AdapterVariable="processInstanceKey" Adapter="adpFFUpdateUser"/>
- *          </TaskAdapterMapping>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="UC"/>
- *              <UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="P"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="C"/><UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="PX"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskResponse repo-type="RDBMS" name="UNKNOWN">
- *              <RSC_DESC>An unknown response was received</RSC_DESC>
- *              <RSC_UPDATE>1386887115000</RSC_UPDATE>
- *              <STA_KEY Status="R"/>
- *          </TaskResponse>
- * 
- *          <TaskStatusPermission repo-type="RDBMS">
- *              <MSG_UPDATE>1386887116000</MSG_UPDATE>
- *              <TOS_KEY Process="Flat File" AtomicProcess="TOS81"/>
- *              <STA_KEY Status="R"/>
- *              <UGP_KEY UserGroup="ALL USERS"/>
- *          </TaskStatusPermission>
- * 
- *          <TaskToObjectStatusMapping repo-type="RDBMS">
- *              <MST_UPDATE>1386887115000</MST_UPDATE>
- *              <STA_KEY Status="R"/>
- *              <OST_KEY Resource="FLATFILERESOURCE" ObjectStatus="None"/>
- *          </TaskToObjectStatusMapping>
- * 
- *          <TaskAssignmentRule repo-type="RDBMS" id="RML245">
- *              <RML_UPDATE>1386887115000</RML_UPDATE>
- *              <RML_TARGET_TYPE>Group</RML_TARGET_TYPE>
- *              <RML_PRIORITY>1</RML_PRIORITY>
- *              <RUL_KEY Rule="Default"/>
- *              <UGP_KEY UserGroup="SYSTEM ADMINISTRATORS"/>
- *          </TaskAssignmentRule>
- * 
- * </ProcessTask>
- */

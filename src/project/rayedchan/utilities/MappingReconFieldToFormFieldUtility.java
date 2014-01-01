@@ -72,7 +72,7 @@ public class MappingReconFieldToFormFieldUtility
      * fields with sorting options.
      * PRF Table contains all the process field and reconcilation field mappings
      * @param   formDefOps      tcFormDefinitionOperationsIntf service object
-     * @param   processKey      the resource process key (PKG.PKG_KEY or TOS.TOS_KEY)
+     * @param   processKey      the resource process key (PKG.PKG_KEY)
      * @param   columnToSort    sort by recon field or form field column; 0 = Reconciliation fields, 1 = Process form fields 
      * @param   descOrAsc       sort by descending or ascending order; 0 = Descending order,  1 = Ascending order            
      */
@@ -142,7 +142,7 @@ public class MappingReconFieldToFormFieldUtility
      * fields.
      * PRF Table contains all the process field and reconcilation field mappings
      * @param   formDefOps      tcFormDefinitionOperationsIntf service object
-     * @param   processKey      the resource process key (PKG._PKG_KEY or TOS.TOS_KEY)
+     * @param   processKey      the resource process key (PKG._PKG_KEY)
      */
     public static void printReconFieldAndFormFieldMappings(tcFormDefinitionOperationsIntf formDefOps, Long processKey) throws tcAPIException, tcProcessNotFoundException, tcColumnNotFoundException
     {
