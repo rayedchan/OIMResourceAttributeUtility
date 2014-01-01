@@ -97,6 +97,8 @@ import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconciliationField;
+import project.rayedchan.exception.AdapterNameNotFoundException;
+import project.rayedchan.exception.EventHandlerNotFoundException;
 import project.rayedchan.exception.NoResourceObjForProcessDefException;
 import project.rayedchan.exception.ProcessDefintionNotFoundException;
 import project.rayedchan.exception.ProcessFormNotFoundException;
@@ -153,7 +155,7 @@ public class TestDriver
         });
     }
     
-    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException
+    public static void main(String[] args) throws LoginException, tcAPIException, tcInvalidLookupException, tcDuplicateLookupCodeException, tcColumnNotFoundException, tcInvalidValueException, tcInvalidAttributeException, tcFormNotFoundException, tcFormFieldNotFoundException, tcDeleteNotAllowedException, tcAddFieldFailedException, tcProcessNotFoundException, SQLException, tcObjectNotFoundException, tcProcessFormException, IOException, NamingException, TransformerConfigurationException, TransformerException, DDMException, TransformationException, tcBulkException, tcUpdateNotAllowedException, ParserConfigurationException, XPathExpressionException, SAXException, tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ProcessFormNotFoundException, AdapterNameNotFoundException, EventHandlerNotFoundException
     { 
         OIMClient oimClient = new OIMClientResourceAttr().getOIMClient(); //Get OIMClient logging as an administrator
         tcOIMDatabaseConnection connection =  new tcOIMDatabaseConnection(oimClient);
@@ -167,21 +169,28 @@ public class TestDriver
         tcImportOperationsIntf importOps = oimClient.getService(tcImportOperationsIntf.class);
         TaskDefinitionOperationsIntf taskOps = oimClient.getService(TaskDefinitionOperationsIntf.class);
         tcWorkflowDefinitionOperationsIntf wfDefOps =  oimClient.getService(tcWorkflowDefinitionOperationsIntf.class);
-               
+             
+        String adapterName = "adpFFUpdateUser";
+        long adapterKey = 65L;
+        
+        //System.out.println(ProcessTaskUtility.getAdapterKeyByAdapterName(dbProvider,adapterName));
+         //System.out.println(ProcessTaskUtility.getEventHandlerByAdapterKey(dbProvider,adapterKey));
         //System.out.println(ProcessTaskUtility.exportProcessObject(exportOps, "Flat File"));
         //HelperUtility.printTcResultSetRecords(wfDefOps.getAvailableAdapters());
-        //HelperUtility.printTcResultSetRecords(ProcessTaskUtility.getAdapterVariableMappings(wfDefOps, "T", 65));
+        HelperUtility.printTcResultSetRecords(ProcessTaskUtility.getAdapterVariableMappings(wfDefOps, "T", 65));
         	
+ 
+        
         //DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         //DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	//Document document = docBuilder.newDocument();
         
-        String processObjectXML = ProcessTaskUtility.exportProcessObject(exportOps, "Flat File");
+        /*String processObjectXML = ProcessTaskUtility.exportProcessObject(exportOps, "Flat File");
         Document document =  HelperUtility.parseStringXMLIntoDocument(processObjectXML); //convert xml to a Document
         ProcessTaskUtility.createUpdateProcessTask(document);
         String newProcessObjectXML = HelperUtility.parseDocumentIntoStringXML(document);
         System.out.println(newProcessObjectXML);
-        ProcessTaskUtility.importResourceObject(importOps, newProcessObjectXML, "CustomProcessTaskUtilAdd");
+        ProcessTaskUtility.importResourceObject(importOps, newProcessObjectXML, "CustomProcessTaskUtilAdd");*/
         
     }
 }

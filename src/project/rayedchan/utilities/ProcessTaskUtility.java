@@ -7,13 +7,31 @@ import Thor.API.Operations.tcExportOperationsIntf;
 import Thor.API.Operations.tcImportOperationsIntf;
 import Thor.API.Operations.tcWorkflowDefinitionOperationsIntf;
 import Thor.API.tcResultSet;
+import com.thortech.xl.dataaccess.tcDataProvider;
+import com.thortech.xl.dataaccess.tcDataSet;
+import com.thortech.xl.dataaccess.tcDataSetException;
+import com.thortech.xl.dataobj.PreparedStatementUtil;
 import com.thortech.xl.ddm.exception.DDMException;
 import com.thortech.xl.ddm.exception.TransformationException;
+import com.thortech.xl.orb.dataaccess.tcDataAccessException;
 import com.thortech.xl.vo.ddm.RootObject;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.NamingException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -22,6 +40,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import project.rayedchan.exception.AdapterNameNotFoundException;
+import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.EventHandlerNotFoundException;
+import project.rayedchan.exception.IncorrectAdapterVariableNameException;
+import project.rayedchan.exception.MissingRequiredFieldException;
+import project.rayedchan.exception.NoResourceObjForProcessDefException;
+import project.rayedchan.exception.ProcessDefintionNotFoundException;
+import project.rayedchan.exception.ResourceObjectNameNotFoundException;
 
 /**
  * @author rayedchan
@@ -129,11 +156,11 @@ public class ProcessTaskUtility
         String objectType = "User"; //file
         
         //Validate these variables with API call
-        String itResourceAdapterName = "itResourceFieldName"; //must provide in file
-        String processInstanceKeyAdapterName = "processInstanceKey"; //long
-        String objectTypeAdapterName = "objectType"; //must provide in file
-        String adapterReturnValueAdapterName = "Adapter return value"; //object
-        String attributeFieldNameAdapterName = "attrFieldName"; ////must provide in file
+        String itResourceAdapterVarName = "itResourceFieldName"; //must provide in file
+        String processInstanceKeyAdapterVarName = "processInstanceKey"; //long
+        String objectTypeAdapterVarName = "objectType"; //must provide in file
+        String adapterReturnValueAdapterVarName = "Adapter return value"; //object
+        String attributeFieldNameAdapterVarName = "attrFieldName"; ////must provide in file
         
         String processTaskName = attributeName + " Updated";
         String tosId = "TOS81"; //TOS_KEY (PKG) with TOS prefix
@@ -222,7 +249,7 @@ public class ProcessTaskUtility
         mavMapOldValue1.setTextContent("0");
         Element advKey1 = document.createElement("ADV_KEY");
         advKey1.setAttribute("Adapter", adapterName);
-        advKey1.setAttribute("AdapterVariable", itResourceAdapterName);
+        advKey1.setAttribute("AdapterVariable", itResourceAdapterVarName);
         advKey1.setAttribute("EventHandler", eventHandlerName);
         itResourceFieldName_adapVarMap.appendChild(mavMapQualifer1);     
         itResourceFieldName_adapVarMap.appendChild(mavUpdate1);
@@ -257,7 +284,7 @@ public class ProcessTaskUtility
         
         Element advKey2 = document.createElement("ADV_KEY");
         advKey2.setAttribute("Adapter", adapterName);
-        advKey2.setAttribute("AdapterVariable", processInstanceKeyAdapterName);
+        advKey2.setAttribute("AdapterVariable", processInstanceKeyAdapterVarName);
         advKey2.setAttribute("EventHandler", eventHandlerName);
         
         processIntsanceKey_adapVarMap.appendChild(mavFieldLength2);  
@@ -291,7 +318,7 @@ public class ProcessTaskUtility
         
         Element advKey3 = document.createElement("ADV_KEY");
         advKey3.setAttribute("Adapter", adapterName);
-        advKey3.setAttribute("AdapterVariable", objectTypeAdapterName);
+        advKey3.setAttribute("AdapterVariable", objectTypeAdapterVarName);
         advKey3.setAttribute("EventHandler", eventHandlerName);
         
         objectType_adapVarMap.appendChild(mavMapQualifer3);     
@@ -321,7 +348,7 @@ public class ProcessTaskUtility
         
         Element advKey4 = document.createElement("ADV_KEY");
         advKey4.setAttribute("Adapter", adapterName);
-        advKey4.setAttribute("AdapterVariable", adapterReturnValueAdapterName);
+        advKey4.setAttribute("AdapterVariable", adapterReturnValueAdapterVarName);
         advKey4.setAttribute("EventHandler", eventHandlerName);
          
         adapterReturnValue_adapVarMap.appendChild(mavFieldLength4);
@@ -353,7 +380,7 @@ public class ProcessTaskUtility
         
         Element advKey5 = document.createElement("ADV_KEY");
         advKey5.setAttribute("Adapter", adapterName);
-        advKey5.setAttribute("AdapterVariable", attributeFieldNameAdapterName);
+        advKey5.setAttribute("AdapterVariable", attributeFieldNameAdapterVarName);
         advKey5.setAttribute("EventHandler", eventHandlerName);
          
         attrFieldName_adapVarMap.appendChild(mavMapQualifier5);
@@ -501,4 +528,228 @@ public class ProcessTaskUtility
         processNode.appendChild(newProcessTask); 
         //document.appendChild(newProcessTask);
     }
+      
+    /*
+     * Create update process tasks defined in a flat file.
+     * Process task name is case sensitive.
+     * Adapter Name is case insensitive.
+     *  
+     *   Adapter Factory.Adapter Variables.Key = 135
+     *   Adapter Factory.Adapter Variables.Name = Adapter return value
+     *   Adapter Factory.Adapter Variables.Type = Object
+     *   Adapter Factory.Adapter Variables.Description 
+     *   IT Resources Type Definition.Key 
+     *   Adapter Factory.Adapter Variables.Map To 
+     *   Adapter Factory.Adapter Variables.Map Qualifier 
+     *   Adapter Factory.Adapter Variables.Map Value 
+     *   Adapter Factory.Adapter Variables.Display Value 
+     *   Adapter Factory.Adapter Variables.Field Length  
+     * 
+     * NOTE: VERY DANGEROUS ASSUMPTION; relies on a determined header order in file 
+     * or else process task will be setup incorrectly. 
+     * attributeName must be first
+     * itResourceFieldName must be second
+     * objectType must be third
+     * 
+     * File Format
+     * <adapter variable names [attributeName itResourceFieldName objectType]>
+     * <processDefRecord1>
+     * <processDefRecord1>
+     * 
+     * @param   dbProvider          connection to the OIM Schema
+     * @param   wfDefOps            tcWorkflowDefinitionOperationsIntf
+     * @param   exportOps           tcExportOperationsIntf service object
+     * @param   importOps           tcImportOperationsIntf service object
+     * @param   fileName            file that contains the process tasks to add
+     * @param   procDefName         Resource Object to add fields to
+     * @param   adapterName         Adapter to be attached to process task
+     * @param   delimiter           Use to separate values in file
+     */
+    public static Boolean createProcessTaskDSFF(tcDataProvider dbProvider, tcWorkflowDefinitionOperationsIntf wfDefOps,tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String procDefName, String adapterName, String delimiter) throws FileNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, AdapterNameNotFoundException, tcAPIException, tcColumnNotFoundException, IOException, IncorrectAdapterVariableNameException, EventHandlerNotFoundException
+    {            
+        FileInputStream fstream = null;
+        DataInputStream in = null;
+        BufferedReader br = null;
+        int lineNumber = 0;
+            
+        try 
+        {    
+            fstream = new FileInputStream(fileName); //Open File
+            in = new DataInputStream(fstream); //Get the object of DataInputStream
+            br = new BufferedReader(new InputStreamReader(in));
+            
+            long processKey = MappingReconFieldToFormFieldUtility.getProcessKeyByProcessDefinitionName(dbProvider, procDefName); //Validation existence of process defintion done in method
+            long objectKey = MappingReconFieldToFormFieldUtility.getObjKeyByProcKey(dbProvider, processKey);
+            String resourceObjectName = ReconFieldUtility.getResourceObjectName(dbProvider, objectKey);
+            String adapterReturnValueAdapterVarName = null;
+            String processInstanceKeyAdapterVarName = null;
+            
+            System.out.println("Process Key: " + processKey);
+            System.out.println("Object Key: " + objectKey);
+            System.out.println("Resource Object Name: " + resourceObjectName);
+            
+            long adapterKey = getAdapterKeyByAdapterName(dbProvider, adapterName); //Validated the name of the adapter
+            System.out.println("Adapter Key: " + adapterKey);
+            
+            String eventHandlerName = getEventHandlerByAdapterKey(dbProvider, adapterKey);
+            System.out.println("Event Handler Name: " + eventHandlerName);
+            
+            tcResultSet adapterVarResultSet = getAdapterVariableMappings(wfDefOps, "T", adapterKey);
+            int numRows = adapterVarResultSet.getTotalRowCount();
+            HashMap adapterVars = new HashMap();
+            
+            for(int i = 0; i < numRows; i++)
+            {
+                adapterVarResultSet.goToRow(i);
+                String adapterVarName = adapterVarResultSet.getStringValue("Adapter Factory.Adapter Variables.Name");
+                String adapterType = adapterVarResultSet.getStringValue("Adapter Factory.Adapter Variables.Type");
+                
+                if("Object".equals(adapterType))
+                {
+                    adapterReturnValueAdapterVarName = adapterVarName;
+                }
+                
+                else if("Long".equals(adapterType))
+                {
+                    processInstanceKeyAdapterVarName = adapterVarName;
+                }
+                
+                else
+                {
+                    adapterVars.put(adapterVarName, adapterType);
+                } 
+            }
+            
+            System.out.println("Adapter Variables: " + adapterVars);
+            
+            //Read first line: row header containing the adapter variable names
+            String fileAdapterNames = br.readLine();
+            StringTokenizer adapterVarNameToken = new StringTokenizer(fileAdapterNames, delimiter);
+            String[] requiredAdapterVar = new String[3];
+            int counter = 0;
+            
+            //Validate adapter names are correct
+            while(adapterVarNameToken.hasMoreTokens())
+            {
+                String adapterVarName = adapterVarNameToken.nextToken();
+                requiredAdapterVar[counter] = adapterVarName;
+                
+                if(!adapterVars.containsKey(adapterVarName))
+                {
+                    throw new IncorrectAdapterVariableNameException(String.format("Here are the valid adapter names (key in map): %s ", adapterVars));
+                }
+            }
+            
+            //Determined order in file; DANGEROUS
+            String attributeFieldAdapterVarName = requiredAdapterVar[0];
+            String itResourceAdapterVarName = requiredAdapterVar[1];
+            String objectTypeAdapterVarName = requiredAdapterVar[2];
+            
+            
+            //Validate process task exist
+            //Read each record
+ 
+            return null;
+        } 
+        
+        finally
+        {
+            if(br != null)
+            {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(in != null)
+            {
+                try {
+                    in.close(); //Close the input stream
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(fstream != null)
+            {
+                try {
+                    fstream.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ProcessFormFieldUtility.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }      
+    }
+    
+    /*
+     * Get the adapter key by adapter name.
+     * Name of adapter is case insenstive.
+     * @param adapterName    Name of the adapter
+     * @return adapter key (ADP.ADP_KEY)
+     */
+    public static Long getAdapterKeyByAdapterName(tcDataProvider dbProvider, String adapterName) throws tcDataSetException, tcDataAccessException, AdapterNameNotFoundException
+    {     
+        tcDataSet adpDefDataSet = null;
+        PreparedStatementUtil ps = null;
+        
+        try 
+        {
+            String query = "SELECT ADP_KEY FROM ADP WHERE LOWER(ADP_NAME) = LOWER(?)";
+            ps = new PreparedStatementUtil();
+            ps.setStatement(dbProvider, query);
+            ps.setString(1, adapterName);
+            ps.execute();
+            adpDefDataSet = ps.getDataSet();
+            int numRecord = adpDefDataSet.getTotalRowCount();
+            
+            if(numRecord == 1)
+            {         
+                Long adapterKey = adpDefDataSet.getLong("ADP_KEY");
+                return adapterKey;
+            }
+            
+            throw new AdapterNameNotFoundException(String.format("Process defintion '%s' does not exist.", adapterName));
+        } 
+        
+        finally
+        { 
+        }  
+    }
+     
+    /*
+     * Get the event handler name by adapter key.
+     * @param adapterKey    Key of the adapter
+     * @return name of event handler (EVT.EVT_NAME)
+     */
+    public static String getEventHandlerByAdapterKey(tcDataProvider dbProvider, long adapterKey) throws tcDataSetException, tcDataAccessException, EventHandlerNotFoundException
+    {     
+        tcDataSet evtDefDataSet = null;
+        PreparedStatementUtil ps = null;
+        
+        try 
+        {
+            String query = "SELECT EVT.EVT_NAME FROM ADP INNER JOIN EVT ON ADP.EVT_KEY = EVT.EVT_KEY WHERE ADP_KEY = ?";
+            ps = new PreparedStatementUtil();
+            ps.setStatement(dbProvider, query);
+            ps.setLong(1, adapterKey);
+            ps.execute();
+            evtDefDataSet = ps.getDataSet();
+            int numRecord = evtDefDataSet.getTotalRowCount();
+            
+            if(numRecord == 1)
+            {         
+                String adapterName = evtDefDataSet.getString("EVT_NAME");
+                return adapterName;
+            }
+            
+            throw new EventHandlerNotFoundException(String.format("Event Handler for adapter key '%s' does not exist.", adapterKey));
+        } 
+        
+        finally
+        { 
+        }  
+    }
+    
 }
