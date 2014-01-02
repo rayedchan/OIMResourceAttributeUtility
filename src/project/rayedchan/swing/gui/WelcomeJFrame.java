@@ -6,12 +6,15 @@ import Thor.API.Exceptions.tcColumnNotFoundException;
 import Thor.API.Exceptions.tcFormNotFoundException;
 import Thor.API.Exceptions.tcInvalidLookupException;
 import Thor.API.Exceptions.tcProcessNotFoundException;
+import Thor.API.Operations.TaskDefinitionOperationsIntf;
 import Thor.API.Operations.tcExportOperationsIntf;
 import Thor.API.Operations.tcFormDefinitionOperationsIntf;
 import Thor.API.Operations.tcImportOperationsIntf;
 import Thor.API.Operations.tcLookupOperationsIntf;
 import Thor.API.Operations.tcObjectOperationsIntf;
+import Thor.API.Operations.tcWorkflowDefinitionOperationsIntf;
 import com.thortech.xl.dataaccess.tcClientDataAccessException;
+import com.thortech.xl.dataaccess.tcDataProvider;
 import com.thortech.xl.dataaccess.tcDataSetException;
 import com.thortech.xl.ddm.exception.DDMException;
 import com.thortech.xl.ddm.exception.TransformationException;
@@ -33,7 +36,11 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
+import project.rayedchan.exception.AdapterNameNotFoundException;
 import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.EventHandlerNotFoundException;
+import project.rayedchan.exception.IncorrectAdapterException;
+import project.rayedchan.exception.IncorrectAdapterVariableNameException;
 import project.rayedchan.exception.LookupNameNotFoundException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.NoResourceObjForProcessDefException;
@@ -47,6 +54,7 @@ import project.rayedchan.services.tcOIMDatabaseConnection;
 import project.rayedchan.utilities.LookupUtility;
 import project.rayedchan.utilities.MappingReconFieldToFormFieldUtility;
 import project.rayedchan.utilities.ProcessFormFieldUtility;
+import project.rayedchan.utilities.ProcessTaskUtility;
 import project.rayedchan.utilities.ReconFieldUtility;
 
 /**
@@ -157,6 +165,25 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         processFormField_delimiterBtnGroup = new javax.swing.ButtonGroup();
         rf_delimiterBtnGroup = new javax.swing.ButtonGroup();
         prfMap_delimiterBtnGroup = new javax.swing.ButtonGroup();
+        processTaskDialog = new javax.swing.JDialog();
+        jPanel5 = new javax.swing.JPanel();
+        procTask_procDefNameLbl = new javax.swing.JLabel();
+        procTask_adapterNameLbl = new javax.swing.JLabel();
+        procTask_fileNameLbl = new javax.swing.JLabel();
+        procTask_operationLbl = new javax.swing.JLabel();
+        procTask_procDefNameFld = new javax.swing.JTextField();
+        procTask_adapterNameFld = new javax.swing.JTextField();
+        procTask_fileNameFld = new javax.swing.JTextField();
+        procTask_addRadioBtn = new javax.swing.JRadioButton();
+        procTask_browseBtn = new javax.swing.JButton();
+        procTask_submitBtn = new javax.swing.JButton();
+        procTask_cancelBtn = new javax.swing.JButton();
+        procTask_delimiterLbl = new javax.swing.JLabel();
+        procTask_tabRadioBtn = new javax.swing.JRadioButton();
+        procTask_commaRadioBtn = new javax.swing.JRadioButton();
+        procTask_semicolonRadioBtn = new javax.swing.JRadioButton();
+        procTask_delimiterGroupBtn = new javax.swing.ButtonGroup();
+        procTask_operationGroupBtn = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lookupBtn = new javax.swing.JButton();
         processFormFieldBtn = new javax.swing.JButton();
@@ -770,6 +797,145 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Process Task Utility", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12))); // NOI18N
+
+        procTask_procDefNameLbl.setText("Process Definition Name:");
+
+        procTask_adapterNameLbl.setText("Adapter Name:");
+
+        procTask_fileNameLbl.setText("File Name:");
+
+        procTask_operationLbl.setText("Operation:");
+
+        procTask_operationGroupBtn.add(procTask_addRadioBtn);
+        procTask_addRadioBtn.setText("Add");
+
+        procTask_browseBtn.setText("Browse");
+        procTask_browseBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                procTask_browseBtnActionPerformed(evt);
+            }
+        });
+
+        procTask_submitBtn.setText("Submit");
+        procTask_submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                procTask_submitBtnActionPerformed(evt);
+            }
+        });
+
+        procTask_cancelBtn.setText("Cancel");
+        procTask_cancelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                procTask_cancelBtnActionPerformed(evt);
+            }
+        });
+
+        procTask_delimiterLbl.setText("Delimiter:");
+
+        procTask_delimiterGroupBtn.add(procTask_tabRadioBtn);
+        procTask_tabRadioBtn.setText("Tab");
+
+        procTask_delimiterGroupBtn.add(procTask_commaRadioBtn);
+        procTask_commaRadioBtn.setText("Comma");
+
+        procTask_delimiterGroupBtn.add(procTask_semicolonRadioBtn);
+        procTask_semicolonRadioBtn.setText("Semicolon");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(procTask_submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(procTask_cancelBtn))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(24, 24, 24)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(procTask_addRadioBtn)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(procTask_tabRadioBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(procTask_commaRadioBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(procTask_semicolonRadioBtn))))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(procTask_procDefNameLbl)
+                                    .addComponent(procTask_adapterNameLbl)
+                                    .addComponent(procTask_fileNameLbl))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(procTask_procDefNameFld, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(procTask_adapterNameFld, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
+                                        .addComponent(procTask_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(procTask_browseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE))))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(procTask_delimiterLbl))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(procTask_operationLbl)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        jPanel5Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {procTask_cancelBtn, procTask_submitBtn});
+
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(procTask_procDefNameLbl)
+                    .addComponent(procTask_procDefNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(procTask_adapterNameLbl)
+                    .addComponent(procTask_adapterNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(procTask_fileNameLbl)
+                    .addComponent(procTask_fileNameFld, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(procTask_browseBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(procTask_delimiterLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(procTask_tabRadioBtn)
+                    .addComponent(procTask_commaRadioBtn)
+                    .addComponent(procTask_semicolonRadioBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(procTask_operationLbl)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(procTask_addRadioBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(procTask_cancelBtn)
+                    .addComponent(procTask_submitBtn))
+                .addGap(21, 21, 21))
+        );
+
+        javax.swing.GroupLayout processTaskDialogLayout = new javax.swing.GroupLayout(processTaskDialog.getContentPane());
+        processTaskDialog.getContentPane().setLayout(processTaskDialogLayout);
+        processTaskDialogLayout.setHorizontalGroup(
+            processTaskDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        processTaskDialogLayout.setVerticalGroup(
+            processTaskDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -794,6 +960,11 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         });
 
         processTaskBtn.setText("Process Tasks");
+        processTaskBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                processTaskBtnActionPerformed(evt);
+            }
+        });
 
         reconFieldBtn.setText("Reconciliation Fields");
         reconFieldBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -1706,6 +1877,173 @@ public class WelcomeJFrame extends javax.swing.JFrame {
         System.out.println("Exiting application");
     }//GEN-LAST:event_formWindowClosing
 
+    private void processTaskBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processTaskBtnActionPerformed
+        // TODO add your handling code here:
+       clearProcessTaskUtilityFields();
+       processTaskDialog.setTitle("Process Task Utility Option");
+       processTaskDialog.pack();
+       processTaskDialog.setLocationRelativeTo(null); //This will center the JFrame in the middle of the screen
+       processTaskDialog.setResizable(true);
+       processTaskDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL); //Modal dialog blocks input from top-level windows
+       processTaskDialog.setVisible(true); //Display lookup dialog
+    }//GEN-LAST:event_processTaskBtnActionPerformed
+
+    private void procTask_cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procTask_cancelBtnActionPerformed
+        // TODO add your handling code here:
+        processTaskDialog.dispose();
+    }//GEN-LAST:event_procTask_cancelBtnActionPerformed
+
+    private void procTask_browseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procTask_browseBtnActionPerformed
+        // TODO add your handling code here:
+         createFileChooserUI(procTask_fileNameFld);
+    }//GEN-LAST:event_procTask_browseBtnActionPerformed
+
+    private void procTask_submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procTask_submitBtnActionPerformed
+        // TODO add your handling code here:
+        
+        tcExportOperationsIntf exportOps = null;
+        tcImportOperationsIntf importOps = null;
+        TaskDefinitionOperationsIntf taskOps = null;
+        tcWorkflowDefinitionOperationsIntf wfDefOps = null;
+
+        try
+        {
+            String procDefName = procTask_procDefNameFld.getText();
+            String adapterName = procTask_adapterNameFld.getText();
+            String fileName = procTask_fileNameFld.getText();
+            String fileDelimiter = null;
+            exportOps = oimClientResAttr.getOIMClient().getService(tcExportOperationsIntf.class);
+            importOps = oimClientResAttr.getOIMClient().getService(tcImportOperationsIntf.class);
+            taskOps = oimClientResAttr.getOIMClient().getService(TaskDefinitionOperationsIntf.class);
+            wfDefOps =  oimClientResAttr.getOIMClient().getService(tcWorkflowDefinitionOperationsIntf.class);
+            
+            //Convert file delimiter option
+            if(procTask_tabRadioBtn.isSelected())
+            {
+                fileDelimiter = "\t";
+            }
+            
+            else if(procTask_commaRadioBtn.isSelected())
+            {
+                fileDelimiter = ",";
+            }
+            
+            else if(procTask_semicolonRadioBtn.isSelected())
+            {
+                fileDelimiter = ";";
+            }
+            
+            System.out.println("Process Defintion Name: " + procDefName);
+            System.out.println("Adapter Name: " + adapterName);
+            System.out.println("File Name: " + fileName);
+
+            if(procTask_addRadioBtn.isSelected())
+            {             
+                if(fileDelimiter == null)
+                {
+                    errorDialogMessage(processTaskDialog, "A file delimiter must be selected.");
+                    return;
+                }
+                try {
+                    ProcessTaskUtility.createUpdateProcessTaskDSFF(dbConnection.getDbProvider(), wfDefOps, exportOps, importOps, fileName, procDefName, adapterName, fileDelimiter);
+                    errorDialogMessage(processTaskDialog, "Add successful.");
+                    processTaskDialog.dispose();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "File not found.");
+                } catch (tcDataSetException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (tcDataAccessException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (ProcessDefintionNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Process defintion not found.");
+                } catch (NoResourceObjForProcessDefException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "No resource object associated with process defintion.");
+                } catch (AdapterNameNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Adapter name not found.");
+                } catch (tcAPIException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (tcColumnNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (IOException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Error reading file.");
+                } catch (IncorrectAdapterVariableNameException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Incorrect adapter variable header in file.");
+                } catch (EventHandlerNotFoundException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (ParserConfigurationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (SAXException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (IncorrectAdapterException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Incorrect adapter.");
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (TransformerConfigurationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (TransformerException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (SQLException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (NamingException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (DDMException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (TransformationException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                } catch (tcBulkException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, "Add failed.");
+                }
+            }
+        }
+
+        finally
+        {
+            if(exportOps != null)
+            {
+                exportOps.close();
+            }
+                       
+            if(importOps != null)
+            {
+                importOps.close();
+            }
+                        
+                                    
+            if(taskOps != null)
+            {
+                taskOps.close();
+            }
+                                                
+            if(wfDefOps != null)
+            {
+                wfDefOps.close();
+            }
+        }
+        
+    }//GEN-LAST:event_procTask_submitBtnActionPerformed
+
     private void createFileChooserUI(javax.swing.JTextField fileNameField)
     {
         int returnVal = fileChooser.showOpenDialog(this); //Open file chooser dialog
@@ -1724,6 +2062,15 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private void errorDialogMessage(Component component, String message)
     {
         JOptionPane.showMessageDialog(component, message);
+    }
+    
+    private void clearProcessTaskUtilityFields()
+    {
+        procTask_procDefNameFld.setText("");
+        procTask_adapterNameFld.setText("");
+        procTask_fileNameFld.setText("");
+        procTask_operationGroupBtn.clearSelection(); 
+        procTask_delimiterGroupBtn.clearSelection();
     }
     
     private void clearLookupUtilityFields()
@@ -1764,6 +2111,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1815,6 +2163,23 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButton prfMap_semicolonRadioBtn;
     private javax.swing.JButton prfMap_submitBtn;
     private javax.swing.JRadioButton prfMap_tabRadioBtn;
+    private javax.swing.JTextField procTask_adapterNameFld;
+    private javax.swing.JLabel procTask_adapterNameLbl;
+    private javax.swing.JRadioButton procTask_addRadioBtn;
+    private javax.swing.JButton procTask_browseBtn;
+    private javax.swing.JButton procTask_cancelBtn;
+    private javax.swing.JRadioButton procTask_commaRadioBtn;
+    private javax.swing.ButtonGroup procTask_delimiterGroupBtn;
+    private javax.swing.JLabel procTask_delimiterLbl;
+    private javax.swing.JTextField procTask_fileNameFld;
+    private javax.swing.JLabel procTask_fileNameLbl;
+    private javax.swing.ButtonGroup procTask_operationGroupBtn;
+    private javax.swing.JLabel procTask_operationLbl;
+    private javax.swing.JTextField procTask_procDefNameFld;
+    private javax.swing.JLabel procTask_procDefNameLbl;
+    private javax.swing.JRadioButton procTask_semicolonRadioBtn;
+    private javax.swing.JButton procTask_submitBtn;
+    private javax.swing.JRadioButton procTask_tabRadioBtn;
     private javax.swing.JButton processFormFieldBtn;
     private javax.swing.JDialog processFormFieldDialog;
     private javax.swing.JLabel processFormFieldForm_tableNameLbl;
@@ -1836,6 +2201,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButton processFormField_tabRadioBtn;
     private javax.swing.JDialog processReconFieldMappingDialog;
     private javax.swing.JButton processTaskBtn;
+    private javax.swing.JDialog processTaskDialog;
     private javax.swing.JButton reconFieldBtn;
     private javax.swing.JDialog reconFieldDialog;
     private javax.swing.JButton rfToPffMappingBtn;

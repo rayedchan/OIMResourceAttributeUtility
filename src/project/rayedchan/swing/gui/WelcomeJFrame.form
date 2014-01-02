@@ -966,6 +966,229 @@
     </Component>
     <Component class="javax.swing.ButtonGroup" name="prfMap_delimiterBtnGroup">
     </Component>
+    <Container class="javax.swing.JDialog" name="processTaskDialog">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jPanel5" alignment="0" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jPanel5" alignment="0" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Container class="javax.swing.JPanel" name="jPanel5">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Process Task Utility">
+                  <Font PropertyName="font" name="Dialog" size="12" style="1"/>
+                </TitledBorder>
+              </Border>
+            </Property>
+          </Properties>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                              <Component id="procTask_submitBtn" linkSize="9" min="-2" pref="98" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="procTask_cancelBtn" linkSize="9" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="procTask_addRadioBtn" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="procTask_tabRadioBtn" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="procTask_commaRadioBtn" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="procTask_semicolonRadioBtn" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="procTask_procDefNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="procTask_adapterNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="procTask_fileNameLbl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                          <Component id="procTask_procDefNameFld" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="procTask_adapterNameFld" alignment="0" max="32767" attributes="0"/>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="procTask_fileNameFld" min="-2" pref="162" max="-2" attributes="0"/>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                              <Component id="procTask_browseBtn" pref="81" max="32767" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                      <Component id="procTask_delimiterLbl" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                      <Component id="procTask_operationLbl" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="procTask_procDefNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_procDefNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="procTask_adapterNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_adapterNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="procTask_fileNameLbl" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_fileNameFld" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_browseBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="procTask_delimiterLbl" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="procTask_tabRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_commaRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_semicolonRadioBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="procTask_operationLbl" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="procTask_addRadioBtn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="15" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="procTask_cancelBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="procTask_submitBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="procTask_procDefNameLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Process Definition Name:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="procTask_adapterNameLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Adapter Name:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="procTask_fileNameLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="File Name:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="procTask_operationLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Operation:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="procTask_procDefNameFld">
+            </Component>
+            <Component class="javax.swing.JTextField" name="procTask_adapterNameFld">
+            </Component>
+            <Component class="javax.swing.JTextField" name="procTask_fileNameFld">
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="procTask_addRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="procTask_operationGroupBtn"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Add"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="procTask_browseBtn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Browse"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="procTask_browseBtnActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="procTask_submitBtn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Submit"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="procTask_submitBtnActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="procTask_cancelBtn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Cancel"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="procTask_cancelBtnActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="procTask_delimiterLbl">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delimiter:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="procTask_tabRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="procTask_delimiterGroupBtn"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Tab"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="procTask_commaRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="procTask_delimiterGroupBtn"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Comma"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="procTask_semicolonRadioBtn">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="procTask_delimiterGroupBtn"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Semicolon"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.ButtonGroup" name="procTask_delimiterGroupBtn">
+    </Component>
+    <Component class="javax.swing.ButtonGroup" name="procTask_operationGroupBtn">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
@@ -1120,6 +1343,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Process Tasks"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="processTaskBtnActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="reconFieldBtn">
           <Properties>
