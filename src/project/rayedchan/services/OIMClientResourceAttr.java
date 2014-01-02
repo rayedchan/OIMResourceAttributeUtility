@@ -21,13 +21,10 @@ public class OIMClientResourceAttr
      * @param   username            OIM Administrator username
      * @param   password            OIM Administrator password
      */
-    public OIMClientResourceAttr(String oimServerURL, String username, char[] password) throws LoginException
+    public OIMClientResourceAttr(String oimServerURL, String username, char[] password, String authwlPath) throws LoginException
     { 
-        if(username == null)
-            System.out.println("Hi");
         String ctxFactory = Constants.WL_CXTFACTORY; //WebLogic Context
-        String authwlConfigPath = Constants.AUTHWL_CONFIG_PATH; //Path to login configuration
-        System.setProperty(Constants.PROPERTY_AUTHWL_CONFIG, authwlConfigPath); //set the login configuration
+        System.setProperty(Constants.PROPERTY_AUTHWL_CONFIG, authwlPath); //set the login configuration
         Hashtable<String,String> env = new Hashtable<String,String>(); //use to store OIM environment properties
         env.put(OIMClient.JAVA_NAMING_FACTORY_INITIAL, ctxFactory);
         env.put(OIMClient.JAVA_NAMING_PROVIDER_URL, oimServerURL);
