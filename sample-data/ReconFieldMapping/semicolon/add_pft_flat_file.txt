@@ -1,0 +1,6 @@
+recon_field_name;form_field_column_name;is_key_field;is_case_insensitive
+Nickname;UD_FLAT_FIL_Nickname;0;0
+MiddleInitial;UD_FLAT_FIL_MiddleInitial;0;0
+Gender;UD_FLAT_FIL_Gender;0;0
+Color;UD_FLAT_FIL_Color;0;0
+Address;UD_FLAT_FIL_Address;0;0

@@ -1,0 +1,5 @@
+Address	Address
+MiddleIntial	MiddleInitial
+Nickname	Nickname
+Gender	Gender
+Color	Color

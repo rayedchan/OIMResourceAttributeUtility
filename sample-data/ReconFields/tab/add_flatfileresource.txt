@@ -1,0 +1,5 @@
+ReconFieldName	FieldType	isRequired
+Address	String	0
+Nickname	String	0
+MiddleInitial	String	0
+Roles	String	1

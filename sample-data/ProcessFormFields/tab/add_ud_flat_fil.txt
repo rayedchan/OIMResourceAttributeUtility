@@ -1,0 +1,4 @@
+field_label	field_type	order	variant_type	length
+MiddleInitial	TextField	7	String	50
+Nickname	TextField	8	String	50
+Address	TextField	9	String	50

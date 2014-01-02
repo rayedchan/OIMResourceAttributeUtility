@@ -1,0 +1,5 @@
+Nickname,Nickname
+Gender,Gender
+Address,Address
+MiddleInitial,MiddleInitial
+Color,Color

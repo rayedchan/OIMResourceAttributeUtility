@@ -1,0 +1,7 @@
+recon_field_name	form_field_column_name	is_key_field	is_case_insensitive
+email	UD_FLAT_FIL_EMAIL	0	0
+AccountId	UD_FLAT_FIL_ACCOUNTID	1	0
+FirstName	UD_FLAT_FIL_FIRSTNAME	0	0
+lastName	UD_FLAT_FIL_LASTNAME	0	0
+ReturnValue	UD_FLAT_FIL_RETURN	0	0
+IT Resource Name	UD_FLAT_FIL_SERVER	0	0

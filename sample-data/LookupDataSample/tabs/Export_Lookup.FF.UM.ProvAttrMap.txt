@@ -1,0 +1,6 @@
+AccountID	AccountId
+FirstName	FirstName
+UD_FLAT_CH~Roles	Role
+ReturnValue	__UID__
+Email	email
+LastName	lastName

@@ -1,0 +1,6 @@
+field_label;variant_type;field_type;length;order;default_value;application_profile;encrypted
+MiddleInitial;String;TextField;30;7;;;0
+Nickname;String;TextField;45;8;;;0
+Color;String;TextField;45;9;;;0
+Address;String;TextField;45;10;;;0
+Gender;String;TextField;45;11;;;0

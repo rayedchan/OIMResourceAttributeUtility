@@ -1,0 +1,6 @@
+ReconFieldName,FieldType,isRequired
+Nickame,String,0
+Address,String,0
+MiddleInitial,String,0
+Gender,String,0
+Color,String,0

@@ -1,0 +1,6 @@
+attrFieldName;itResourceFieldName;objectType
+Gender;UD_FLAT_FIL_SERVER;User
+Address;UD_FLAT_FIL_SERVER;User
+MiddleInitial;UD_FLAT_FIL_SERVER;User
+Color;UD_FLAT_FIL_SERVER;User
+Nickname;UD_FLAT_FIL_SERVER;User

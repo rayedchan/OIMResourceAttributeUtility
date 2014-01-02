@@ -1,0 +1,8 @@
+ReconFieldName,FieldType,isRequired
+AccountId,String,1
+FirstName,String,0
+IT Resource Name,IT Resource,0
+ReturnValue,String,0
+Status,String,0
+email,String,0
+lastName,String,0
