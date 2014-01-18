@@ -33,6 +33,7 @@ import project.rayedchan.custom.objects.FormFieldColumnNameComparator;
 import project.rayedchan.custom.objects.ReconFieldAndFormFieldMap;
 import project.rayedchan.custom.objects.ReconFieldComparator;
 import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.MissingHeaderException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.NoResourceObjForProcessDefException;
 import project.rayedchan.exception.ProcessDefintionNotFoundException;
@@ -374,7 +375,7 @@ public class MappingReconFieldToFormFieldUtility
      * @param   delimiter       Used to separate values in file
      * @return  true for success; false otherwise 
      */
-    public static Boolean addReconFieldAndFormFieldMapDSFF(tcDataProvider dbProvider, tcFormDefinitionOperationsIntf formDefOps, String fileName, String processDefName, String delimiter) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ResourceObjectNotFoundException, ProcessFormNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException
+    public static Boolean addReconFieldAndFormFieldMapDSFF(tcDataProvider dbProvider, tcFormDefinitionOperationsIntf formDefOps, String fileName, String processDefName, String delimiter) throws tcAPIException, tcFormNotFoundException, tcColumnNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, ResourceObjectNotFoundException, ProcessFormNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException, MissingHeaderException
     {        
         HashMap<String,String> mappings = new HashMap<String,String>(); //store all the mappings of a recon field and a form field in staging
         FileInputStream fstream = null;
@@ -404,6 +405,13 @@ public class MappingReconFieldToFormFieldUtility
             //First line determines the ordering of the mappings attributes in the file
             ArrayList<String> mappingAttributeNameArray = new ArrayList<String>(); //store the name of each mapping attribute name 
             String mappingAttributeNames = br.readLine();
+            
+            if(mappingAttributeNames == null)
+            {
+                throw new MissingHeaderException(String.format("Here are all the possible mapping attribute names for file header: %s, %s, %s, %s",
+                     RECONFIELDNAME, FORMFIELDCOLUMNNAME, ISKEYFIELD, IS_CASE_INSENSITIVE));
+            }
+            
             StringTokenizer mappingAttributeNameTokens = new StringTokenizer(mappingAttributeNames, delimiter);
             lineNumber++;
             

@@ -1740,6 +1740,9 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     MappingReconFieldToFormFieldUtility.addReconFieldAndFormFieldMapDSFF(dbConnection.getDbProvider(), formDefOps, fileName, procDefName, fileDelimiter);
                     errorDialogMessage(processReconFieldMappingDialog, "Add successful.");
                     processReconFieldMappingDialog.dispose();
+                } catch (MissingHeaderException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processReconFieldMappingDialog, ex.getMessage());
                 } catch (tcAPIException ex) {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(processReconFieldMappingDialog, "Add failed.");
@@ -1849,6 +1852,12 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(processReconFieldMappingDialog, "Unsupported encoding. Contact developer.");
                 }
+            }
+            
+            else
+            {
+                errorDialogMessage(processReconFieldMappingDialog, "An operation must be selected.");
+                return;
             }
         }
 
