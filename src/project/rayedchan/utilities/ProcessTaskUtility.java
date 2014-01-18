@@ -730,6 +730,13 @@ public class ProcessTaskUtility
             
             System.out.println("Process Tasks to be added: " + newProcessTasks);
             
+            //Do nothing if there are no process task to add
+            if(newProcessTasks.isEmpty())
+            {
+                System.out.println("No process tasks to add.");
+                return true;
+            }
+            
             //Export the process xml of the given process definition
             String processObjectXML = ProcessTaskUtility.exportProcessObject(exportOps, procDefName);
             Document document =  HelperUtility.parseStringXMLIntoDocument(processObjectXML); //convert xml to a Document
