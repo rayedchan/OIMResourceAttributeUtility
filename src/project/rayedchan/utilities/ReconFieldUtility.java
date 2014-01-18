@@ -309,6 +309,14 @@ public class ReconFieldUtility
             }
             
             System.out.println(newReconFieldArray);
+            
+            //Do not perform export and import resource metadata if no recon fields are to be added
+            if(newReconFieldArray.isEmpty())
+            {
+                System.out.println("No reconciliation fields to add.");
+                return true;
+            }
+            
             String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName); //Export the resource metadata as a String
             Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML); //convert xml to a Document
             
@@ -448,6 +456,14 @@ public class ReconFieldUtility
             }
 
             System.out.println(reconFieldToRemove);
+                    
+            //Do not perform export and import resource metadata if no recon fields are to be deleted
+            if(reconFieldToRemove.isEmpty())
+            {
+                System.out.println("No reconciliation fields to delete.");
+                return true;
+            }
+            
             String resourceObjectXML = ReconFieldUtility.exportResourceObject(exportOps, resourceObjectName); //Export the resource metadata as a String
             Document document = HelperUtility.parseStringXMLIntoDocument(resourceObjectXML); //convert xml to a Document
             
