@@ -44,6 +44,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import project.rayedchan.custom.objects.ReconciliationField;
 import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.MissingHeaderException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.ResourceObjectNameNotFoundException;
 
@@ -116,7 +117,7 @@ public class ReconFieldUtility
      * @param   resourceObjectName  Resource Object to add fields to
      * @param   delimiter           Use to separate values in file
      */
-    public static Boolean addReconFieldsDSFF(tcDataProvider dbProvider, tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String resourceObjectName, String delimiter) throws tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException, tcAPIException, ParserConfigurationException, SAXException, TransformerConfigurationException, TransformerException, SQLException, NamingException, DDMException, TransformationException, tcBulkException, XPathExpressionException
+    public static Boolean addReconFieldsDSFF(tcDataProvider dbProvider, tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String resourceObjectName, String delimiter) throws tcDataSetException, tcDataAccessException, ResourceObjectNameNotFoundException, MissingRequiredFieldException, BadFileFormatException, FileNotFoundException, IOException, tcAPIException, ParserConfigurationException, SAXException, TransformerConfigurationException, TransformerException, SQLException, NamingException, DDMException, TransformationException, tcBulkException, XPathExpressionException, MissingHeaderException
     {            
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -146,6 +147,13 @@ public class ReconFieldUtility
             //First line contains the attributes of a reconciliation field
             //Each record in flat file must have values for these attributes
             String rf_AttributeNames = br.readLine();
+            
+            if(rf_AttributeNames == null)
+            {
+                throw new MissingHeaderException(String.format("Here are all the possible attribute names for file header: %s, %s, %s\n",
+                     RECON_FIELD_ATTR_NAME, RECON_FIELD_ATTR_TYPE ,RECON_FIELD_ATTR_ISREQUIRED));
+            }
+            
             StringTokenizer attributeNameToken = new StringTokenizer(rf_AttributeNames, delimiter); 
             lineNumber++;
             

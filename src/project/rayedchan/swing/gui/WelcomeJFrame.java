@@ -1498,6 +1498,9 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     ReconFieldUtility.addReconFieldsDSFF(dbConnection.getDbProvider(), exportOps,  importOps, fileName, resourceObjectName, fileDelimiter);
                     errorDialogMessage(reconFieldDialog, "Add successful.");
                     reconFieldDialog.dispose();
+                } catch (MissingHeaderException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(reconFieldDialog, ex.getMessage());
                 } catch (tcDataSetException ex) {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(reconFieldDialog, "Add failed.");
@@ -1640,6 +1643,12 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(reconFieldDialog, "Export failed.");
                 }
+            }
+            
+            else
+            {
+                errorDialogMessage(reconFieldDialog, "An operation must be selected.");  
+                return; 
             }
         }
         
