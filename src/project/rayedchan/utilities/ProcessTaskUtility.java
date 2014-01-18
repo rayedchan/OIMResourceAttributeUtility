@@ -48,6 +48,7 @@ import project.rayedchan.exception.BadFileFormatException;
 import project.rayedchan.exception.EventHandlerNotFoundException;
 import project.rayedchan.exception.IncorrectAdapterException;
 import project.rayedchan.exception.IncorrectAdapterVariableNameException;
+import project.rayedchan.exception.MissingHeaderException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.NoResourceObjForProcessDefException;
 import project.rayedchan.exception.ProcessDefintionNotFoundException;
@@ -581,7 +582,7 @@ public class ProcessTaskUtility
      * @param   adapterName         Adapter to be attached to process task
      * @param   delimiter           Use to separate values in file
      */
-    public static Boolean createUpdateProcessTaskDSFF(tcDataProvider dbProvider, tcWorkflowDefinitionOperationsIntf wfDefOps,tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String procDefName, String adapterName, String delimiter) throws FileNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, AdapterNameNotFoundException, tcAPIException, tcColumnNotFoundException, IOException, IncorrectAdapterVariableNameException, EventHandlerNotFoundException, ParserConfigurationException, SAXException, IncorrectAdapterException, XPathExpressionException, TransformerConfigurationException, TransformerException, SQLException, NamingException, DDMException, TransformationException, tcBulkException
+    public static Boolean createUpdateProcessTaskDSFF(tcDataProvider dbProvider, tcWorkflowDefinitionOperationsIntf wfDefOps,tcExportOperationsIntf exportOps, tcImportOperationsIntf importOps, String fileName, String procDefName, String adapterName, String delimiter) throws FileNotFoundException, tcDataSetException, tcDataAccessException, ProcessDefintionNotFoundException, NoResourceObjForProcessDefException, AdapterNameNotFoundException, tcAPIException, tcColumnNotFoundException, IOException, IncorrectAdapterVariableNameException, EventHandlerNotFoundException, ParserConfigurationException, SAXException, IncorrectAdapterException, XPathExpressionException, TransformerConfigurationException, TransformerException, SQLException, NamingException, DDMException, TransformationException, tcBulkException, MissingHeaderException
     {            
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -651,6 +652,12 @@ public class ProcessTaskUtility
             
             //Read first line: row header containing the adapter variable names
             String fileAdapterNames = br.readLine();
+            
+            if(fileAdapterNames == null)
+            {
+                throw new MissingHeaderException(String.format("Here are the valid adapter variable names (key in map) for file header: %s ", adapterVars));
+            }
+            
             StringTokenizer adapterVarNameToken = new StringTokenizer(fileAdapterNames, delimiter);
             lineNumber++;
             String[] requiredAdapterVar = new String[3];

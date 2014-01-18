@@ -1952,6 +1952,9 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     ProcessTaskUtility.createUpdateProcessTaskDSFF(dbConnection.getDbProvider(), wfDefOps, exportOps, importOps, fileName, procDefName, adapterName, fileDelimiter);
                     errorDialogMessage(processTaskDialog, "Add successful.");
                     processTaskDialog.dispose();
+                } catch (MissingHeaderException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processTaskDialog, ex.getMessage());
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(processTaskDialog, "File not found.");
@@ -2019,6 +2022,12 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(processTaskDialog, "Add failed.");
                 }
+            }
+            
+            else
+            {                  
+                errorDialogMessage(processTaskDialog, "An operation must be selected.");
+                return;
             }
         }
 
