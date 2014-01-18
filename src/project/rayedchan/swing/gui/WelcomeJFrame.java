@@ -42,6 +42,7 @@ import project.rayedchan.exception.EventHandlerNotFoundException;
 import project.rayedchan.exception.IncorrectAdapterException;
 import project.rayedchan.exception.IncorrectAdapterVariableNameException;
 import project.rayedchan.exception.LookupNameNotFoundException;
+import project.rayedchan.exception.MissingHeaderException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.NoResourceObjForProcessDefException;
 import project.rayedchan.exception.ProcessDefintionNotFoundException;
@@ -1328,6 +1329,9 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     ProcessFormFieldUtility.addFieldsToProcessFormDSFF(formDefOps, fileName, processFormName, fileDelimiter);
                     errorDialogMessage(processFormFieldDialog, "Add successful.");
                     processFormFieldDialog.dispose();
+                } catch (MissingHeaderException ex) {
+                    Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    errorDialogMessage(processFormFieldDialog, ex.getMessage());
                 } catch (tcAPIException ex) {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(processFormFieldDialog, "Add failed.");

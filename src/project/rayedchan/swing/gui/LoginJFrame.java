@@ -213,7 +213,7 @@ public class LoginJFrame extends javax.swing.JFrame {
         catch(com.thortech.xl.dataaccess.tcDataSetException ex)
         {
             Logger.getLogger(LoginJFrame.class.getName()).log(Level.SEVERE, null, ex);
-            errorDialogMessage("Invalid username or password");
+            errorDialogMessage("Invalid username or password. Or user must have 'Design Console Access' privilege enabled.");
         }
 
         catch(Exception ex)

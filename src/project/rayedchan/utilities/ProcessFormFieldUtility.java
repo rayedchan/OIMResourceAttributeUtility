@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import project.rayedchan.custom.objects.ProcessFormField;
 import project.rayedchan.exception.BadFileFormatException;
+import project.rayedchan.exception.MissingHeaderException;
 import project.rayedchan.exception.MissingRequiredFieldException;
 import project.rayedchan.exception.ProcessFormNotFoundException;
 import project.rayedchan.exception.ProcessFormVersionLockedException;
@@ -114,7 +115,7 @@ public class ProcessFormFieldUtility
      * @param   delimiter           Use to separate values in file
      * @return  boolean value to indicate success or failure
      */
-    public static boolean addFieldsToProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName, String processFormName, String delimiter) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, FileNotFoundException, IOException, ProcessFormNotFoundException, ProcessFormVersionLockedException, BadFileFormatException, MissingRequiredFieldException
+    public static boolean addFieldsToProcessFormDSFF(tcFormDefinitionOperationsIntf formDefOps, String fileName, String processFormName, String delimiter) throws tcAPIException, tcColumnNotFoundException, tcFormNotFoundException, FileNotFoundException, IOException, ProcessFormNotFoundException, ProcessFormVersionLockedException, BadFileFormatException, MissingRequiredFieldException, MissingHeaderException
     {    
         FileInputStream fstream = null;
         DataInputStream in = null;
@@ -154,6 +155,13 @@ public class ProcessFormFieldUtility
             //First line contains the attributes of a process form field
             //Each process form field record in file must have a value for these attributes 
             String fieldAttributes = br.readLine();
+            
+            if(fieldAttributes == null)
+            {
+                throw new MissingHeaderException(String.format("Here are all the possible attribute names for file header: %s, %s, %s, %s, %s, %s, %s", 
+                            FIELDLABEL, VARIANTTYPE, FIELDTYPE, LENGTH, ORDER, DEFAULTVALUE, APP_PROFILE, ENCRYPTED));
+            }
+            
             StringTokenizer attributeNameToken = new StringTokenizer(fieldAttributes, delimiter); 
             lineNumber++;
             
