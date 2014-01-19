@@ -21,5 +21,6 @@ public class Constants
     public static String AUTHWL_CONFIG_PATH = "resources/oimConfig/authwl.conf"; //can be found in "<IDM_HOME>/designconsole/config" directory
     public static String WL_CXTFACTORY = "weblogic.jndi.WLInitialContextFactory";
     public static String PROPERTY_AUTHWL_CONFIG ="java.security.auth.login.config";
+    public static String APPSERVER_TYPE = "wls";
     
 }

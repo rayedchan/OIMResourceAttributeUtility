@@ -2002,7 +2002,7 @@ public class WelcomeJFrame extends javax.swing.JFrame {
                     errorDialogMessage(processTaskDialog, "Error reading file.");
                 } catch (IncorrectAdapterVariableNameException ex) {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    errorDialogMessage(processTaskDialog, "Incorrect adapter variable header in file.");
+                    errorDialogMessage(processTaskDialog, "Incorrect adapter variable header in file." + ex.getMessage());
                 } catch (EventHandlerNotFoundException ex) {
                     Logger.getLogger(WelcomeJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     errorDialogMessage(processTaskDialog, "Add failed.");

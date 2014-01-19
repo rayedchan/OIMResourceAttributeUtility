@@ -4,6 +4,11 @@ The utility allows user to setup lookups, process form fields, process tasks (On
 reconciliation fields, and reconcilaition mappings.
 
 
+OIM Server URL      =   t3://localhost:14000
+Path authwl.conf    =   /home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/config/authwl.conf
+OIM User ID         =   xelsysadm
+
+
   The MIT License (MIT)
 
 Copyright (c) 2014 Ray Chan

@@ -25,6 +25,7 @@ public class OIMClientResourceAttr
     { 
         String ctxFactory = Constants.WL_CXTFACTORY; //WebLogic Context
         System.setProperty(Constants.PROPERTY_AUTHWL_CONFIG, authwlPath); //set the login configuration
+        System.setProperty("APPSERVER_TYPE", Constants.APPSERVER_TYPE);  
         Hashtable<String,String> env = new Hashtable<String,String>(); //use to store OIM environment properties
         env.put(OIMClient.JAVA_NAMING_FACTORY_INITIAL, ctxFactory);
         env.put(OIMClient.JAVA_NAMING_PROVIDER_URL, oimServerURL);
