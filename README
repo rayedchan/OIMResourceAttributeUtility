@@ -1,31 +1,187 @@
 Version: Oracle Idenity Manager 11g R2
-A utility for Oracle Idenity Manager to speed up development for setting up a ICF connector. 
-The utility allows user to setup lookups, process form fields, process tasks (Only for Update), 
-reconciliation fields, and reconcilaition mappings.
+A graphical user interface utility for Oracle Identity Manager
+to speed up configurations for an Identity Connector Framework (ICF) connector.
+The utility allows user to setup lookups, process form fields, process tasks (Only for Update),
+reconciliation fields, and reconciliation mappings. Data is read from flat file and pushed to OIM.
+
+Features Not Supported Yet
+  - There is no logging framework in use. Currently, the logs are printed to standard out.  
+  - Child Tables or MultiValued attributes not allowed
+  - Trusted reconciliation mappings on Process Definition.
+
+Need to Fix
+  - Add checks not to remove required fields. 
+  - Adding to an empty process form causes errors (Utility requires at least one form field).
+
+==========================
+ Running the Application
+==========================
+To run the application, go to the dist folder and type the following command:
+java -jar OIMResourceAttributeUtility.jar
+
+If you are using SSL for running the application, you must ensure the following steps are meet:
+
+1. Ensure SSL listen Port for OIM is enabled.
+Log into WebLogic Administration console.
+Navigate to Servers -> OIM_SERVER.
+Check mark SSL Listen Port Enabled and restart OIM server.
+ 
+2. The following jvm argument must be specified when executing this application:
+-Dweblogic.security.SSL.trustedCAKeyStore={Demo Trust Keystore}
+ 
+In WebLogic Administration console, navigate to Servers -> OIM_SERVER -> 
+Keystores to see the location of your Demo Trust Keystore. 
+
+3. Application execution example
+java -jar -Dweblogic.security.SSL.trustedCAKeyStore=/home/oracle/Oracle/Middleware/wlserver_10.3/server/lib/DemoTrust.jks OIMResourceAttributeUtility.jar
 
 
-OIM Server URL      =   t3://localhost:14000
-Path authwl.conf    =   /home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/config/authwl.conf
-OIM User ID         =   xelsysadm
+==================
+ Login Screen
+==================
+Below is a description of each parameter on the Login screen.
+
+Parameter Name              Description                                     Sample Value
+OIM Server URL              OIM Provider URL                                
+                            Non-SSL: t3://OIMHOST:OIMPORT                   t3://localhost:14000
+                            SSL: t3s://OIMHOST:OIMSSLPORT                   t3s://localhost:14001
 
 
-  The MIT License (MIT)
+Path authwl.conf            Absolute path to the authwl.conf file           /home/oracle/Oracle/Middleware/Oracle_IDM1/designconsole/config/authwl.conf
+                            This file can be found in
+                            $MW_HOME/Oracle_IDM1/designconsole/config
 
-Copyright (c) 2014 Ray Chan
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+OIM User ID                 OIM System Administrator                        xelsysadm
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Password                    Password of OIM User ID
+
+
+==================
+ Utility Options
+==================
+Before running any of the utilities in this application, backup the following
+artifacts using Deployment Manager:
+
+- Process Forms
+- Lookups
+- Process Definition
+- Resource
+
+Use this application in conjunction with design console. The export data features 
+implemented in this application is by no means a way of backing up data. Sample file
+data, which can be found in sample-data directory of this project, is given for each utility.
+
+
+
+**Lookup Utility**
+This utility can add or remove entries from any existing lookup. Each record in file must be separated by a newline. 
+
+Parameter       Description                     Sample Value
+Lookup Name     The code name of a lookup       Lookup.FF.UM.ProvAttrMap
+File Name       File to output to or read from
+
+For adding new entries, the file format header is assumed to be "{CODEKEY}{DELIMITER}{DECODE}" (E.g ReturnValue;__UID__).
+For removing entries, only specify the code key name. No delimiter needed.
+
+
+
+**Process Form Field Utility**
+This utility can add or remove form fields from the process form. The latest process form version
+that is not active yet is modified. Each record in file must be separated by a newline.
+Since this utility uses the API, the UD attribute column name is determined by the field label. 
+Only through design console, you are able to name the column whatever you like when adding.
+You must manually remove the "required" property on a process form field in order to delete the field.
+
+Parameter       Description                     Sample Value
+Table Name      Process form table name         UD_FLAT_FIL
+File Name       File to output to or read from
+
+For adding process form fields, the first line must be the attribute header.
+Header example: field_label;variant_type;field_type;length;order;default_value;application_profile;encrypted
+
+Header Name                 Description  
+field_label                 Field Label on process form. Column name is named based on this attribute. Space are converted to underscore.
+variant_type                Byte, Double, Integer, String, Short, Long, Date, Boolean, Byte Array
+field_type                  TextField, RadioButton, DateFieldDlg, DOField, PasswordField, CheckBox, ComboBox, TextArea, ITResourceLookupField, LookupField
+length                      Size of attribute
+order                       Ordering of attribute on process form
+default_value               Default value of process form field
+application_profile         0 for false; 1 for true
+encrypted                   0 for false; 1 for true
+
+Record example: Email;String;TextField;45;4;;0;0
+
+For removing process form fields, only specify the field label name.
+
+
+
+**Process Tasks**
+This utility only creates Updated process tasks that uses ICProvisioningManager.updateAttributeValue(String, String)
+for a Java task. It sets up the adapter, adapter variable mapping, response code, and
+process task properties. Directly modifies the metadata.
+
+Parameter                       Description                     Sample Value
+Process Definition Name         Name of process definition      Flat File
+Adapter Name                    Name of process adapter         adpFFUpdateUser
+File Name                       File read from
+
+For adding Updated process tasks, the following header must be defined with exact ordering:
+attrFieldName;itResourceFieldName;objectType
+
+Header Name             Description
+attrFieldName           Field label name of process form field
+itResourceFieldName     Column name of the Server process form field (ITResourceLookupField)
+objectType              Literal Value = User
+
+Example: Address;UD_FLAT_FIL_SERVER;User
+
+
+**Reconciliation Fields**
+This utility creates or removes reconciliation fields in a given resource object.
+Directly modifies the metadata. MultiValued fields are not supported by this utility.
+If a recon field is marked required, you must uncheck that property in order to remove it using this utility.
+
+Parameter                       Description                     Sample Value
+Resource Object Name            Name of resource object         FLATFILERESOURCE
+File Name                       File read from
+
+For adding reconciliation fields, the first line must be the attribute header.
+Example: ReconFieldName;FieldType;isRequired
+
+Header Name             Description
+ReconFieldName          Name of the reconciliation field
+FieldType               Field type of reconciliation field. String, Number, IT Resource, Date
+isRequired              Determine if reconciliation field is required
+
+For removing reconciliation fields, only specified the name of the recon field each line.
+
+
+
+**Reconciliation Mapping Utility**
+This utility maps/unmaps a process form field to/from a reconciliation field. The reconciliation mappings
+are defined in Process Definition of a connector. MultiValued and special OIM fields mappings (E.g. OIM_OBJECT_STATUS) are not supported.
+Trusted reconciliation mappings (Mapping of reconciliation field to OIM User Profile attributes) on Process Definition are not supported.
+Each record in file must be separated by a newline. Make sure your latest process form version has been activated.
+
+Parameter                       Description                     Sample Value
+Process Definition Name         Name of process definition      Flat File
+File Name                       File read from
+
+For adding new recon mappings, the file format header must be defined on the first line.
+Header example: recon_field_name;form_field_column_name;is_key_field;is_case_insensitive
+The following is a description of each required header attribute:
+
+Header Name                 Description  
+recon_field                 Name of the reconciliation field on resource object     
+form_field_column_name      The UD attribute column name on the process form.
+is_key_field                Determines if mapping will be part of the process matching during reconciliation
+                            0 for false; 1 for true
+is_case_insensitive         Determines if mapping will be case insensitive
+                            0 for false; 1 for true
+
+Each record in file must have a value for all header attributes.
+Record example: AccountId;UD_FLAT_FIL_ACCOUNTID;1;0
+
+For removing recon mappings, only the reconciliation field name needs to specified in the file.
