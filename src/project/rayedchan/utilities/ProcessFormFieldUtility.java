@@ -867,7 +867,7 @@ public class ProcessFormFieldUtility
     }
     
     /*
-     * Get all the data of a process form.
+     * Get all the data of a process form in the latest version.
      * @param   formDefOps          tcFormDefinitionOperationsIntf service object
      * @param   processFormName     table name of the process form
      * @return  tcResultSet pointing to the process form record
