@@ -1,4 +1,5 @@
 Version: Oracle Identity Manager 11g R1
+Jar file is complied using Java 6. 
 A graphical user interface utility for Oracle Identity Manager
 to speed up configurations for an Identity Connector Framework (ICF) connector.
 The utility allows user to setup lookups, process form fields, process tasks (Only for Update),
