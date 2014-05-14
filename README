@@ -13,6 +13,7 @@ Features Not Supported Yet
 Need to Fix
   - Add checks not to remove required fields. 
   - Adding to an empty process form causes errors (Utility requires at least one form field).
+  - Process form fields of type integers failed to be created (Code has length validation which are not applied to integer, dob, and long fields)
 
 ==========================
  Running the Application
