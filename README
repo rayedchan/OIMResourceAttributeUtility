@@ -13,8 +13,9 @@ Features Not Supported Yet
 Need to Fix
   - Add checks not to remove required fields. 
   - Adding to an empty process form causes errors (Utility requires at least one form field).
-  - Process form fields of type integers failed to be created (Code has length validation which are not applied to integer, dob, and long fields)
-
+  - Process form fields of type integers failed to be created (Code has length validation which are not applied to integer, dob, and long fields).
+  - Updated process tasks failed to be mapped when no updated process task is made for process definition.
+  - (Process Form Field Utility may corrupt the process form => unable to active/create new form version and process form may disappear from designconsole interface)
 ==========================
  Running the Application
 ==========================
